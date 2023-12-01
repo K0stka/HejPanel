@@ -2,9 +2,9 @@ RewriteEngine On
 
 FileETag MTime Size
 
-RewriteCond %{REQUEST_URI} \/PAGE_NAME\/
-RewriteCond %{HTTPS} off
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+#RewriteCond %{REQUEST_URI} \/HejPanel\/
+#RewriteCond %{HTTPS} off
+#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
 RewriteRule ^php/pages/404.php php/pages/404.php [END,L]
 
@@ -28,11 +28,11 @@ RewriteRule ^(\w+)/(.*)/?$ index.php?page=$1&subpage=$2 [END,L]
 RewriteCond %{REQUEST_URI} !(assets|tasks)
 RewriteRule ^(.*)/?$ index.php?page=$1 [END,L]
 
-<If "%{REQUEST_URI} =~ /PAGE_NAME/">
-ErrorDocument 404 /PAGE_NAME/php/pages/404.php
+<If "%{REQUEST_URI} =~ /HejPanel/">
+ErrorDocument 404 /HejPanel/php/pages/404.php
 </If>
 <Else>
-ErrorDocument 404 /PAGE_NAME/php/pages/404.php
+ErrorDocument 404 /HejPanel/php/pages/404.php
 </Else>
 
 <IfModule mod_expires.c>  

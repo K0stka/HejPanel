@@ -1,7 +1,8 @@
 .mainWrapper {
 	width: 100vw;
-	overflow: hidden;
-	height: calc(100vh - 10rem);
+	overflow-x: hidden;
+	overflow-y: auto;
+	height: calc(100vh - 8rem);
 }
 
 .toRight,

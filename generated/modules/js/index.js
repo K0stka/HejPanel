@@ -55,6 +55,16 @@ const onReady = () => {
 		e.setAttribute("autocomplete", "off");
 	});
 
+	document.querySelectorAll("input").forEach((e) => {
+		e.addEventListener("change", (event) => {
+			if (e.value != "") {
+				e.setAttribute("not-empty", "");
+			} else {
+				e.removeAttribute("not-empty");
+			}
+		});
+	});
+
 	try {
 		document.querySelector("#back").addEventListener("click", (e) => {
 			window.history.go(-1);
@@ -102,27 +112,28 @@ const onReady = () => {
 	});
 
 	document.querySelectorAll("form").forEach((e) => {
-		const inputs = e.querySelectorAll("input");
+		const inputs = e.querySelectorAll("input, textarea");
 
 		const lastInput = inputs[inputs.length - 1];
 
-		const submitBtn = e.querySelector("button");
+		const btns = e.querySelectorAll("button");
+		const submitBtn = btns[btns.length - 1];
 
 		inputs.forEach((input, index) => {
-			if (index == input.length - 1) return;
-			input.onkeydown = (event) => {
-				if (event.key === "Enter") focusLast(inputs[index + 1]);
-			};
+			if (index == inputs.length - 1) return;
+			input.addEventListener("keydown", (event) => {
+				if (event.key === "Enter" && (input.tagName == "INPUT" || event.ctrlKey)) focusLast(inputs[index + 1]);
+			});
 		});
 
-		lastInput.onkeydown = (event) => {
-			if (event.key === "Enter")
+		lastInput.addEventListener("keydown", (event) => {
+			if (event.key === "Enter" && (lastInput.tagName == "INPUT" || event.ctrlKey))
 				if (submitBtn) {
 					submitBtn.click();
 				} else {
 					e.submit();
 				}
-		};
+		});
 	});
 };
 

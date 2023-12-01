@@ -1,21 +1,4 @@
 <?php
-/*
-CREATE TABLE `sessions` (
-  `session_id` varchar(100) NOT NULL,
-  `expires` int NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `data` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE `sessions` ADD `fingerprint` VARCHAR(200) NULL AFTER `expires`;
-ALTER TABLE `sessions` ADD `subscription` TEXT DEFAULT NULL AFTER `user_id`;
-ALTER TABLE `sessions`
-  ADD PRIMARY KEY (`session_id`),
-  ADD KEY `user_id` (`user_id`);
-ALTER TABLE `sessions`
-  ADD CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-COMMIT;
-*/
-
 class MysqlSession implements SessionHandlerInterface {
     private Conn $con;
     private int $lifetime;

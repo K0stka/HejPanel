@@ -1,14 +1,7 @@
 <?php
-/* CONSTANTS TO SET:
-    PAGE_NAME
-    PAGE_DESCRIPTION
-    PAGE_DIR
-    DB_NAME
-*/
-
 // Product details
-define("NAME", "PAGE_NAME");
-define("DESCRIPTION", "PAGE_DESCRIPTION");
+define("NAME", "HejPanel");
+define("DESCRIPTION", "Panel pro rychou a efektivní distribuci informací mezi žáky Gymnázia Hejčín");
 
 define("DATE_FORMAT", "j. n. Y");
 define("TIME_FORMAT", "G:i:s");
@@ -24,11 +17,11 @@ if (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVE
 
     require_once("php/fx.php");
 
-    $con = new Conn("localhost", "root", "", "DB_NAME");
+    $con = new Conn("localhost", "root", "", "hejpanel");
 
     $v = "?v=1";
 
-    $prefix = (substr($_SERVER['SERVER_NAME'], -9) == "localhost" ? "http://localhost/" : "http://192.168.137.1/") . "PAGE_DIR";
+    $prefix = (substr($_SERVER['SERVER_NAME'], -9) == "localhost" ? "http://localhost/" : "http://192.168.137.1/") . "HejPanel";
 } else {
     define("DEV", false);
 
@@ -43,12 +36,33 @@ if (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVE
 
 // Valid subpages
 $validPagesDynamic = [
-    "logged-out" => [],
-    "logged-in" => [],
+    "logged-out" => [
+        "panel" => "",
+        "submit" => "",
+        "login" => ""
+    ],
+    "logged-in" => [
+        "review" => "",
+        "archive" => "",
+        "account" => ""
+    ],
+    "logged-in-superadmin" => [
+        "review" => "",
+        "archive" => "",
+        "users" => "",
+        "account" => ""
+    ]
 ];
 
 // Will be filled later
 $validPages = [];
 
 // Subpages names
-$page_names = array();
+$pageNames = array(
+    "submit" => "Přidat panel",
+    "login" => "Přihlášení",
+    "review" => "Nové panely",
+    "archive" => "Archiv panelů",
+    "account" => "Účet",
+    "users" => "Uživatelé"
+);

@@ -11,14 +11,18 @@ $user = User::getUser();
 // Required action logic
 $actionManager = new ActionManager($user);
 
-if (!$user) {
-    $validPages = $validPagesDynamic["logged-out"];
+if ($user) {
+    if ($user->type == UserType::admin) {
+        $validPages = $validPagesDynamic["logged-in"];
+    } else {
+        $validPages = $validPagesDynamic["logged-in-superadmin"];
+    }
 } else {
-    $validPages = $validPagesDynamic["logged-in"];
+    $validPages = $validPagesDynamic["logged-out"];
 }
 
 // Initiate page manager
-$pageManager = new PageManager($validPages, $page_names);
+$pageManager = new PageManager($validPages, $pageNames);
 
 // Initiate module managers
 $cssManager = new ModuleManager(ModuleType::CSS, false);
@@ -76,31 +80,41 @@ if ($user && !($_SESSION["subscription"] ?? null)) {
     $jsManager->passToJS(["PUBLIC_KEY" => $user->notificationManager::PUBLIC_KEY]);
     $jsManager->require("notifications");
 }
+if ($pageManager->page == "panel") {
+    include($pageManager->pagePath);
+} else {
     ?>
-    <header>
-        <?= NAME ?>
-    </header>
-    <div class="mainWrapper">
-        <main>
-            <?php
-            include($pageManager->pagePath);
-            ?>
-        </main>
-    </div>
-    <footer>
-    </footer>
+        <header>
+            <?= NAME ?>
+        </header>
+        <div class="mainWrapper">
+            <main>
+                <?php
+                include($pageManager->pagePath);
+                ?>
+            </main>
+        </div>
+        <footer>
+            <span>
+                Upozornění: Z důvodu zabránění spamu logujeme Vaší IP adresu.
+            </span>
+            <span>
+                V případě problémů/dotazů prosím kontaktujte&nbsp;<a href="mailto:kostkaj@gytool.cz">kostkaj@gytool.cz</a>
+            </span>
+        </footer>
     <?php
-    if ($pageManager->isNormalRequest) {
-        // Fetch dynamic modules (Initial load)
-        $cssManager->fetch();
-        $jsManager->fetch();
+}
+if ($pageManager->isNormalRequest) {
+    // Fetch dynamic modules (Initial load)
+    $cssManager->fetch();
+    $jsManager->fetch();
     ?>
     </body>
 
     </html>
 <?php
-    } else {
-        // Fetch dynamic modules - using js (Hydration load)
-        $cssManager->fetch(false);
-        $jsManager->fetch(false);
-    }
+} else {
+    // Fetch dynamic modules - using js (Hydration load)
+    $cssManager->fetch(false);
+    $jsManager->fetch(false);
+}

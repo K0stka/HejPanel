@@ -1,2 +1,215 @@
-@media only screen and (min-width: 760px) {
+@media (prefers-color-scheme: light) {
+	:root {
+		--text: #0c1d1c;
+		--background: #fffcf6;
+		--primary: #ffae00;
+		--secondary: #fff2de;
+		--accent: #d90d13;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--text: #0c1d1c;
+		--background: #fffcf6;
+		--primary: #ffae00;
+		--secondary: #fff2de;
+		--accent: #d90d13;
+	}
+}
+
+:root {
+	--t: 0.3s ease-in-out;
+	--f: "Nunito", sans-serif;
+	--large: 2.5rem;
+	--medium: 2rem;
+	--normalplus: 1.1rem;
+	--normal: 1rem;
+	--small: 0.3rem;
+	--bold: 900;
+	--semibold: 700;
+	--light: 500;
+}
+
+* {
+	font-family: var(--f);
+	user-select: none;
+}
+
+body {
+	color: var(--text);
+	background: var(--background);
+}
+
+header {
+	height: 5rem;
+	background: var(--secondary);
+	color: var(--primary);
+	font-size: var(--large);
+	font-weight: var(--bold);
+	display: flex;
+	align-items: center;
+	padding: 0 var(--medium);
+}
+
+footer {
+	height: 3rem;
+	background: var(--text);
+	color: var(--background);
+	font-size: var(--normal);
+	font-weight: var(--light);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 var(--medium);
+	flex-direction: column;
+	text-align: center;
+}
+
+footer a {
+	color: inherit !important;
+	user-select: all;
+}
+
+a {
+	text-decoration: underline;
+	transition: var(--t);
+}
+
+a:hover {
+	text-decoration-color: transparent;
+}
+
+main {
+	text-align: center;
+	padding: var(--large);
+}
+
+h1 {
+	font-size: var(--medium);
+	font-weight: var(--semibold);
+	padding-bottom: var(--large);
+}
+
+.two-columns > * {
+	flex-grow: 1;
+	flex-shrink: 0;
+}
+
+form, .two-columns > form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--medium);
+	align-items: center;
+	flex-grow: 0;
+}
+
+.input-label {
+	position: relative;
+}
+
+.input-label label {
+	position: absolute;
+	left: var(--normalplus);
+	top: 50%;
+	width: auto;
+	min-width: calc(100% - calc(var(--normalplus) * 2));
+	text-align: left;
+	background: var(--background);
+	transition: var(--t);
+	pointer-events: none;
+	transform: translate(0%, -50%);
+}
+
+.input-label:has(textarea) label,
+.input-label:has(input:active) label,
+.input-label:has(input:focus) label,
+.input-label:has(input[not-empty]) label {
+	transform: scale(0.8) translate(0%, -50%);
+	top: 0;
+	min-width: 0;
+	left: 0;
+}
+
+input,
+button,
+textarea {
+	border: 2px var(--primary) solid;
+	border-radius: 1rem;
+	padding: var(--small) var(--normal);
+	width: 20rem;
+	box-sizing: border-box;
+}
+
+textarea {
+	padding: var(--small);
+	resize: none;
+	height: 10rem;
+}
+
+button {
+	background: var(--primary);
+	color: var(--background);
+	font-size: var(--normal);
+	cursor: pointer;
+	transition: var(--t);
+	width: auto;
+}
+
+button:hover {
+	background: var(--background);
+	color: var(--primary);
+}
+
+button.active:hover {
+	background: var(--primary);
+	color: var(--background);
+}
+
+button.non-active {
+	background: var(--background);
+	color: var(--primary);
+}
+
+button.non-active:hover {
+	background: var(--primary);
+	color: var(--background);
+}
+
+.button-group {
+	display: flex;
+	justify-content: center;
+	gap: var(--small);
+	background: var(--secondary);
+	border-radius: 1em;
+}
+
+.button-group button {
+	border-radius: 0;
+}
+
+.button-group button:first-child {
+	border-top-left-radius: 1rem;
+	border-bottom-left-radius: 1rem;
+}
+
+.button-group button:last-child {
+	border-top-right-radius: 1rem;
+	border-bottom-right-radius: 1rem;
+}
+
+.two-columns {
+	display: flex;
+	align-items: center;
+	gap: var(--large);
+	justify-content: center;
+}
+
+.preview {
+	border: 15px solid var(--primary);
+	aspect-ratio: 16 / 9 !important;
+	box-sizing: border-box;
+	flex-grow: 1;
+	max-height: calc(calc(100vh - 8rem) * 0.5);
+	max-width: calc(calc(100vh - 8rem) * 0.5 * 16 / 9);
 }
