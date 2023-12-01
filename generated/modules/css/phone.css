@@ -1,0 +1,28 @@
+@media (prefers-color-scheme: light) {
+	:root {
+		--text: #0c1d1c;
+		--background: #fffcf6;
+		--primary: #ffae00;
+		--secondary: #fff2de;
+		--accent: #d90d13;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--text: #f3efe2;
+		--background: #050a0a;
+		--primary: #ffad00;
+		--secondary: #1e1f1f;
+		--accent: #f2262d;
+	}
+}
+
+:root {
+	--t: 0.3s ease-in-out;
+	--f: "Nunito", sans-serif;
+}
+
+* {
+	font-family: var(--f);
+}

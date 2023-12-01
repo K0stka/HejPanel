@@ -1,0 +1,101 @@
+/* ANIMATIONS */
+
+dialog {
+	transition: 0.5s;
+
+	background: var(--background);
+	color: var(--text);
+
+	border-radius: 1rem;
+	min-width: 60vw;
+	border: none;
+	padding: 0;
+}
+dialog[open] {
+	animation: dialog-in 0.5s cubic-bezier(0.5, -0.5, 0.1, 1.5) normal;
+}
+dialog.is-hidden {
+	animation: dialog-out 0.5s cubic-bezier(0.5, -0.5, 0.1, 1.5) normal;
+}
+dialog::backdrop {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgb(0 0 0 / 30%);
+	backdrop-filter: blur(1rem);
+	will-change: opacity;
+}
+dialog:not(.noAnim)[open]::backdrop {
+	animation: backdrop-in 0.5s ease forwards;
+}
+dialog.noAnim[open]::backdrop {
+	animation: backdrop-in 0s ease forwards;
+}
+dialog.is-hidden::backdrop {
+	animation: backdrop-out 0.5s ease forwards !important;
+}
+@keyframes dialog-in {
+	from {
+		opacity: 0;
+		transform: scale(0);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+@keyframes dialog-out {
+	to {
+		opacity: 0;
+		transform: scale(0);
+	}
+}
+@keyframes backdrop-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+@keyframes backdrop-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+/* DIALOG BOX STYLES */
+
+.dialog-close {
+	position: absolute;
+	top: 0.5rem;
+	right: 1rem;
+	font-weight: 900;
+	color: var(--secondary);
+	font-size: 2rem;
+	z-index: 1;
+}
+
+.dialog-header {
+	background: var(--primary);
+	padding: 1rem 2rem 1rem 1rem;
+	font-weight: 900;
+	color: var(--secondary);
+	font-size: 1.3rem;
+	border-radius: 1rem;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+.dialog-content {
+	padding: 2rem 1rem;
+	max-width: 100%;
+	word-break: break-word;
+	margin-top: 3.5rem;
+}

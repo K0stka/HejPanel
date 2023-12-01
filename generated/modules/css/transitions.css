@@ -1,0 +1,158 @@
+.mainWrapper {
+	width: 100vw;
+	overflow: hidden;
+	height: calc(100vh - 10rem);
+}
+
+.toRight,
+.toLeft,
+.fromRight,
+.fromLeft,
+.toOut,
+.fromOut,
+.toIn,
+.fromIn,
+.toFade,
+.fromFade {
+	position: relative;
+	animation-fill-mode: forwards !important;
+	animation-duration: 0.15s !important;
+}
+
+.toRight {
+	animation: toRight;
+}
+
+@keyframes toRight {
+	0% {
+		left: 0;
+	}
+	100% {
+		left: 100vw;
+	}
+}
+
+.toLeft {
+	animation: toLeft;
+}
+
+@keyframes toLeft {
+	0% {
+		left: 0;
+	}
+	100% {
+		left: -100vw;
+	}
+}
+
+.fromLeft {
+	animation: fromLeft;
+}
+
+@keyframes fromLeft {
+	0% {
+		left: -100vw;
+	}
+	100% {
+		left: 0;
+	}
+}
+
+.fromRight {
+	animation: fromRight;
+}
+
+@keyframes fromRight {
+	0% {
+		left: 100vw;
+	}
+	100% {
+		left: 0;
+	}
+}
+
+.toOut {
+	animation: toOut;
+}
+
+@keyframes toOut {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(0.8);
+		opacity: 0;
+	}
+}
+
+.fromOut {
+	animation: fromOut;
+}
+
+@keyframes fromOut {
+	0% {
+		transform: scale(1.2);
+		opacity: 0;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+.toIn {
+	animation: toIn;
+}
+
+@keyframes toIn {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(1.2);
+		opacity: 0;
+	}
+}
+
+.fromIn {
+	animation: fromIn;
+}
+
+@keyframes fromIn {
+	0% {
+		transform: scale(0.8);
+		opacity: 0;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+.toFade {
+	animation: toFade;
+}
+
+@keyframes toFade {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+.fromFade {
+	animation: fromFade;
+}
+
+@keyframes fromFade {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}

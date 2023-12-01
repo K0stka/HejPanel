@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /api
+Disallow: /*/*
+Sitemap: https://krychlic.com/sitemap.xml

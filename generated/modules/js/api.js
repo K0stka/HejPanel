@@ -1,0 +1,329 @@
+class ApiCallback {
+	callback;
+
+	constructor(callback) {
+		this.callback = callback;
+	}
+
+	call(result, data, address) {
+		if (!result || !data || !address) {
+			console.trace("MISSING PARAMETERS ON API CALLBACK CALL");
+			console.log("Result: ", result, "\nData: ", data, "\nAddress:<br>", address);
+		}
+		this.callback(result, data, address);
+	}
+}
+
+class ApiTask {
+	method;
+	parameters;
+
+	constructor(api, method, ...parameters) {
+		this.api = api;
+
+		this.method = method;
+
+		this.parameters = parameters;
+	}
+
+	call() {
+		this.api[this.method](...this.parameters);
+	}
+}
+
+class ApiConnector {
+	apiName;
+	apiManager;
+	constructor(apiName, apiManager) {
+		this.apiName = apiName;
+		this.apiManager = apiManager;
+		// this.address = base_url.replace("://", "://api.") + "/" + apiName + "/"; CORS error :I
+		// this.address = base_url + "/php/api/" + apiName + ".php"; UGLY URL :l
+		this.address = base_url + "/api/" + apiName + "/";
+	}
+
+	async get(data, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
+		return await this.fetch("get", data, callback, userErrorCallback);
+	}
+
+	async post(data, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
+		return await this.fetch("post", data, callback, userErrorCallback);
+	}
+
+	async fetch(method, data, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
+		const API_MANAGER = this.apiManager;
+		const address = this.address;
+
+		if (API_MANAGER.apiBusy) {
+			API_MANAGER.errorHandlers.notice.call("Tried to send a request but the API is already busy", data, this.address);
+			return;
+		}
+
+		API_MANAGER.busy();
+
+		return new Promise((resolve) => {
+			$.ajax({
+				type: method,
+				url: address,
+				data: data,
+				cache: "no-cache",
+				success: function (result) {
+					if (result.result) {
+						API_MANAGER.free();
+						callback.call(result, data, address);
+					} else {
+						API_MANAGER.free(true);
+						API_MANAGER.errorHandlers.php_error.call(result, data, address);
+					}
+
+					resolve(result);
+				},
+				error: function (result) {
+					API_MANAGER.free(true);
+
+					if (result.status == 0) {
+						API_MANAGER.errorHandlers.network_error.call(result, data, address);
+					} else if (result.responseJSON) {
+						userErrorCallback.call(result.responseJSON, data, address);
+					} else {
+						API_MANAGER.errorHandlers.php_error.call(result.responseText, data, address);
+					}
+
+					resolve(result);
+				},
+			});
+		}).catch((e) => {
+			return e.responseJSON ?? e.response ?? { result: "error" };
+		});
+	}
+
+	async uploadFiles(requestData, fileInputElement, fileInputName, progressCallback = this.apiManager.errorHandlers.notice, finishedCallback = this.apiManager.defaultResponseHandler, emptyInputCallback = () => {}) {
+		if (this.apiManager.apiBusy) {
+			this.apiManager.errorHandlers.notice.call("Tried to send a request but the API is already busy", "[...]", this.address);
+			return;
+		}
+
+		if (!fileInputElement.files[0]) {
+			emptyInputCallback(fileInputElement);
+			return;
+		}
+
+		const API_MANAGER = this.apiManager;
+		const ADDRESS = this.address;
+
+		API_MANAGER.busy();
+
+		API_MANAGER.fileUploadProgress = {
+			uploaded: 0,
+			total: 0,
+			filesCount: fileInputElement.files.length,
+			files: fileInputElement.files.map(() => ({
+				uploaded: 0,
+				total: 0,
+				status: "pending",
+				response: "",
+			})),
+		};
+
+		return await Promise.all(
+			fileInputElement.files.map(async (file, i) => {
+				let formdata = new FormData();
+
+				objectForEach(requestData, (key, value) => formdata.append(key, value));
+
+				formdata.append(fileInputName, file);
+
+				formdata.append("fileIndex", i + 1);
+				formdata.append("fileCount", fileInputElement.files.length);
+
+				var request = new XMLHttpRequest();
+
+				return new Promise((resolve) => {
+					request.onload = () => {
+						const json = JSON.parse(request.responseText);
+
+						if (json && json.result && json.result == "success") {
+							API_MANAGER.fileUploadProgress.files[i].status = "success";
+							API_MANAGER.fileUploadProgress.files[i].response = json ?? {};
+
+							resolve();
+						} else if (json && json.result) {
+							API_MANAGER.fileUploadProgress.files[i].status = "user_error";
+							API_MANAGER.fileUploadProgress.files[i].response = json ?? {};
+
+							resolve();
+						} else {
+							API_MANAGER.fileUploadProgress.files[i].status = "error";
+							API_MANAGER.fileUploadProgress.files[i].response = json ?? {};
+
+							resolve();
+						}
+					};
+
+					request.upload.addEventListener("progress", function (e) {
+						API_MANAGER.fileUploadProgress.uploaded += e.loaded - API_MANAGER.fileUploadProgress.files[i].uploaded;
+						API_MANAGER.fileUploadProgress.files[i].uploaded = e.loaded;
+						API_MANAGER.fileUploadProgress.total += e.total - API_MANAGER.fileUploadProgress.files[i].total;
+						API_MANAGER.fileUploadProgress.files[i].total = e.total;
+
+						progressCallback.call(API_MANAGER.fileUploadProgress, formdata, ADDRESS);
+					});
+
+					request.upload.addEventListener("error", function (e) {
+						API_MANAGER.fileUploadProgress.files[i].status = "error";
+						API_MANAGER.fileUploadProgress.files[i].response = e ?? {};
+
+						resolve();
+					});
+
+					request.open("post", ADDRESS);
+					request.send(formdata);
+				});
+			}),
+		).then(() => {
+			API_MANAGER.free();
+
+			finishedCallback.call(API_MANAGER.fileUploadProgress, "[...]", this.address);
+
+			const fileUploadProgress = API_MANAGER.fileUploadProgress;
+			API_MANAGER.fileUploadProgress = {};
+
+			return fileUploadProgress;
+		});
+	}
+
+	fetchContinuously(data, callback = this.apiManager.defaultResponseHandler, lastCallback = this.apiManager.defaultResponseHandler, serverErrorHandler = this.apiManager.errorHandlers.server_error) {
+		if (this.apiManager.apiBusy) {
+			this.apiManager.errorHandlers.notice.call("Tried to send a request but the API is already busy", data, this.address);
+			return;
+		}
+
+		this.apiManager.busy();
+
+		let es;
+		const API_MANAGER = this.apiManager;
+		const address = this.address;
+
+		var get = [];
+
+		for (var key in data) {
+			if (data.hasOwnProperty(key)) {
+				get.push(key + "=" + encodeURIComponent(data[key]));
+			}
+		}
+
+		get.join("&");
+
+		es = new EventSource(address + "?" + get);
+
+		es.addEventListener("message", function (e) {
+			var result = JSON.parse(e.data);
+			if (e.lastEventId == "CLOSE") {
+				lastCallback.call({ messsage: result.message, progress: result.progress }, data, address);
+				es.close();
+				API_MANAGER.free();
+			} else {
+				callback.call({ messsage: result.message, progress: result.progress }, data, address);
+			}
+		});
+
+		es.addEventListener("error", function (e) {
+			serverErrorHandler.call(e, data, address);
+			es.close();
+			API_MANAGER.free(true);
+		});
+	}
+}
+
+class ApiManager {
+	apiBusy = false;
+	errorHandlers;
+	defaultResponseHandler;
+	requests = [];
+	fileUploadProgress = {};
+
+	constructor(defaultResponseHandler, errorHandlers = {}) {
+		if (!errorHandlers.user_error || !errorHandlers.server_error || !errorHandlers.network_error || !errorHandlers.notice || !errorHandlers.php_error) console.error("Not all error handlers were set!\nError handlers:", errorHandlers);
+		this.errorHandlers = errorHandlers;
+		this.defaultResponseHandler = defaultResponseHandler;
+	}
+
+	schedule(...requests) {
+		this.requests.push(...requests);
+
+		this.nextTask();
+	}
+
+	nextTask() {
+		if (this.requests.length == 0 || this.apiBusy == true) return;
+
+		this.requests.shift().call();
+	}
+
+	busy() {
+		this.apiBusy = true;
+	}
+
+	free(wasError = false) {
+		this.apiBusy = false;
+		if (!wasError) this.nextTask();
+		else if (this.requests.length > 0) {
+			this.errorHandlers.notice.call("Stopping the execution of this queue because an error has occured.\nDropping " + this.requests.length + " task(s):\n" + this.requests.map((e) => "Address:<br>" + e.api.address + "\nMethod: " + e.method + "\nParameters: " + JSON.stringify(e.parameters) + "\n"), "[...]", "...");
+			this.requests = [];
+		}
+	}
+}
+
+const VALIDATE = (value, type) => {
+	return REGEXES[type] && REGEXES[type].test(value) == true;
+};
+
+const VALIDATE_FORM = (element, addClass = null) => {
+	let r = true;
+	element.querySelectorAll("input[data-type]").forEach((input) => {
+		if (addClass) {
+			input.classList.remove(addClass);
+		}
+
+		if (!REGEXES[input.getAttribute("data-type")]) {
+			console.error("No regex found for data-type: " + input.getAttribute("data-type"));
+			r = false;
+		}
+
+		if (!REGEXES[input.getAttribute("data-type")].test(input.value)) {
+			if (addClass) setTimeout(() => input.classList.add(addClass), 0);
+			r = false;
+		}
+	});
+
+	return r;
+};
+
+const API_MANAGER = new ApiManager(new ApiCallback((result, data, address) => createModal("Požadavek byl úspěšně vykonnán", "")), {
+	user_error: new ApiCallback((result, data, address) => createModal("Neplatný požadavek", result.message)),
+	server_error: new ApiCallback((result, data, address) => {
+		createModal("Nespecifikovaná hláška " + result.status, "Prosím kontaktuj správce se sledem událostí, které k tomuto vedli a těmito informacemi:<br><br>ADDRESS:<br>" + address.toString() + "<br><br>" + "SENT:<br>" + JSON.stringify(data) + "<br><br>" + "RECIEVED:<br>" + result.responseJSON.message ?? "Nebyla obtržena žádná chybová hláška");
+		console.error("Fetch request failed with error code: " + result.status + "\nAPI address: " + address + "\n", data, "\n     |\n    \\|/\n", result.responseJSON ?? result.responseText ?? result);
+	}),
+	network_error: new ApiCallback((result, data, address) => {
+		createModal("Požadavek selhal", "Nemohli jsme kontaktovat server. Prosím zkontroluj své připojení k internetu a zkus to znovu.");
+		console.error("Fetch request failed due to a network error\nAPI address: " + address + "\n", data, "\n     |\n    \\|/\n", result);
+	}),
+	notice: new ApiCallback((result, data, address) => {
+		console.warn("Notice:\nAPI address: " + address + "\n", data, "\n     |\n    \\|/\n", result);
+	}),
+	php_error: new ApiCallback((result, data, address) => {
+		createModal("Chyba serveru", "Došlo k nespecifikované chybě serveru.<br><br>Prosím kontaktuj správce se sledem událostí, které k tomuto vedli a těmito informacemi:<br><br>ADDRESS:<br>" + address.toString() + "<br><br>" + "SENT:<br>" + JSON.stringify(data) + "<br><br>RECIEVED:<br>...");
+		console.error("PHP ERROR:\nAPI address: " + address + "\n", data, "\n     |\n    \\|/\n", result);
+	}),
+});
+
+window.onbeforeunload = () => {
+	if (API_MANAGER.apiBusy == true) {
+		return false;
+	}
+};
+
+const USER_API = new ApiConnector("user", API_MANAGER);
+const SUBJECT_API = new ApiConnector("subject", API_MANAGER);
+const ACTION_API = new ApiConnector("action", API_MANAGER);
