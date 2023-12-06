@@ -1,17 +1,17 @@
 <h1>Přidat nový panel</h1>
 <div class="two-columns">
-    <form>
+    <form id="submit-form">
         <div class="input-label">
-            <label for="show_from">Vyvěsit od (včetně):</label>
-            <input type="date" id="show_from" required>
+            <label for="show-from">Vyvěsit od (včetně):</label>
+            <input type="date" id="show-from" required>
         </div>
         <div class="input-label">
-            <label for="show_till">Vyvěsit do (včetně):</label>
-            <input type="date" id="show_till" required>
+            <label for="show-till">Vyvěsit do (včetně):</label>
+            <input type="date" id="show-till" required>
         </div>
         <div class="button-group">
-            <button id="set-type-image" class="active">Obrázek</button>
-            <button id="set-type-text" class="non-active">Text</button>
+            <button id="set-type-image">Obrázek</button>
+            <button id="set-type-text">Text</button>
         </div>
         <div id="additional-settings"></div>
         <div class="input-label">

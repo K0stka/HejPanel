@@ -19,7 +19,7 @@ async function getPageContent(url) {
 const navigate = async (url, target_history_level = 0, top = 0, left = 0, direction = 0, fade = false, fetchSamePage = false, isBackNavigation = false) => {
 	const starting_history_level = HISTORY_TREE.length - 1;
 	const main = document.querySelector("main");
-	main.classList = [];
+	main.classList = main.classList.filter((e) => e != "toRight" && e != "toLeft" && e != "toIn" && e != "toOut" && e != "toFade" && e != "fromRight" && e != "fromLeft" && e != "fromIn" && e != "fromOut" && e != "fromFade");
 
 	// SAME PAGE NAVIGATION
 	if (url == window.location.href && !fade && !fetchSamePage) {

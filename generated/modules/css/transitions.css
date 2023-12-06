@@ -17,63 +17,95 @@
 .fromFade {
 	position: relative;
 	animation-fill-mode: forwards !important;
-	animation-duration: 0.15s !important;
+	animation-duration: 0.3s !important;
 }
 
 .toRight {
 	animation: toRight;
 }
 
-@keyframes toRight {
-	0% {
-		left: 0;
-	}
-	100% {
-		left: 100vw;
-	}
-}
-
 .toLeft {
 	animation: toLeft;
-}
-
-@keyframes toLeft {
-	0% {
-		left: 0;
-	}
-	100% {
-		left: -100vw;
-	}
 }
 
 .fromLeft {
 	animation: fromLeft;
 }
 
-@keyframes fromLeft {
-	0% {
-		left: -100vw;
-	}
-	100% {
-		left: 0;
-	}
-}
-
 .fromRight {
 	animation: fromRight;
 }
 
-@keyframes fromRight {
+.toOut {
+	animation: toOut;
+}
+
+.fromOut {
+	animation: fromOut;
+}
+
+.toIn {
+	animation: toIn;
+}
+
+.fromIn {
+	animation: fromIn;
+}
+
+.toFade {
+	animation: toFade;
+}
+
+.fromFade {
+	animation: fromFade;
+}
+
+@keyframes toRight {
 	0% {
-		left: 100vw;
+		transform: translateX(0);
+		opacity: 1;
 	}
+
 	100% {
-		left: 0;
+		transform: translateX(5vw);
+		opacity: 0;
 	}
 }
 
-.toOut {
-	animation: toOut;
+@keyframes toLeft {
+	0% {
+		transform: translateX(0);
+		opacity: 1;
+	}
+
+	100% {
+		transform: translateX(5vw);
+		opacity: 0;
+	}
+}
+
+@keyframes fromLeft {
+	0% {
+		transform: translateX(-5vw);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes fromRight {
+	0% {
+		transform: translateX(5vw);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateX(0);
+		opacity: 1;
+	}
 }
 
 @keyframes toOut {
@@ -87,10 +119,6 @@
 	}
 }
 
-.fromOut {
-	animation: fromOut;
-}
-
 @keyframes fromOut {
 	0% {
 		transform: scale(1.2);
@@ -100,10 +128,6 @@
 		transform: scale(1);
 		opacity: 1;
 	}
-}
-
-.toIn {
-	animation: toIn;
 }
 
 @keyframes toIn {
@@ -117,10 +141,6 @@
 	}
 }
 
-.fromIn {
-	animation: fromIn;
-}
-
 @keyframes fromIn {
 	0% {
 		transform: scale(0.8);
@@ -132,10 +152,6 @@
 	}
 }
 
-.toFade {
-	animation: toFade;
-}
-
 @keyframes toFade {
 	0% {
 		opacity: 1;
@@ -145,15 +161,49 @@
 	}
 }
 
-.fromFade {
-	animation: fromFade;
-}
-
 @keyframes fromFade {
 	0% {
 		opacity: 0;
 	}
 	100% {
 		opacity: 1;
+	}
+}
+
+@media only screen and (max-width: 760px) {
+	@keyframes toRight {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(100vw);
+		}
+	}
+
+	@keyframes toLeft {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(-100vw);
+		}
+	}
+
+	@keyframes fromLeft {
+		0% {
+			transform: translateX(-100vw);
+		}
+		100% {
+			transform: translateX(0);
+		}
+	}
+
+	@keyframes fromRight {
+		0% {
+			transform: translateX(100vw);
+		}
+		100% {
+			transform: translateX(0);
+		}
 	}
 }

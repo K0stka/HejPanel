@@ -8,7 +8,7 @@ class ApiCallback {
 	call(result, data, address) {
 		if (!result || !data || !address) {
 			console.trace("MISSING PARAMETERS ON API CALLBACK CALL");
-			console.log("Result: ", result, "\nData: ", data, "\nAddress:<br>", address);
+			console.log("Result: ", result, "\nData: ", data, "\nAddress:", address);
 		}
 		this.callback(result, data, address);
 	}
@@ -268,7 +268,7 @@ class ApiManager {
 		this.apiBusy = false;
 		if (!wasError) this.nextTask();
 		else if (this.requests.length > 0) {
-			this.errorHandlers.notice.call("Stopping the execution of this queue because an error has occured.\nDropping " + this.requests.length + " task(s):\n" + this.requests.map((e) => "Address:<br>" + e.api.address + "\nMethod: " + e.method + "\nParameters: " + JSON.stringify(e.parameters) + "\n"), "[...]", "...");
+			this.errorHandlers.notice.call("Stopping the execution of this queue because an error has occured.\nDropping " + this.requests.length + " task(s):\n" + this.requests.map((e) => "Address:\n" + e.api.address + "\nMethod: " + e.method + "\nParameters: " + JSON.stringify(e.parameters) + "\n"), "[...]", "...");
 			this.requests = [];
 		}
 	}
@@ -295,8 +295,22 @@ const VALIDATE_FORM = (element, addClass = null) => {
 			r = false;
 		}
 	});
+	element.querySelectorAll("input[required], textarea[required]").forEach((input) => {
+		if (addClass) {
+			input.classList.remove(addClass);
+		}
+
+		if (input.value == "" || (input.type == "file" && input.files.length == 0)) {
+			if (addClass) setTimeout(() => input.classList.add(addClass), 0);
+			r = false;
+		}
+	});
 
 	return r;
+};
+
+const GET_FINGERPRINT = async () => {
+	return navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
 };
 
 const API_MANAGER = new ApiManager(new ApiCallback((result, data, address) => createModal("Požadavek byl úspěšně vykonnán", "")), {
@@ -325,5 +339,5 @@ window.onbeforeunload = () => {
 };
 
 const USER_API = new ApiConnector("user", API_MANAGER);
-const SUBJECT_API = new ApiConnector("subject", API_MANAGER);
-const ACTION_API = new ApiConnector("action", API_MANAGER);
+const CONTENT_API = new ApiConnector("content", API_MANAGER);
+const PANEL_API = new ApiConnector("panel", API_MANAGER);

@@ -14,6 +14,7 @@ if (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVE
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     define("DEV", true);
+    define("SERVICE_WORKER_ENABLED", false);
 
     require_once("php/fx.php");
 
@@ -24,6 +25,7 @@ if (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVE
     $prefix = (substr($_SERVER['SERVER_NAME'], -9) == "localhost" ? "http://localhost/" : "http://192.168.137.1/") . "HejPanel";
 } else {
     define("DEV", false);
+    define("SERVICE_WORKER_ENABLED", true);
 
     require_once("php/fx.php");
 
@@ -39,14 +41,17 @@ $validPagesDynamic = [
     "logged-out" => [
         "panel" => "",
         "submit" => "",
-        "login" => ""
+        "login" => "",
+        "register" => ""
     ],
     "logged-in" => [
+        "live" => "",
         "review" => "",
         "archive" => "",
         "account" => ""
     ],
     "logged-in-superadmin" => [
+        "live" => "",
         "review" => "",
         "archive" => "",
         "users" => "",
@@ -61,7 +66,9 @@ $validPages = [];
 $pageNames = array(
     "submit" => "Přidat panel",
     "login" => "Přihlášení",
-    "review" => "Nové panely",
+    "register" => "Registrace",
+    "live" => "Momentálně viditelné",
+    "review" => "Čeká na povolení",
     "archive" => "Archiv panelů",
     "account" => "Účet",
     "users" => "Uživatelé"

@@ -23,11 +23,15 @@ class Panel {
     public PanelType $type;
     public string $content;
 
-    public function __construct(int $id) {
+    public function __construct(int|array $data) {
         global $con;
         $this->con = $con;
 
-        $panel = $this->con->query("SELECT * FROM panels WHERE id = ", [$id])->fetchRow();
+        if (is_array($data)) {
+            $panel = $data;
+        } else {
+            $panel = $this->con->query("SELECT * FROM panels WHERE id = ", [$data])->fetchRow();
+        }
 
         if (empty($panel)) return;
 
@@ -59,7 +63,8 @@ class Panel {
 
     /** @return Panel[] */
     public static function getVisiblePanels(): array {
-        return [];
+        global $con;
+        return array_map(fn ($data) => new Panel($data), $con->query("SELECT * FROM panels WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= NOW() AND show_till >= NOW())")->fetchAll());
     }
 
     public static function getVisiblePanelsHash(): string {

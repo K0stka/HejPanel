@@ -4,8 +4,9 @@ class MysqlSession implements SessionHandlerInterface {
     private int $lifetime;
 
     private array $saveSeparately = [
-        "user_id" => "user_id",
-        "subscription" => "subscription"
+        "user" => "user",
+        "subscription" => "subscription",
+        "fingerprint" => "fingerprint",
     ];
 
     public function __construct(int $lifetime) {
@@ -24,7 +25,7 @@ class MysqlSession implements SessionHandlerInterface {
     }
 
     public function read(string $id): string {
-        $data = $this->con->query("SELECT user_id, subscription, data FROM sessions WHERE session_id = ", [$id], " AND expires > ", [time()])->fetchRow();
+        $data = $this->con->query("SELECT " . join("", array_map(fn ($e) => $e . ", ", $this->saveSeparately)) . " data FROM sessions WHERE session_id = ", [$id], " AND expires > ", [time()])->fetchRow();
         if (empty($data) || $data["data"] == null) $data["data"] = "";
         return $data["data"];
     }
@@ -34,7 +35,11 @@ class MysqlSession implements SessionHandlerInterface {
         foreach ($this->saveSeparately as $sessionKey => $dbKey) {
             $separateData[] = ", $dbKey = ";
             if (isset($_SESSION[$sessionKey])) {
-                $separateData[] = [$_SESSION[$sessionKey]];
+                if (is_array($_SESSION[$sessionKey])) {
+                    $separateData[] = [utf8json($_SESSION[$sessionKey])];
+                } else {
+                    $separateData[] = [$_SESSION[$sessionKey]];
+                }
             } else {
                 $separateData[] = [MYSQL::NULL];
             }
@@ -42,12 +47,7 @@ class MysqlSession implements SessionHandlerInterface {
 
         $expires = time() + $this->lifetime;
 
-        $fingerprint = [
-            "ip" => getUserIP(),
-            "user_agent" => $_SERVER["HTTP_USER_AGENT"],
-        ];
-
-        $this->con->query(...["REPLACE INTO sessions SET session_id = ", [$id], ", expires = $expires", ...$separateData, ", fingerprint = ", [utf8json($fingerprint)], ", data = ", [$data]]);
+        $this->con->query(...["REPLACE INTO sessions SET session_id = ", [$id], ", expires = $expires", ...$separateData, ", data = ", [$data]]);
 
         return true;
     }

@@ -9,6 +9,7 @@ const objectForEach = (object, callback) => {
 
 NodeList.prototype.forEach = Array.prototype.forEach;
 FileList.prototype.map = Array.prototype.map;
+DOMTokenList.prototype.filter = Array.prototype.filter;
 
 // https://www.cssscript.com/accessible-modal-dialog-animations/
 const createModal = (header, text) => {
@@ -56,7 +57,9 @@ const onReady = () => {
 	});
 
 	document.querySelectorAll("input").forEach((e) => {
-		e.addEventListener("change", (event) => {
+		e.addEventListener("input", (event) => {
+			e.classList.remove("error");
+
 			if (e.value != "") {
 				e.setAttribute("not-empty", "");
 			} else {

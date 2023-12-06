@@ -16,6 +16,7 @@ class User {
     public int $id;
     public string $name;
     public string $nickname;
+    public string $password;
     public UserType $type;
 
     public NotificationManager $notificationManager;
@@ -47,6 +48,7 @@ class User {
         $this->id = $user["id"];
         $this->name = $user["name"];
         $this->nickname = $user["nickname"];
+        $this->password = $user["password"];
         $this->type = UserType::from($user["type"]);
 
         $this->notificationManager = new NotificationManager($this);
@@ -78,8 +80,9 @@ class User {
         unset($_SESSION[self::$sessionKey]);
     }
 
-    public static function register(string $name, string $nickname, string $passwordHash, UserType $userType) {
+    public static function register(string $name, string $nickname, string $passwordHash, UserType $userType): int {
         global $con;
         $con->query("INSERT INTO users (name, nickname, password, type) VALUES (", [$name], ",", [$nickname], ",", [$passwordHash], ", ", [$userType->value], ")");
+        return $con->stmt->insert_id;
     }
 }

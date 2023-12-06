@@ -85,6 +85,41 @@ main {
 	padding: var(--large);
 }
 
+main.shrinkForNav {
+	width: calc(100% - 16em);
+	display: inline-block;
+	box-sizing: border-box;
+	margin-left: 16em;
+}
+
+nav {
+	width: 16em;
+	display: inline-flex;
+	box-sizing: border-box;
+	position: fixed;
+	flex-direction: column;
+	height: calc(100vh - 8rem);
+	gap: var(--normal);
+	padding: var(--normal);
+	background: var(--secondary);
+	z-index: 1;
+}
+
+.navBtn {
+	/* border: 2px solid var(--primary); */
+	padding: var(--normal);
+	border-radius: var(--large);
+	color: var(--primary);
+	text-decoration: none;
+	font-weight: var(--semibold);
+	background: var(--background);
+}
+
+.navBtn:hover, .navBtn.active {
+	color: var(--background);
+	background: var(--primary);
+}
+
 h1 {
 	font-size: var(--medium);
 	font-weight: var(--semibold);
@@ -96,7 +131,8 @@ h1 {
 	flex-shrink: 0;
 }
 
-form, .two-columns > form {
+form,
+.two-columns > form {
 	display: flex;
 	flex-direction: column;
 	gap: var(--medium);
@@ -139,6 +175,31 @@ textarea {
 	padding: var(--small) var(--normal);
 	width: 20rem;
 	box-sizing: border-box;
+	transition: border var(--t);
+}
+
+.input-label:has(*.error) {
+	--primary: var(--accent);
+	animation: shake 0.3s ease-out;
+	animation-fill-mode: forwards;
+}
+
+@keyframes shake {
+	0% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(0.2em);
+	}
+	50% {
+		transform: translateX(-0.2em);
+	}
+	75% {
+		transform: translateX(0.2em);
+	}
+	100% {
+		transform: translateX(0);
+	}
 }
 
 textarea {

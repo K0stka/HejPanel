@@ -10,6 +10,14 @@ function prettyPrint($array) {
     echo ("</pre>");
 }
 
+function escapeConservative($string, $multiline = false) {
+    $r = trim(htmlspecialchars($string));
+    if ($multiline) {
+        $r = str_replace("\n", "<br>", $r);
+    }
+    return $r;
+}
+
 function escape($string, $multiline = false) {
     $from = array("'", "\\");
     $to = array("&#39;", "&#8726;");

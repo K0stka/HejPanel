@@ -49,6 +49,13 @@ class Api {
                 return false;
             }
 
+            if ($value instanceof \DataStructure && !Validator::validateDataStructure($this->req[$key], $value)) {
+                // $request = new ApiErrorResponse("Parameter $key is not in the required format " . $value->value);
+                // $request->send();
+
+                return false;
+            }
+
             if ($value instanceof ApiEndpointCondition) {
                 $fx = $value->condition;
                 if (!$fx($this->req[$key])) {

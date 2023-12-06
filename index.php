@@ -8,9 +8,6 @@ require_once("php/session.php");
 // Auth logic
 $user = User::getUser();
 
-// Required action logic
-$actionManager = new ActionManager($user);
-
 if ($user) {
     if ($user->type == UserType::admin) {
         $validPages = $validPagesDynamic["logged-in"];
@@ -44,9 +41,15 @@ if ($pageManager->isNormalRequest) { // Only for initial page load
             Validator::generateJsValues();
             ?>
 
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>');
+            <?php
+            if (SERVICE_WORKER_ENABLED) {
+            ?>
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>');
+                }
+            <?php
             }
+            ?>
         </script>
 
         <title><?= $pageManager->pageTitle ?></title>
@@ -80,6 +83,9 @@ if ($user && !($_SESSION["subscription"] ?? null)) {
     $jsManager->passToJS(["PUBLIC_KEY" => $user->notificationManager::PUBLIC_KEY]);
     $jsManager->require("notifications");
 }
+if ($user && !($_SESSION["fingerprint"] ?? null)) {
+    $jsManager->require("fingerprint");
+}
 if ($pageManager->page == "panel") {
     include($pageManager->pagePath);
 } else {
@@ -88,7 +94,22 @@ if ($pageManager->page == "panel") {
             <?= NAME ?>
         </header>
         <div class="mainWrapper">
-            <main>
+            <?php
+            if ($user) {
+            ?>
+                <nav>
+                    <?php
+                    foreach ($validPages as $pageIndex => $query) {
+                    ?>
+                        <a href="<?= $prefix ?>/<?= $pageIndex ?>" class="navBtn<?= ($pageIndex == $pageManager->page ? " active" : "") ?>" data-hierarchy="0" data-direction="-1"><?= $pageNames[$pageIndex] ?></a>
+                    <?php
+                    }
+                    ?>
+                </nav>
+            <?php
+            }
+            ?>
+            <main <?= ($user ? "class=\"shrinkForNav\"" : "") ?>>
                 <?php
                 include($pageManager->pagePath);
                 ?>
@@ -96,7 +117,7 @@ if ($pageManager->page == "panel") {
         </div>
         <footer>
             <span>
-                Upozornění: Z důvodu zabránění spamu logujeme Vaší IP adresu.
+                Upozornění: Z důvodu zabránění spamu logujeme otisk Vašeho zařízení.
             </span>
             <span>
                 V případě problémů/dotazů prosím kontaktujte&nbsp;<a href="mailto:kostkaj@gytool.cz">kostkaj@gytool.cz</a>
