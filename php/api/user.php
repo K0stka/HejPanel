@@ -17,7 +17,7 @@ $notAuthenticated = new ApiEndpointCondition(function () use ($user) {
     return $user == false;
 }, new ApiErrorResponse("Tuto akci nemůžeš provést, jelikož už jsi přihlášený", 403));
 
-$api->addEndpoint(Method::POST, ["type" => "login", "nickname" => Type::string, "password" => Type::string], [$notAuthenticated], function () {
+$api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::string, "password" => DataType::string], [$notAuthenticated], function () {
     $user = new User(["nickname" => $_POST["nickname"]]);
 
     if (!$user->exists) {
@@ -57,14 +57,15 @@ $api->addEndpoint(Method::POST, ["type" => "register", "name" => Type::name, "ni
     return new ApiSuccessResponse();
 });
 
-$api->addEndpoint(Method::POST, ["type" => "setSubscription", "data" => DataStructure::json], [$authenticated], function () use ($con, $user) {
+$api->addEndpoint(Method::POST, ["type" => "setSubscription", "data" => DataType::json], [$authenticated], function () use ($con, $user) {
     $_SESSION["subscription"] = $_POST["data"];
 
     return new ApiSuccessResponse();
 });
 
-$api->addEndpoint(Method::POST, ["type" => "fingerprint", "fingerprint" => DataStructure::array], [$authenticated], function () use ($con, $user) {
+$api->addEndpoint(Method::POST, ["type" => "fingerprint", "fingerprint" => DataType::array], [$authenticated], function () use ($con, $user) {
     $_SESSION["fingerprint"] = $_POST["fingerprint"];
+    $_POST["fingerprint"]["ip"] = getUserIP();
 
     return new ApiSuccessResponse();
 });

@@ -1,12 +1,23 @@
 <?php
 
 spl_autoload_register(function ($name) {
-    require_once("php/classes/" . lcfirst($name) . ".php");
+    $components = ["PanelReview"];
+    if (in_array($name, $components)) {
+        require_once("php/components/" . lcfirst($name) . ".php");
+    } else {
+        require_once("php/classes/" . lcfirst($name) . ".php");
+    }
 });
 
 function prettyPrint($array) {
-    echo ("<pre>");
+    echo ("<pre style=\"text-align:left\">");
     echo utf8json($array, true);
+    echo ("</pre>");
+}
+
+function out($var) {
+    echo ("<pre style=\"text-align:left\">");
+    echo var_dump($var);
     echo ("</pre>");
 }
 
@@ -108,4 +119,22 @@ function str_replace_first(string|array $from, string $to, string $in) {
     }
 
     return $in;
+}
+
+function assignColorById(int $id): string {
+    if ($id < 0) return "#000000";
+    $colors = ["#69d2e7", "#a7dbd8", "#e0e4cc", "#f38630", "#fa6900", "#0048BA", "#B0BF1A", "#7CB9E8", "#C9FFE5", "#B284BE", "#5D8AA8", "#00308F", "#72A0C1", "#AF002A", "#F2F0E6", "#F0F8FF", "#84DE02", "#E32636", "#C46210", "#EFDECD", "#E52B50", "#9F2B68", "#F19CBB", "#AB274F", "#D3212D", "#3B7A57", "#00C4B0", "#FFBF00", "#FF7E00", "#FF033E", "#9966CC", "#A4C639", "#F2F3F4", "#CD9575", "#665D1E", "#915C83", "#841B2D", "#FAEBD7", "#008000", "#8DB600", "#FBCEB1", "#00FFFF", "#7FFFD4", "#D0FF14", "#4B5320", "#3B444B", "#8F9779", "#E9D66B", "#B2BEB5", "#87A96B", "#FF9966", "#A52A2A", "#FDEE00", "#6E7F80", "#568203", "#FF2052", "#C39953", "#007FFF", "#F0FFFF", "#F0FFFF", "#DBE9F4", "#89CFF0", "#A1CAF1", "#F4C2C2", "#FEFEFA", "#FF91AF", "#21ABCD", "#FAE7B5", "#FFE135", "#006A4E", "#E0218A", "#7C0A02", "#1DACD6", "#848482", "#98777B", "#BCD4E6", "#9F8170", "#FA6E79", "#F5F5DC", "#2E5894", "#9C2542", "#E88E5A", "#FFE4C4", "#3D2B1F", "#967117", "#CAE00D", "#BFFF00", "#FE6F5E", "#BF4F51", "#000000", "#3D0C02", "#54626F", "#253529", "#3B3C36", "#BFAFB2", "#FFEBCD", "#A57164", "#318CE7", "#ACE5EE", "#FAF0BE", "#0000FF", "#1F75FE", "#0093AF", "#0087BD", "#0018A8", "#333399", "#0247FE", "#A2A2D0", "#00B9FB", "#6699CC"];
+    return $colors[$id % count($colors)];
+}
+
+function getWeekDay(DateTime $dateTime): string {
+    return ([
+        "Mon" => "Po",
+        "Tue" => "Út",
+        "Wed" => "St",
+        "Thu" => "Čt",
+        "Fri" => "Pá",
+        "Sat" => "So",
+        "Sun" => "Ne"
+    ])[$dateTime->format("D")];
 }

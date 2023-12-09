@@ -1,8 +1,8 @@
-<h1>Archiv panelů</h1>
+<h1>Momentálně viditelné</h1>
 
 <?php
 
-$panels = Panel::getExpiredPanels();
+$panels = Panel::getVisiblePanels();
 
 $fingerprintMap = User::getFingerprintToUsersMap();
 
@@ -10,7 +10,7 @@ foreach ($panels as $panel) {
 ?>
     <?= PanelReview::render($panel, $fingerprintMap, function () {
     ?>
-        <button>Zobrazit</button>
+        <button class="danger">Skrýt</button>
     <?php
     }) ?>
 <?php
@@ -19,7 +19,7 @@ foreach ($panels as $panel) {
 if (empty($panels)) {
 ?>
     <div class="note">
-        Ještě zde nejsou žádné archivované panely.
+        Nejsou aktivní žádné panely, zobrazuji hlášku.
     </div>
 <?php
 }

@@ -3,8 +3,10 @@
 define("NAME", "HejPanel");
 define("DESCRIPTION", "Panel pro rychou a efektivní distribuci informací mezi žáky Gymnázia Hejčín");
 
-define("DATE_FORMAT", "j. n. Y");
-define("TIME_FORMAT", "G:i:s");
+define("DATE_DM_FORMAT", "j. n.");
+define("DATE_DMY_FORMAT", "j. n. Y");
+define("TIME_HM_FORMAT", "G:i");
+define("TIME_HMS_FORMAT", "G:i:s");
 
 define('PREFIX', str_replace(["php\conf.php", "php/conf.php"], '', __FILE__));
 set_include_path(PREFIX);
@@ -46,16 +48,20 @@ $validPagesDynamic = [
     ],
     "logged-in" => [
         "live" => "",
+        "current" => "",
         "review" => "",
         "archive" => "",
-        "account" => ""
+        "account" => "",
+        "panel" => ""
     ],
     "logged-in-superadmin" => [
         "live" => "",
+        "current" => "",
         "review" => "",
         "archive" => "",
         "users" => "",
-        "account" => ""
+        "account" => "",
+        "panel" => ""
     ]
 ];
 
@@ -67,7 +73,8 @@ $pageNames = array(
     "submit" => "Přidat panel",
     "login" => "Přihlášení",
     "register" => "Registrace",
-    "live" => "Momentálně viditelné",
+    "live" => "Živý náhled",
+    "current" => "Momentálně viditelné",
     "review" => "Čeká na povolení",
     "archive" => "Archiv panelů",
     "account" => "Účet",

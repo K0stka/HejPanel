@@ -1,24 +1,10 @@
-@media (prefers-color-scheme: light) {
-	:root {
-		--text: #0c1d1c;
-		--background: #fffcf6;
-		--primary: #ffae00;
-		--secondary: #fff2de;
-		--accent: #d90d13;
-	}
-}
-
-@media (prefers-color-scheme: dark) {
-	:root {
-		--text: #0c1d1c;
-		--background: #fffcf6;
-		--primary: #ffae00;
-		--secondary: #fff2de;
-		--accent: #d90d13;
-	}
-}
-
 :root {
+	--text: #070f15;
+	--background: #f2f7fb;
+	--primary: #0062a3;
+	--secondary: #f2d280;
+	--accent: #ef5647;
+
 	--t: 0.3s ease-in-out;
 	--f: "Nunito", sans-serif;
 	--large: 2.5rem;
@@ -43,13 +29,19 @@ body {
 
 header {
 	height: 5rem;
-	background: var(--secondary);
-	color: var(--primary);
+	background: var(--primary);
+	color: var(--background);
 	font-size: var(--large);
 	font-weight: var(--bold);
 	display: flex;
 	align-items: center;
 	padding: 0 var(--medium);
+}
+
+.logo {
+	width: 3rem;
+	margin-right: 1rem;
+	aspect-ratio: 1 / 1;
 }
 
 footer {
@@ -101,21 +93,23 @@ nav {
 	height: calc(100vh - 8rem);
 	gap: var(--normal);
 	padding: var(--normal);
-	background: var(--secondary);
+	border-right: 0.3em solid var(--primary);
 	z-index: 1;
+	background: var(--background);
 }
 
 .navBtn {
-	/* border: 2px solid var(--primary); */
 	padding: var(--normal);
 	border-radius: var(--large);
 	color: var(--primary);
 	text-decoration: none;
 	font-weight: var(--semibold);
 	background: var(--background);
+	border: 2px solid var(--primary);
 }
 
-.navBtn:hover, .navBtn.active {
+.navBtn:hover,
+.navBtn.active {
 	color: var(--background);
 	background: var(--primary);
 }
@@ -176,6 +170,14 @@ textarea {
 	width: 20rem;
 	box-sizing: border-box;
 	transition: border var(--t);
+}
+
+.danger {
+	--primary: var(--accent);
+}
+
+.notice {
+	--primary: var(--secondary);
 }
 
 .input-label:has(*.error) {
@@ -241,7 +243,6 @@ button.non-active:hover {
 	display: flex;
 	justify-content: center;
 	gap: var(--small);
-	background: var(--secondary);
 	border-radius: 1em;
 }
 
@@ -267,10 +268,110 @@ button.non-active:hover {
 }
 
 .preview {
-	border: 15px solid var(--primary);
 	aspect-ratio: 16 / 9 !important;
 	box-sizing: border-box;
 	flex-grow: 1;
 	max-height: calc(calc(100vh - 8rem) * 0.5);
 	max-width: calc(calc(100vh - 8rem) * 0.5 * 16 / 9);
+	overflow: hidden;
+}
+
+.notification {
+	display: inline-flex;
+	background: var(--accent);
+	height: 1.2rem;
+	min-width: 1.2rem;
+	justify-content: center;
+	border-radius: 1rem;
+	color: var(--background);
+	line-height: 0;
+	align-items: center;
+	font-weight: var(--light);
+	margin-left: 1rem;
+}
+
+.panel {
+	background: linear-gradient(45deg, var(--primary), var(--accent));
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.panel-text {
+	color: var(--background);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 4rem;
+	font-weight: var(--bold);
+	text-align: center;
+}
+
+.panel-review {
+	border-radius: 1rem;
+	padding: var(--medium);
+	margin: var(--large) 0;
+	text-align: left;
+	border: solid 0.3em var(--primary);
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: var(--medium);
+}
+
+.panel-review-preview {
+	width: 32rem;
+	height: 18rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.user-chip {
+	padding: var(--small) var(--normal);
+	border-radius: 1rem;
+}
+
+.two-columns-grid {
+	display: inline-grid;
+	grid-template-columns: auto auto;
+	margin: var(--normal) 0;
+	gap: var(--normal);
+	align-items: center;
+}
+
+.note {
+	background: var(--secondary);
+	display: inline-block;
+	padding: var(--normal);
+	border-radius: var(--normal);
+}
+
+.panel-container {
+	width: 100vw;
+	height: 100vh;
+}
+
+.tooltip {
+	position: absolute;
+	background: inherit;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) scale(0);
+	z-index: 1;
+	pointer-events: none;
+	padding: var(--normal);
+	border-radius: var(--normal);
+	color: inherit;
+	transition: transform var(--t);
+}
+
+*:has(.tooltip) {
+	position: relative;
+}
+
+*:has(.tooltip):hover > .tooltip {
+	transform: translate(-50%, -50%) scale(1);
+	pointer-events: all;
+	cursor: help;
 }

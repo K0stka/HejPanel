@@ -9,10 +9,16 @@ require_once("php/session.php");
 $user = User::getUser();
 
 if ($user) {
-    if ($user->type == UserType::admin) {
-        $validPages = $validPagesDynamic["logged-in"];
-    } else {
-        $validPages = $validPagesDynamic["logged-in-superadmin"];
+    switch ($user->type) {
+        case UserType::temp:
+            $validPages = $validPagesDynamic["logged-out"];
+            break;
+        case UserType::admin:
+            $validPages = $validPagesDynamic["logged-in"];
+            break;
+        case UserType::superadmin:
+            $validPages = $validPagesDynamic["logged-in-superadmin"];
+            break;
     }
 } else {
     $validPages = $validPagesDynamic["logged-out"];
@@ -79,29 +85,34 @@ if ($pageManager->isNormalRequest) { // Only for initial page load
     <?php
 }
 // Initial page load + hydration load
-if ($user && !($_SESSION["subscription"] ?? null)) {
-    $jsManager->passToJS(["PUBLIC_KEY" => $user->notificationManager::PUBLIC_KEY]);
-    $jsManager->require("notifications");
-}
-if ($user && !($_SESSION["fingerprint"] ?? null)) {
-    $jsManager->require("fingerprint");
-}
 if ($pageManager->page == "panel") {
     include($pageManager->pagePath);
 } else {
+    if ($user && $user->type != UserType::temp && !($_SESSION["subscription"] ?? null)) {
+        $jsManager->passToJS(["PUBLIC_KEY" => $user->notificationManager::PUBLIC_KEY]);
+        $jsManager->require("notifications");
+    }
+    if ($user && !($_SESSION["fingerprint"] ?? null)) {
+        $jsManager->require("fingerprint");
+    }
     ?>
         <header>
+            <img src="<?= $prefix ?>/assets/icons/icon.png" class="logo">
             <?= NAME ?>
         </header>
         <div class="mainWrapper">
             <?php
-            if ($user) {
+            if ($user && $user->type != UserType::temp) {
             ?>
                 <nav>
                     <?php
                     foreach ($validPages as $pageIndex => $query) {
+                        if ($pageIndex == "panel") continue;
                     ?>
-                        <a href="<?= $prefix ?>/<?= $pageIndex ?>" class="navBtn<?= ($pageIndex == $pageManager->page ? " active" : "") ?>" data-hierarchy="0" data-direction="-1"><?= $pageNames[$pageIndex] ?></a>
+                        <a href="<?= $prefix ?>/<?= $pageIndex ?>" class="navBtn<?= ($pageIndex == $pageManager->page ? " active" : "") ?>" data-hierarchy="0" data-direction="-1">
+                            <?= $pageNames[$pageIndex] ?>
+                            <?php if ($pageIndex == "review" && ($count = Panel::countWaitingPanels()) > 0) { ?> <div class="notification"> <?= $count ?> </div> <?php } ?>
+                        </a>
                     <?php
                     }
                     ?>
@@ -109,7 +120,7 @@ if ($pageManager->page == "panel") {
             <?php
             }
             ?>
-            <main <?= ($user ? "class=\"shrinkForNav\"" : "") ?>>
+            <main <?= ($user && $user->type != UserType::temp ? "class=\"shrinkForNav\"" : "") ?>>
                 <?php
                 include($pageManager->pagePath);
                 ?>

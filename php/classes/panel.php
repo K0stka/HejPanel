@@ -23,6 +23,8 @@ class Panel {
     public PanelType $type;
     public string $content;
 
+    public string $note;
+
     public function __construct(int|array $data) {
         global $con;
         $this->con = $con;
@@ -41,7 +43,7 @@ class Panel {
         $this->postedAt = new DateTime($panel["posted_at"]);
 
         $this->approved = $panel["approved"] == 1;
-        $this->approvedBy = new User($panel["approved_by"]);
+        $this->approvedBy = new User($panel["approved_by"] ?? -1);
         $this->approvedAt = new DateTime($panel["approved_at"]);
 
         $this->showFrom = new DateTime($panel["show_from"]);
@@ -49,6 +51,8 @@ class Panel {
 
         $this->type = PanelType::from($panel["type"]);
         $this->content = $panel["content"];
+
+        $this->note = $panel["note"];
     }
 
     public function render(): string {
@@ -64,10 +68,27 @@ class Panel {
     /** @return Panel[] */
     public static function getVisiblePanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->query("SELECT * FROM panels WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= NOW() AND show_till >= NOW())")->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->query("SELECT * FROM panels WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= ", [date("Y-m-d")], " AND show_till >= ", [date("Y-m-d")], ") ORDER BY show_from ASC")->fetchAll());
     }
 
     public static function getVisiblePanelsHash(): string {
         return "";
+    }
+
+    /** @return Panel[] */
+    public static function getExpiredPanels(): array {
+        global $con;
+        return array_map(fn ($data) => new Panel($data), $con->query("SELECT * FROM panels WHERE show_till < ", [date("Y-m-d")], " or (approved = 'false' AND approved_by IS NOT NULL) or show_override = 'false'")->fetchAll());
+    }
+
+    /** @return Panel[] */
+    public static function getWaitingPanels(): array {
+        global $con;
+        return array_map(fn ($data) => new Panel($data), $con->query("SELECT * FROM panels WHERE approved_at IS NULL")->fetchAll());
+    }
+
+    public static function countWaitingPanels(): int {
+        global $con;
+        return $con->query("SELECT COUNT(*) AS count FROM panels WHERE approved_at IS NULL")->fetchRow()["count"];
     }
 }

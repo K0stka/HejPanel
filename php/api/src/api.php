@@ -49,7 +49,7 @@ class Api {
                 return false;
             }
 
-            if ($value instanceof \DataStructure && !Validator::validateDataStructure($this->req[$key], $value)) {
+            if ($value instanceof \DataType && !Validator::validateDataType($this->req[$key], $value)) {
                 // $request = new ApiErrorResponse("Parameter $key is not in the required format " . $value->value);
                 // $request->send();
 

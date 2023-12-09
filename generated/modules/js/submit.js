@@ -34,8 +34,20 @@ textInput.addEventListener("input", (event) => {
 	} else {
 		textInput.removeAttribute("not-empty");
 	}
+
+	textPanel.innerHTML = textInput.value.replaceAll("\n", "<br>");
 });
 textInput.setAttribute("required", "");
+
+const panelContainer = document.querySelector("#panel-container");
+
+const textPanel = document.createElement("div");
+textPanel.classList.add("panel");
+textPanel.classList.add("panel-text");
+
+const imagePanel = document.createElement("div");
+imagePanel.classList.add("panel");
+imagePanel.classList.add("panel-image");
 
 const submitBtn = document.querySelector("#submit");
 
@@ -54,6 +66,9 @@ const controlsToImage = () => {
 
 	additional_settings.innerHTML = "";
 	additional_settings.appendChild(input_label_file);
+
+	panelContainer.innerHTML = "";
+	panelContainer.appendChild(imagePanel);
 };
 const controlsToText = () => {
 	set_type_image.classList.add("non-active");
@@ -65,6 +80,10 @@ const controlsToText = () => {
 
 	additional_settings.innerHTML = "";
 	additional_settings.appendChild(input_label_text);
+
+	panelContainer.innerHTML = "";
+	textPanel.innerHTML = textInput.value.replaceAll("\n", "<br>");
+	panelContainer.appendChild(textPanel);
 };
 
 set_type_image.addEventListener("click", controlsToImage);
@@ -103,6 +122,7 @@ if (submitBtn) {
 								fingerprint: fp,
 								panel_type: "image",
 								content: fileName,
+								note: document.querySelector("#note").value,
 							},
 							new ApiCallback(() => {
 								createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na hejpanelu");
@@ -116,8 +136,9 @@ if (submitBtn) {
 							show_from: document.querySelector("#show-from").value,
 							show_till: document.querySelector("#show-till").value,
 							fingerprint: fp,
-							panel_type: "image",
-							content: fileName,
+							panel_type: "text",
+							content: textInput.value,
+							note: document.querySelector("#note").value,
 						},
 						new ApiCallback(() => {
 							createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na hejpanelu");

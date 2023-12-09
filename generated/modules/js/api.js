@@ -140,23 +140,38 @@ class ApiConnector {
 
 				return new Promise((resolve) => {
 					request.onload = () => {
-						const json = JSON.parse(request.responseText);
+						let json;
+						try {
+							json = JSON.parse(request.responseText);
+						} catch (e) {
+							API_MANAGER.fileUploadProgress.files[i].status = "error";
+							API_MANAGER.fileUploadProgress.files[i].response = {};
+							let sent = {};
+							objectForEach(requestData, (key, value) => (sent[key] = value));
+
+							sent[fileInputName] = "binary";
+
+							sent["fileIndex"] = i + 1;
+							sent["fileCount"] = fileInputElement.files.length;
+							API_MANAGER.errorHandlers.php_error.call(request.responseText, sent, this.address);
+							resolve(false);
+						}
 
 						if (json && json.result && json.result == "success") {
 							API_MANAGER.fileUploadProgress.files[i].status = "success";
 							API_MANAGER.fileUploadProgress.files[i].response = json ?? {};
 
-							resolve();
+							resolve(true);
 						} else if (json && json.result) {
 							API_MANAGER.fileUploadProgress.files[i].status = "user_error";
 							API_MANAGER.fileUploadProgress.files[i].response = json ?? {};
 
-							resolve();
+							resolve(false);
 						} else {
 							API_MANAGER.fileUploadProgress.files[i].status = "error";
 							API_MANAGER.fileUploadProgress.files[i].response = json ?? {};
 
-							resolve();
+							resolve(false);
 						}
 					};
 
@@ -180,8 +195,8 @@ class ApiConnector {
 					request.send(formdata);
 				});
 			}),
-		).then(() => {
-			API_MANAGER.free();
+		).then((results) => {
+			API_MANAGER.free(!results.every((v) => v === true));
 
 			finishedCallback.call(API_MANAGER.fileUploadProgress, "[...]", this.address);
 

@@ -12,9 +12,10 @@ enum Type: string {
     case code = "code";
 }
 
-enum DataStructure {
+enum DataType {
     case array;
     case json;
+    case string;
 }
 
 class Validator {
@@ -25,7 +26,6 @@ class Validator {
         "password" => "(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$",
         "passwordOrEmpty" => "^$|(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$",
         "date" => "^\d{4}-\d{1,2}-\d{1,2}$",
-        "string" => "^[a-žA-Ž0-9 ]+$",
         "number" => "\d{1,}",
         "code" => "^[A-Z0-9]{20}$",
     ];
@@ -34,12 +34,14 @@ class Validator {
         return preg_match("/" . self::$regexStrings[$type->value] . "/", $value) == 1;
     }
 
-    public static function validateDataStructure($data, DataStructure $dataStructure) {
-        switch ($dataStructure) {
-            case DataStructure::array:
+    public static function validateDataType($data, DataType $DataType) {
+        switch ($DataType) {
+            case DataType::array:
                 return is_array($data);
-            case DataStructure::json:
+            case DataType::json:
                 return is_json($data);
+            case DataType::string:
+                return is_string($data);
         }
 
         return false;

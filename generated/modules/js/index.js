@@ -68,6 +68,21 @@ const onReady = () => {
 		});
 	});
 
+	document.querySelectorAll(".auto-color").forEach((e) => {
+		const color = JSON.parse(e.computedStyleMap().get("background-color").toString().replace("rgb(", "[").replace("rgba(", "[").replace(")", "]"));
+
+		const c = [color[0] / 255, color[1] / 255, [2] / 255].map((col) => {
+			if (col <= 0.03928) {
+				return col / 12.92;
+			}
+			return Math.pow((col + 0.055) / 1.055, 2.4);
+		});
+
+		var L = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+
+		e.style.color = L > 0.179 ? "var(--text)" : "var(--background)";
+	});
+
 	try {
 		document.querySelector("#back").addEventListener("click", (e) => {
 			window.history.go(-1);

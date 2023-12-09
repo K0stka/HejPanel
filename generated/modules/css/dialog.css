@@ -76,16 +76,22 @@ dialog.is-hidden::backdrop {
 	top: 0.5rem;
 	right: 1rem;
 	font-weight: 900;
-	color: var(--secondary);
+	color: var(--background);
 	font-size: 2rem;
 	z-index: 1;
+	cursor: pointer;
+	transition: var(--t);
+}
+
+.dialog-close:hover {
+	color: var(--text);
 }
 
 .dialog-header {
 	background: var(--primary);
 	padding: 1rem 2rem 1rem 1rem;
 	font-weight: 900;
-	color: var(--secondary);
+	color: var(--background);
 	font-size: 1.3rem;
 	border-radius: 1rem;
 	position: absolute;
