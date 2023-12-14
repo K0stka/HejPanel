@@ -1,6 +1,6 @@
 <?php
 class PanelReview {
-    public static function render(Panel $panel, array $fingerprintMap, $thirdColumnGenerator = null): void {
+    public static function render(Panel $panel, array $fingerprintMap, $buttorsGenerator = null): void {
         $panel->postedBy->categorizeByFingerprint($fingerprintMap);
 ?>
         <div class="panel-review">
@@ -20,8 +20,8 @@ class PanelReview {
                     <textarea readonly style="width: 100%;"><?= str_replace("<br>", "\n", $panel->note) ?></textarea>
                 </div>
             </div>
-            <div>
-                <?= $thirdColumnGenerator ? $thirdColumnGenerator() : "" ?>
+            <div class="panel-review-buttons">
+                <?= $buttorsGenerator ? $buttorsGenerator() : "" ?>
             </div>
         </div>
 <?php

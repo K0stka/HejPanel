@@ -25,7 +25,7 @@ class MysqlSession implements SessionHandlerInterface {
     }
 
     public function read(string $id): string {
-        $data = $this->con->query("SELECT " . join("", array_map(fn ($e) => $e . ", ", $this->saveSeparately)) . " data FROM sessions WHERE session_id = ", [$id], " AND expires > ", [time()])->fetchRow();
+        $data = $this->con->select(["data", ...$this->saveSeparately], "sessions")->where(["session_id" => $id])->addSQL("AND expires > ", [time()])->fetchRow();
         if (empty($data) || $data["data"] == null) $data["data"] = "";
         return $data["data"];
     }
@@ -53,12 +53,12 @@ class MysqlSession implements SessionHandlerInterface {
     }
 
     public function destroy(string $id): bool {
-        $this->con->query("DELETE FROM sessions WHERE session_id =", [$id]);
+        $this->con->delete("sessions")->where(["session_id" => $id]);
         return true;
     }
 
     public function gc(int $maxlifetime): bool {
-        $this->con->query("DELETE FROM sessions WHERE expires < ", [time()]);
+        $this->con->delete("sessions")->addSQL("WHERE expires < ", [time()]);
         return true;
     }
 }

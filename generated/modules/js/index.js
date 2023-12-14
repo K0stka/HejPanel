@@ -8,8 +8,22 @@ const objectForEach = (object, callback) => {
 };
 
 NodeList.prototype.forEach = Array.prototype.forEach;
+HTMLCollection.prototype.forEach = Array.prototype.forEach;
+NodeList.prototype.filter = Array.prototype.filter;
 FileList.prototype.map = Array.prototype.map;
 DOMTokenList.prototype.filter = Array.prototype.filter;
+
+function hasJsonStructure(str) {
+	if (typeof str === "object") return true;
+	if (typeof str !== "string") return false;
+	try {
+		const result = JSON.parse(str);
+		const type = Object.prototype.toString.call(result);
+		return type === "[object Object]" || type === "[object Array]";
+	} catch (err) {
+		return false;
+	}
+}
 
 // https://www.cssscript.com/accessible-modal-dialog-animations/
 const createModal = (header, text) => {

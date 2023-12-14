@@ -31,11 +31,11 @@ if (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVE
 
     require_once("php/fx.php");
 
-    $con = new Conn("", "", "", "");
+    $con = new Conn("REDACTED", "REDACTED", "REDACTED", "REDACTED");
 
     $v = "?v=1";
 
-    $prefix = "https://example.com/";
+    $prefix = "https://krychlic.com/hejpanel";
 }
 
 // Valid subpages

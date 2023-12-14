@@ -10,9 +10,9 @@ require_once("php/api/src/apiFileResponse.php");
 require_once("php/api/src/apiSuccessResponse.php");
 require_once("php/api/src/apiErrorResponse.php");
 
-enum Method {
-    case GET;
-    case POST;
+enum Method: string {
+    case GET = "GET";
+    case POST = "POST";
 }
 
 class Api {
@@ -27,7 +27,7 @@ class Api {
     }
 
     public function addEndpoint(Method $method, array $requiredRequestStructure, array $conditions, $callback) {
-        if ($_SERVER["REQUEST_METHOD"] == ($method == Method::POST ? "POST" : "GET")) // Only process relevant endpoints
+        if ($_SERVER["REQUEST_METHOD"] == $method->value) // Only process relevant endpoints
             array_push($this->endpoints, new ApiEndpoint($method, $requiredRequestStructure, $conditions, $callback));
     }
 

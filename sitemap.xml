@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <url>
-        <loc>https://krychlic.com/</loc>
+        <loc>https://krychlic.com/hejpanel/</loc>
         <priority>1.0</priority>
    </url>
    <url>
-        <loc>https://krychlic.com/some-url/</loc>
+        <loc>https://krychlic.com/hejpanel/panel</loc>
    </url>
    <url>
-        <loc>https://krychlic.com/other-url/</loc>
+        <loc>https://krychlic.com/hejpanel/submit</loc>
    </url>
 </urlset>

@@ -1,4 +1,5 @@
 User-agent: *
-Disallow: /api
-Disallow: /*/*
+Allow: /panel
+Allow: /submit
+Disallow: /*
 Sitemap: https://krychlic.com/sitemap.xml

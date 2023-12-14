@@ -32,6 +32,9 @@ $cssManager = new ModuleManager(ModuleType::CSS, false);
 $jsManager = new ModuleManager(ModuleType::JS, false);
 $jsManager->defer(true);
 
+// Start output buffering to allow for response rewrite
+ob_start();
+
 if ($pageManager->isNormalRequest) { // Only for initial page load
     $cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
     $jsManager->require("ajax", "index", "api", "transitions");
@@ -84,7 +87,7 @@ if ($pageManager->isNormalRequest) { // Only for initial page load
     <body>
     <?php
 }
-// Initial page load + hydration load
+
 if ($pageManager->page == "panel") {
     include($pageManager->pagePath);
 } else {
@@ -136,6 +139,7 @@ if ($pageManager->page == "panel") {
         </footer>
     <?php
 }
+
 if ($pageManager->isNormalRequest) {
     // Fetch dynamic modules (Initial load)
     $cssManager->fetch();

@@ -6,7 +6,7 @@ class ApiCallback {
 	}
 
 	call(result, data, address) {
-		if (!result || !data || !address) {
+		if (result === null || data === null || address === null) {
 			console.trace("MISSING PARAMETERS ON API CALLBACK CALL");
 			console.log("Result: ", result, "\nData: ", data, "\nAddress:", address);
 		}
@@ -68,15 +68,14 @@ class ApiConnector {
 				data: data,
 				cache: "no-cache",
 				success: function (result) {
-					if (result.result) {
+					if (hasJsonStructure(result)) {
 						API_MANAGER.free();
-						callback.call(result, data, address);
+						if (callback) callback.call(result, data, address);
+						resolve(result);
 					} else {
 						API_MANAGER.free(true);
 						API_MANAGER.errorHandlers.php_error.call(result, data, address);
 					}
-
-					resolve(result);
 				},
 				error: function (result) {
 					API_MANAGER.free(true);
@@ -88,8 +87,6 @@ class ApiConnector {
 					} else {
 						API_MANAGER.errorHandlers.php_error.call(result.responseText, data, address);
 					}
-
-					resolve(result);
 				},
 			});
 		}).catch((e) => {
@@ -207,7 +204,7 @@ class ApiConnector {
 		});
 	}
 
-	fetchContinuously(data, callback = this.apiManager.defaultResponseHandler, lastCallback = this.apiManager.defaultResponseHandler, serverErrorHandler = this.apiManager.errorHandlers.server_error) {
+	fetchContinuously(data, callback = this.apiManager.defaultResponseHandler, lastCallback = this.apiManager.defaultResponseHandler, networkErrorHandler = this.apiManager.errorHandlers.network_error) {
 		if (this.apiManager.apiBusy) {
 			this.apiManager.errorHandlers.notice.call("Tried to send a request but the API is already busy", data, this.address);
 			return;
@@ -243,7 +240,7 @@ class ApiConnector {
 		});
 
 		es.addEventListener("error", function (e) {
-			serverErrorHandler.call(e, data, address);
+			networkErrorHandler.call(e, data, address);
 			es.close();
 			API_MANAGER.free(true);
 		});

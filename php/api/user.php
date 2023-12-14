@@ -17,7 +17,14 @@ $notAuthenticated = new ApiEndpointCondition(function () use ($user) {
     return $user == false;
 }, new ApiErrorResponse("Tuto akci nemůžeš provést, jelikož už jsi přihlášený", 403));
 
-$api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::string, "password" => DataType::string], [$notAuthenticated], function () {
+$notAuthenticatedAsAdmin = new ApiEndpointCondition(function () use ($user) {
+    return $user == false || $user->type == UserType::temp;
+}, new ApiErrorResponse("Tuto akci nemůžeš provést, jelikož už jsi přihlášený", 403));
+
+$api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::string, "password" => DataType::string], [$notAuthenticatedAsAdmin], function () use ($user) {
+    if ($user != false) User::logout();
+    unset($user);
+
     $user = new User(["nickname" => $_POST["nickname"]]);
 
     if (!$user->exists) {
@@ -44,13 +51,16 @@ $api->addEndpoint(Method::POST, ["type" => "register", "name" => Type::name, "ni
         return new ApiErrorResponse("Uživatel s touto přezdívkou již existuje", 403);
     }
 
-    $code = $con->query("SELECT id, type FROM codes WHERE code = ", [$_POST["code"]])->fetchRow();
+    $code = $con
+        ->select(["id", "type"], "codes")
+        ->where(["code" => $_POST["code"]])
+        ->fetchRow();
 
     if (empty($code)) {
         return new ApiErrorResponse("Neplatný kód", 403);
     }
 
-    $con->query("DELETE FROM codes WHERE id = ", [$code["id"]]);
+    $con->delete("codes")->where(["id" => $code["id"]]);
 
     User::register($_POST["name"], $_POST["nickname"], password_hash($_POST["password"], PASSWORD_BCRYPT), UserType::from($code["type"]));
 

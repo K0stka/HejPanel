@@ -75,6 +75,10 @@ a:hover {
 main {
 	text-align: center;
 	padding: var(--large);
+	max-height: calc(100vh - 8rem);
+	overflow: overlay;
+	position: relative;
+	box-sizing: border-box;
 }
 
 main.shrinkForNav {
@@ -96,6 +100,8 @@ nav {
 	border-right: 0.3em solid var(--primary);
 	z-index: 1;
 	background: var(--background);
+	max-height: 100%;
+	overflow: overlay;
 }
 
 .navBtn {
@@ -291,7 +297,7 @@ button.non-active:hover {
 }
 
 .panel {
-	background: linear-gradient(45deg, var(--primary), var(--accent));
+	background: linear-gradient(45deg, #0b264b, var(--primary));
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
@@ -307,6 +313,34 @@ button.non-active:hover {
 	text-align: center;
 }
 
+.panel-hidden {
+	position: absolute;
+	animation: panel-out ease-in-out 1s;
+	animation-fill-mode: forwards;
+}
+
+.panel-hidden.animate-in {
+	animation: panel-in ease-in-out 1s;
+}
+
+@keyframes panel-in {
+	from {
+		left: 100vw;
+	}
+	to {
+		left: 0;
+	}
+}
+
+@keyframes panel-out {
+	from {
+		right: 0;
+	}
+	to {
+		right: 100vw;
+	}
+}
+
 .panel-review {
 	border-radius: 1rem;
 	padding: var(--medium);
@@ -314,7 +348,7 @@ button.non-active:hover {
 	text-align: left;
 	border: solid 0.3em var(--primary);
 	position: relative;
-	display: flex;
+	display: inline-flex;
 	flex-direction: row;
 	align-items: center;
 	gap: var(--medium);
@@ -327,9 +361,18 @@ button.non-active:hover {
 	overflow: hidden;
 }
 
+.panel-review-buttons {
+	position: absolute;
+	top: 0;
+	right: var(--medium);
+	transform: translateY(-50%);
+	background: var(--background);
+}
+
 .user-chip {
 	padding: var(--small) var(--normal);
 	border-radius: 1rem;
+	cursor: help;
 }
 
 .two-columns-grid {
@@ -349,7 +392,42 @@ button.non-active:hover {
 
 .panel-container {
 	width: 100vw;
-	height: 100vh;
+	height: calc(100vh - 10rem);
+	overflow: hidden;
+	position: relative;
+}
+
+.panel-info {
+	height: 10rem;
+	display: flex;
+	align-items: center;
+	padding: var(--medium);
+	box-sizing: border-box;
+	gap: var(--medium);
+}
+
+.panel-logo {
+	width: 4rem;
+	aspect-ratio: 1 / 1;
+	background: var(--primary);
+	padding: 1rem;
+	border-radius: 2rem;
+}
+
+.panel-time {
+	color: var(--primary);
+	font-size: var(--large);
+	font-weight: var(--bold);
+}
+
+.panel-counter {
+	position: absolute;
+	z-index: 1;
+	color: var(--background);
+	font-weight: var(--bold);
+	font-size: var(--normalplus);
+	right: var(--medium);
+	margin-top: var(--medium);
 }
 
 .tooltip {
@@ -366,7 +444,7 @@ button.non-active:hover {
 	transition: transform var(--t);
 }
 
-*:has(.tooltip) {
+*:has(.tooltip):not(:has(* *.tooltip)) {
 	position: relative;
 }
 
@@ -374,4 +452,30 @@ button.non-active:hover {
 	transform: translate(-50%, -50%) scale(1);
 	pointer-events: all;
 	cursor: help;
+}
+
+* {
+	--scroll-temp: #00000030;
+	--scroll-temp2: #0000000d;
+	--scroll-width: var(--small);
+}
+
+*:hover {
+	--scroll-temp: #0000006b;
+	--scroll-temp2: #0000001a;
+	--scroll-width: var(--small);
+}
+
+*::-webkit-scrollbar {
+	width: var(--scroll-width);
+	height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+	background: var(--scroll-temp);
+	border-radius: 4px;
+}
+
+*::-webkit-scrollbar-track {
+	background: var(--scroll-temp2);
 }

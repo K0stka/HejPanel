@@ -1,7 +1,7 @@
 .mainWrapper {
 	width: 100vw;
 	overflow-x: hidden;
-	overflow-y: auto;
+	overflow-y: hidden;
 	height: calc(100vh - 8rem);
 }
 

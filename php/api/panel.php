@@ -35,7 +35,7 @@ $api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date
 
     switch ($panelType = PanelType::from($_POST["panel_type"])) {
         case PanelType::image:
-            $fileExists = $con->query("SELECT id FROM files WHERE name = ", [$_POST["content"]])->fetchRow();
+            $fileExists = $con->select("id", "files")->where(["name" => $_POST["content"]])->fetchRow();
             if (empty($fileExists)) return new ApiErrorResponse("Nahraný soubor nebylo možné nalézt.");
             break;
         case PanelType::text:
@@ -43,9 +43,37 @@ $api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date
             break;
     }
 
-    $con->query("INSERT INTO panels (posted_by, show_from, show_till, type, content, note) VALUES (", [$user->id], ", ", [$_POST["show_from"]], ", ", [$_POST["show_till"]], ", ", [$panelType->value], ", ", [$_POST["content"]], ", ", [escapeConservative($_POST["note"], true)], ")");
+    $con->insert("panels", [
+        "posted_by" => $user->id,
+        "show_from" => $_POST["show_from"],
+        "show_till" => $_POST["show_till"],
+        "type" => $panelType->value,
+        "content" => $_POST["content"],
+        "note" => escapeConservative($_POST["note"], true)
+    ]);
 
     return new ApiSuccessResponse();
+});
+
+// Get all visible panels
+$api->addEndpoint(Method::GET, ["t" => "a"], [], function () {
+    $panels = Panel::getVisiblePanels();
+    if (empty($panels)) $panels = [Panel::getEmptyPanel()];
+    return new ApiResponse(["data" => array_map(fn ($e) => $e->serialize(), $panels)]);
+});
+
+// Get all visible panels with ids
+$api->addEndpoint(Method::GET, ["t" => "b", "ids" => DataType::int_array], [], function () {
+    $panels = Panel::getPanelsByIds($_GET["ids"]);
+    if (empty($panels)) $panels = [Panel::getEmptyPanel()];
+    return new ApiResponse(["data" => array_map(fn ($e) => $e->serialize(), $panels)]);
+});
+
+// Get ids of all currently visible panels
+$api->addEndpoint(Method::GET, ["t" => "c"], [], function () {
+    $panelIds = Panel::getVisiblePanelsIds();
+    if (empty($panelIds)) $panelIds = [Panel::getEmptyPanel()->id];
+    return new ApiResponse($panelIds);
 });
 
 $api->listen(); // Execute all the api logic (automaticaly handles respones)

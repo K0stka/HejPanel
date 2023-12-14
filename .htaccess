@@ -2,16 +2,15 @@ RewriteEngine On
 
 FileETag MTime Size
 
-#RewriteCond %{REQUEST_URI} \/HejPanel\/
 #RewriteCond %{HTTPS} off
 #RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
 RewriteRule ^php/pages/404.php php/pages/404.php [END,L]
 
 RewriteCond %{HTTP_HOST} ^api.
-RewriteRule ^([\w.-]*)/?(.*)?$ php/api/$1.php?$2 [END,L]
+RewriteRule ^([\w.-]*)/?(.*)?$ php/api/$1.php?$2 [END,L,QSA]
 
-RewriteRule ^api/(\w+)/?(.*)?$ php/api/$1.php?$2 [END,L]
+RewriteRule ^api/(\w+)/?(.*)?$ php/api/$1.php?$2 [END,L,QSA]
 
 RewriteRule ^(js|css)/(.*)\.(js|css) generated/handler.php?type=$1&modules=$2 [END,L]
 

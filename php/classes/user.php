@@ -29,16 +29,9 @@ class User {
         $this->con = $con;
 
         if (is_int($searchParams)) {
-            $user = $con->query("SELECT * FROM users WHERE id = ", ["i", $searchParams])->fetchRow();
+            $user = $con->select(true, "users")->where(["id" => $searchParams])->fetchRow();
         } elseif (is_array($searchParams) && count($searchParams) != 0) {
-            $query = ["SELECT * FROM users WHERE "];
-            foreach ($searchParams as $searchKey => $searchParam) {
-                array_push($query, "$searchKey = ");
-                array_push($query, [$searchParam]);
-                array_push($query, " AND ");
-            }
-            array_pop($query);
-            $user = $con->query(...$query)->fetchRow();
+            $user = $con->select(true, "users")->where($searchParams)->fetchRow();
         } else {
             return;
         }
@@ -78,11 +71,11 @@ class User {
     }
 
     public function getFingerprints(): array {
-        return array_map(fn ($e) => json_decode($e["fingerprint"], true), $this->con->query("SELECT fingerprint FROM sessions WHERE user = ", [$this->id])->fetchAll());
+        return array_map(fn ($e) => json_decode($e["fingerprint"], true), $this->con->select("fingerprint", "sessions")->where(["user" => $this->id])->fetchAll());
     }
 
     public function updateLastFingerprint(array $fingerprint) {
-        $this->con->query("UPDATE users SET last_fingerprint = ", [utf8json($fingerprint)], " WHERE id = ", [$this->id]);
+        $this->con->update("users", ["last_fingerprint" => utf8json($fingerprint)])->where(["id" => $this->id])->execute();
     }
 
     public static function getUser(): User|bool {
@@ -111,14 +104,13 @@ class User {
 
     public static function register(string $name, string $nickname, string $passwordHash, UserType $userType): int {
         global $con;
-        $con->query("INSERT INTO users (name, nickname, password, type) VALUES (", [$name], ",", [$nickname], ",", [$passwordHash], ", ", [$userType->value], ")");
-        return $con->stmt->insert_id;
+        return $con->insert("users", ["name" => $name, "nickname" => $nickname, "password" => $passwordHash, "type" => $userType->value]);
     }
 
     /** @return User[] */
     public static function getFingerprintToUsersMap(): array {
         global $con;
-        $map = $con->query("SELECT last_fingerprint, GROUP_CONCAT(id) AS IDS FROM users GROUP BY last_fingerprint ORDER BY id")->fetchAll();
+        $map = $con->select(["last_fingerprint", "GROUP_CONCAT(id)" => "IDS"], "users")->groupBy("last_fingerprint")->orderBy("id", Order::minToMax)->fetchAll();
         array_walk($map, fn (&$e, $f) => $e = [
             "id" => $f,
             "fingerprint" => $e["last_fingerprint"],

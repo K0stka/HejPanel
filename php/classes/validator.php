@@ -14,8 +14,10 @@ enum Type: string {
 
 enum DataType {
     case array;
+    case int_array;
     case json;
     case string;
+    case int;
 }
 
 class Validator {
@@ -26,7 +28,6 @@ class Validator {
         "password" => "(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$",
         "passwordOrEmpty" => "^$|(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$",
         "date" => "^\d{4}-\d{1,2}-\d{1,2}$",
-        "number" => "\d{1,}",
         "code" => "^[A-Z0-9]{20}$",
     ];
 
@@ -38,28 +39,35 @@ class Validator {
         switch ($DataType) {
             case DataType::array:
                 return is_array($data);
+            case DataType::int_array:
+                return is_array($data) && empty(array_filter($data, fn ($e) => !is_numeric($e)));
             case DataType::json:
                 return is_json($data);
             case DataType::string:
                 return is_string($data);
+            case DataType::int:
+                return is_int($data);
+            default:
+                $response = new ApiErrorResponse("Invalid data type " . $DataType->value);
+                $response->send();
         }
-
-        return false;
     }
 
     public static function generateJsValues() {
         /** @var Type $key */
-        echo ("const REGEXES = {");
+        $output = "const REGEXES = {";
         foreach (self::$regexStrings as $key => $value) {
-            echo ($key . ": new RegExp(\""  . $value . "\"),\n");
+            $output .= $key . ": new RegExp(\""  . $value . "\"),\n";
         }
-        echo ("};");
+        $output .= "};";
+
+        echo $output;
     }
 
     public static function existsIn(string $tableName): ApiEndpointCondition {
         global $con;
         return new ApiEndpointCondition(function (string $id) use ($con, $tableName) {
-            return !empty($con->query("SELECT id FROM $tableName WHERE id =", [$id])->fetchRow());
+            return !empty($con->select("id", $tableName)->where(["id" => $id])->fetchRow());
         }, new ApiErrorResponse(""));
     }
 }
