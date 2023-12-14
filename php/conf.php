@@ -33,7 +33,7 @@ if (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVE
 
     $con = new Conn("REDACTED", "REDACTED", "REDACTED", "REDACTED");
 
-    $v = "?v=1";
+    $v = "?v=2";
 
     $prefix = "https://krychlic.com/hejpanel";
 }

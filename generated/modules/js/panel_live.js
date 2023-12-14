@@ -48,12 +48,8 @@ const updatePanels = async (panelIds) => {
 };
 
 const cyclePanels = () => {
-	console.log("A");
-	console.log(panels);
-	console.log("PanelPointer = " + panelPointer);
 	if (panels.length == 0) return;
 
-	console.log("PanelPointer = " + panelPointer);
 	panelPointer = (panelPointer + 1) % panels.length;
 	panelCounter.innerHTML = panelPointer + 1 + "/" + panels.length;
 	panelContainer.children.forEach((e) => e.classList.remove("animate-in"));
