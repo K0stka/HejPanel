@@ -51,15 +51,15 @@ class MySQLtoPHPautomapper {
         return $serialized;
     }
 
-    public function complete($requiredPHPKey = null) {
-        if ($requiredPHPKey) {
-            $missing = [$this->reverseMap[$requiredPHPKey][0] => $requiredPHPKey];
+    public function complete(string ...$requiredPHPKeys) {
+        if (!empty($requiredPHPKeys)) {
+            foreach ($requiredPHPKeys as $requiredPHPKey)
+                $missing = [$this->reverseMap[$requiredPHPKey][0] => $requiredPHPKey];
         } else {
             $missing = [];
 
-            foreach ($this->mapFromTo as $mysqlKey => $mapTo) {
+            foreach ($this->mapFromTo as $mysqlKey => $mapTo)
                 if (!isset($this->{$mapTo[0]})) $missing[$mysqlKey] = $mapTo[0];
-            }
 
             if (count($missing) == 0) return;
         }
@@ -90,12 +90,10 @@ class MySQLtoPHPautomapper {
         $this->con->delete(self::$tableName)->where([$this->index => $this->{$this->index}])->execute();
     }
 
-    public function __get($name) {
-        out("GET $name");
+    public function get($name) {
+        if (!isset($this->$name) && isset($this->reverseMap[$name])) $this->complete($name);
 
-        if (!isset($this->$name)) $this->complete($name);
-
-        return $this->$name;
+        return $this->$name ?? null;
     }
 
     public function update($name, $value) {
