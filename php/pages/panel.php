@@ -31,7 +31,7 @@ $dayData = $jidelna->fetchDay(new DateTime());
         } else {
         ?>
             <b>
-                Nemohli jsme načíst data z jídelny.
+                Nemohli jsme načíst data z jídelny 😞
             </b>
         <?php
         }
@@ -45,4 +45,4 @@ $dayData = $jidelna->fetchDay(new DateTime());
     </div>
 </div>
 <?php
-$jsManager->require("panel", "panel_live");
+$app->jsManager->require("panel", "panel_live");

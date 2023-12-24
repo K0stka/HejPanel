@@ -5,39 +5,17 @@ require_once("./php/conf.php");
 // Handle session
 require_once("php/session.php");
 
-// Auth logic
-$user = User::getUser();
-
-if ($user) {
-    switch ($user->type) {
-        case UserType::temp:
-            $validPages = $validPagesDynamic["logged-out"];
-            break;
-        case UserType::admin:
-            $validPages = $validPagesDynamic["logged-in"];
-            break;
-        case UserType::superadmin:
-            $validPages = $validPagesDynamic["logged-in-superadmin"];
-            break;
-    }
-} else {
-    $validPages = $validPagesDynamic["logged-out"];
-}
-
-// Initiate page manager
-$pageManager = new PageManager($validPages, $pageNames);
-
-// Initiate module managers
-$cssManager = new ModuleManager(ModuleType::CSS, false);
-$jsManager = new ModuleManager(ModuleType::JS, false);
-$jsManager->defer(true);
+// Create app object
+$app = new AppManager();
+$app->authenticate(User::getUser());
+$app->initiateRouter($validPagesPerUserType, $pageNames);
 
 // Start output buffering to allow for response rewrite
 ob_start();
 
-if ($pageManager->isNormalRequest) { // Only for initial page load
-    $cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
-    $jsManager->require("ajax", "index", "api", "transitions");
+if ($app->pageManager->isNormalRequest) { // Only for initial page load
+    $app->cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
+    $app->jsManager->require("ajax", "index", "api", "transitions");
 ?>
     <!DOCTYPE html>
     <html lang="cs">
@@ -61,7 +39,7 @@ if ($pageManager->isNormalRequest) { // Only for initial page load
             ?>
         </script>
 
-        <title><?= $pageManager->pageTitle ?></title>
+        <title><?= $app->pageManager->pageTitle ?></title>
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,28 +53,28 @@ if ($pageManager->isNormalRequest) { // Only for initial page load
 
         <?php
         // Include main modules
-        $cssManager->fetch();
-        $jsManager->fetch();
+        $app->cssManager->fetch();
+        $app->jsManager->fetch();
 
         // Enable sort for future modules
-        $cssManager->sort();
-        $jsManager->sort();
+        $app->cssManager->sort();
+        $app->jsManager->sort();
         ?>
     </head>
 
     <body>
     <?php
 }
-
-if ($pageManager->page == "panel") {
-    include($pageManager->pagePath);
+if ($app->pageManager->page == "panel") {
+    include($app->pageManager->pagePath);
 } else {
-    if ($user && $user->type != UserType::temp && !($_SESSION["subscription"] ?? null)) {
-        $jsManager->passToJS(["PUBLIC_KEY" => $user->notificationManager::PUBLIC_KEY]);
-        $jsManager->require("notifications");
-    }
-    if ($user && !($_SESSION["fingerprint"] ?? null)) {
-        $jsManager->require("fingerprint");
+    // Not used
+    // if ($app->user && $app->user->type != UserType::temp && !($_SESSION["subscription"] ?? null)) {
+    //     $app->jsManager->passToJS(["PUBLIC_KEY" => $app->user->notificationManager::PUBLIC_KEY]);
+    //     $app->jsManager->require("notifications");
+    // }
+    if ($app->user && !($_SESSION["fingerprint"] ?? null)) {
+        $app->jsManager->require("fingerprint");
     }
     ?>
         <header>
@@ -105,14 +83,14 @@ if ($pageManager->page == "panel") {
         </header>
         <div class="mainWrapper">
             <?php
-            if ($user && $user->type != UserType::temp) {
+            if ($app->user && $app->user->type != UserType::temp) {
             ?>
                 <nav>
                     <?php
-                    foreach ($validPages as $pageIndex => $query) {
+                    foreach ($app->pageManager->validPages as $pageIndex => $query) {
                         if ($pageIndex == "panel") continue;
                     ?>
-                        <a href="<?= $prefix ?>/<?= $pageIndex ?>" class="navBtn<?= ($pageIndex == $pageManager->page ? " active" : "") ?>" data-hierarchy="0" data-direction="-1">
+                        <a href="<?= $prefix ?>/<?= $pageIndex ?>" class="navBtn<?= ($pageIndex == $app->pageManager->page ? " active" : "") ?>" data-hierarchy="0" data-direction="-1">
                             <?= $pageNames[$pageIndex] ?>
                             <?php if ($pageIndex == "review" && ($count = Panel::countWaitingPanels()) > 0) { ?> <div class="notification"> <?= $count ?> </div> <?php } ?>
                         </a>
@@ -123,9 +101,9 @@ if ($pageManager->page == "panel") {
             <?php
             }
             ?>
-            <main <?= ($user && $user->type != UserType::temp ? "class=\"shrinkForNav\"" : "") ?>>
+            <main <?= ($app->user && $app->user->type != UserType::temp ? "class=\"shrinkForNav\"" : "") ?>>
                 <?php
-                include($pageManager->pagePath);
+                include($app->pageManager->pagePath);
                 ?>
             </main>
         </div>
@@ -140,10 +118,12 @@ if ($pageManager->page == "panel") {
     <?php
 }
 
-if ($pageManager->isNormalRequest) {
+if ($app->pageManager->isNormalRequest) {
     // Fetch dynamic modules (Initial load)
-    $cssManager->fetch();
-    $jsManager->fetch();
+    $app->cssManager->fetch();
+    $app->jsManager->fetch();
+
+    // Finish document
     ?>
     </body>
 
@@ -151,6 +131,6 @@ if ($pageManager->isNormalRequest) {
 <?php
 } else {
     // Fetch dynamic modules - using js (Hydration load)
-    $cssManager->fetch(false);
-    $jsManager->fetch(false);
+    $app->cssManager->fetch(false);
+    $app->jsManager->fetch(false);
 }

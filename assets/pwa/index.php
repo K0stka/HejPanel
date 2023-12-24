@@ -3,11 +3,11 @@
 require_once("../../php/conf.php");
 
 // Initiate module managers
-$cssManager = new ModuleManager(ModuleType::CSS, false);
-$jsManager = new ModuleManager(ModuleType::JS, false);
+$app->cssManager = new ModuleManager(ModuleType::CSS, false);
+$app->jsManager = new ModuleManager(ModuleType::JS, false);
 
-$cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
-$jsManager->require("ajax", "index", "api", "transitions");
+$app->cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
+$app->jsManager->require("ajax", "index", "api", "transitions");
 ?>
 <!DOCTYPE html>
 <html lang="cs">
@@ -41,8 +41,8 @@ $jsManager->require("ajax", "index", "api", "transitions");
 
     <?php
     // Include main modules
-    $cssManager->fetch();
-    $jsManager->fetch();
+    $app->cssManager->fetch();
+    $app->jsManager->fetch();
     ?>
 </head>
 

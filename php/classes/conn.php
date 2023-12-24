@@ -203,6 +203,12 @@ class Conn {
         return $this;
     }
 
+    public function limit(int $limit): Conn {
+        $this->queryTemp[] = " LIMIT $limit";
+
+        return $this;
+    }
+
     public function addSQL(string|array ...$query): Conn {
         array_push($this->queryTemp, ...[...$query, " "]);
 

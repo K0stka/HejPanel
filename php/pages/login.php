@@ -11,4 +11,4 @@
     <button id="submit">Přihlásit se</button>
 </form>
 <?php
-$jsManager->require("login");
+$app->jsManager->require("login");

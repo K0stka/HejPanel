@@ -138,8 +138,8 @@ class ModuleManager {
         echo $minified;
     }
     public function passToJs(array $values) {
-        global $pageManager;
-        if ($pageManager->isNormalRequest) {
+        global $app;
+        if ($app->pageManager->isNormalRequest) {
             echo ("<script>");
             foreach ($values as $name => $value) {
                 echo ("window[\"$name\"]=" . utf8json($value) . ";");

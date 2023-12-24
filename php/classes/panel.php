@@ -5,8 +5,8 @@ enum PanelType: string {
     case text = "text";
 }
 
-class Panel {
-    private Conn $con;
+class Panel extends MySQLtoPHPautomapper {
+    protected Conn $con;
 
     public int $id;
 
@@ -25,34 +25,37 @@ class Panel {
 
     public string $note;
 
-    public function __construct(int|array $data) {
+    // Automapper settings
+    protected string $tableName = "panels";
+    protected string $index = "id";
+    protected array $mapFromTo = [
+        "id" => ["id", StoredAs::int],
+        "posted_by" => ["postedBy", StoredAs::foreignId, "User"],
+        "posted_at" => ["postedAt", StoredAs::datetime],
+        "approved" => ["approved", StoredAs::bool],
+        "approved_by" => ["approvedBy", StoredAs::foreignId, "User"],
+        "approved_at" => ["approvedAt", StoredAs::datetime],
+        "show_from" => ["showFrom", StoredAs::datetime],
+        "show_till" => ["showTill", StoredAs::datetime],
+        "type" => ["type", StoredAs::enum, "PanelType"],
+        "content" => ["content", StoredAs::string],
+        "note" => ["note", StoredAs::string]
+    ];
+
+
+    public function __construct(int|array $data, bool $shallow = false) {
         global $con;
         $this->con = $con;
 
-        if (is_array($data)) {
-            $panel = $data;
-        } else {
-            $panel = $this->con->select(true, "panels")->where(["id" => $data])->fetchRow();
+        parent::__construct($data);
+
+        if ($shallow) return;
+
+        try {
+            $this->complete();
+        } catch (Exception) {
+            return;
         }
-
-        if (empty($panel)) return;
-
-        $this->id = $panel["id"];
-
-        $this->postedBy = new User($panel["posted_by"]);
-        $this->postedAt = new DateTime($panel["posted_at"]);
-
-        $this->approved = $panel["approved"] == 1;
-        $this->approvedBy = new User($panel["approved_by"] ?? -1);
-        $this->approvedAt = new DateTime($panel["approved_at"]);
-
-        $this->showFrom = new DateTime($panel["show_from"]);
-        $this->showTill = new DateTime($panel["show_till"]);
-
-        $this->type = PanelType::from($panel["type"]);
-        $this->content = $panel["content"];
-
-        $this->note = $panel["note"];
     }
 
     public function render(): string {
@@ -108,16 +111,8 @@ class Panel {
     public static function getEmptyPanel(): Panel {
         return new Panel([
             "id" => -1,
-            "posted_by" => -1,
-            "posted_at" => -1,
-            "approved" => true,
-            "approved_by" => -1,
-            "approved_at" => -1,
-            "show_from" => -1,
-            "show_till" => -1,
             "type" => "text",
             "content" => "Víte, jak zajistit, že zde vždy bude něco ke čtení?<br>Přesně takto :)",
-            "note" => ""
-        ]);
+        ], true);
     }
 }

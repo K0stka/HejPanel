@@ -23,4 +23,4 @@ if (empty($panels)) {
     </div>
 <?php
 }
-$jsManager->require("panel");
+$app->jsManager->require("panel");

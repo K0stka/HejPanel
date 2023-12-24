@@ -90,23 +90,25 @@ const navigate = async (url, target_history_level = 0, top = 0, left = 0, direct
 
 	const newMain = document.querySelector("main");
 
-	if ((direction == -1 || direction == 1) && !fade) {
-		if (direction == -1) {
-			newMain.classList.add("fromLeft");
-		} else if (direction == 1) {
-			newMain.classList.add("fromRight");
+	if(newMain) {
+		if ((direction == -1 || direction == 1) && !fade) {
+			if (direction == -1) {
+				newMain.classList.add("fromLeft");
+			} else if (direction == 1) {
+				newMain.classList.add("fromRight");
+			}
+		} else if (target_history_level - starting_history_level == -1 && !fade) {
+			newMain.classList.add("fromOut");
+		} else if (target_history_level - starting_history_level == 1 && !fade) {
+			newMain.classList.add("fromIn");
+		} else {
+			newMain.classList.add("fromFade");
 		}
-	} else if (target_history_level - starting_history_level == -1 && !fade) {
-		newMain.classList.add("fromOut");
-	} else if (target_history_level - starting_history_level == 1 && !fade) {
-		newMain.classList.add("fromIn");
-	} else {
-		newMain.classList.add("fromFade");
+	
+		// SCROLL RESTORATION
+	
+		newMain.scrollTo({ top: top, left: left });
 	}
-
-	// SCROLL RESTORATION
-
-	newMain.scrollTo({ top: top, left: left });
 
 	onReady();
 };

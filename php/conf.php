@@ -1,74 +1,53 @@
 <?php
-// Product details
+// Site-wide configuration
 define("NAME", "HejPanel");
 define("DESCRIPTION", "Panel pro rychou a efektivní distribuci informací mezi žáky Gymnázia Hejčín");
+define("COLOR", "#FFAB00");
 
 define("DATE_DM_FORMAT", "j. n.");
 define("DATE_DMY_FORMAT", "j. n. Y");
 define("TIME_HM_FORMAT", "G:i");
 define("TIME_HMS_FORMAT", "G:i:s");
 
+// Define side-wide constants
 define('PREFIX', str_replace(["php\conf.php", "php/conf.php"], '', __FILE__));
 set_include_path(PREFIX);
+define("DEV", (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVER_NAME'], -13) == "192.168.137.1"));
 
-// Database, prefix
-if (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVER_NAME'], -13) == "192.168.137.1") {
+// Include dependencies
+require_once(".env.php");
+require_once("php/fx.php");
+
+// Environmental settings
+if (DEV) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
-    define("DEV", true);
+
     define("SERVICE_WORKER_ENABLED", false);
-
-    require_once("php/fx.php");
-
-    $con = new Conn("localhost", "root", "", "hejpanel");
 
     $v = "?v=1";
 
-    $prefix = (substr($_SERVER['SERVER_NAME'], -9) == "localhost" ? "http://localhost/" : "http://192.168.137.1/") . "HejPanel";
+    $rootDir = (substr($_SERVER['SERVER_NAME'], -9) == "localhost" ? "http://localhost/" : "http://192.168.137.1/");
+    $folder = "HejPanel";
 } else {
-    define("DEV", false);
     define("SERVICE_WORKER_ENABLED", true);
-
-    require_once("php/fx.php");
-
-    $con = new Conn("REDACTED", "REDACTED", "REDACTED", "REDACTED");
 
     $v = "?v=2";
 
-    $prefix = "https://krychlic.com/hejpanel";
+    $rootDir = "https://krychlic.com/";
+    $folder = "hejpanel";
 }
 
-// Valid subpages
-$validPagesDynamic = [
-    "logged-out" => [
-        "panel" => "",
-        "submit" => "",
-        "login" => "",
-        "register" => ""
-    ],
-    "logged-in" => [
-        "live" => "",
-        "current" => "",
-        "review" => "",
-        "archive" => "",
-        "account" => "",
-        "panel" => ""
-    ],
-    "logged-in-superadmin" => [
-        "live" => "",
-        "current" => "",
-        "review" => "",
-        "archive" => "",
-        "users" => "",
-        "account" => "",
-        "panel" => ""
-    ]
+$prefix =  $rootDir . $folder;
+
+// Router settings
+require_once("php/classes/user.php");
+$validPagesPerUserType = [
+    UserType::temp->value => ["panel", "submit", "login", "register"],
+    UserType::admin->value => ["live", "current", "review", "archive", "account", "panel"],
+    UserType::superadmin->value => ["live", "current", "review", "archive", "users", "account", "panel"]
 ];
 
-// Will be filled later
-$validPages = [];
-
-// Subpages names
 $pageNames = array(
     "submit" => "Přidat panel",
     "login" => "Přihlášení",
@@ -80,3 +59,7 @@ $pageNames = array(
     "account" => "Účet",
     "users" => "Uživatelé"
 );
+
+
+// Connect to the databases
+$con = new Conn(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);

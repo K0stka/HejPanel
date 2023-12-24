@@ -3,4 +3,4 @@
     <iframe src="<?= $prefix ?>/panel" style="width: 1920px;height: 1080px;position:absolute;top:0;left:0;" class="auto-scale" data-target-width="100"></iframe>
 </div>
 <?php
-$jsManager->require("panel");
+$app->jsManager->require("panel");

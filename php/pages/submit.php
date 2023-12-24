@@ -30,4 +30,4 @@
     </div>
 </div>
 <?php
-$jsManager->require("submit", "panel");
+$app->jsManager->require("submit", "panel");

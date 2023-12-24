@@ -19,4 +19,4 @@
     <button id="submit">Zaregistrovat se</button>
 </form>
 <?php
-$jsManager->require("register");
+$app->jsManager->require("register");

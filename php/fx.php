@@ -85,7 +85,7 @@ function utf8json($array, $prettyPrint = false) { // json_encode() alternative
     );
 }
 
-function getUserIP() {
+function getClientIP() {
     // Get real visitor IP behind CloudFlare network
     if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
         $_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];

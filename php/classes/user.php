@@ -6,8 +6,8 @@ enum UserType: string {
     case superadmin = "superadmin";
 }
 
-class User {
-    private Conn $con;
+class User extends MySQLtoPHPautomapper {
+    protected Conn $con;
 
     private static string $sessionKey = "user";
 
@@ -22,33 +22,33 @@ class User {
 
     public int $fingerprintGroupId = -1;
 
-    public NotificationManager $notificationManager;
+    // Automapper settings
+    protected string $tableName = "users";
+    protected string $index = "id";
+    protected array $mapFromTo = [
+        "id" => ["id", StoredAs::int],
+        "name" => ["name", StoredAs::string],
+        "nickname" => ["nickname", StoredAs::string],
+        "password" => ["password", StoredAs::string],
+        "type" => ["type", StoredAs::enum, "UserType"],
+        "last_fingerprint" => ["lastFingerprint", StoredAs::json]
+    ];
 
-    public function __construct(array|int $searchParams) {
+    public function __construct(array|int $data, bool $shallow = false) {
         global $con;
         $this->con = $con;
 
-        if (is_int($searchParams)) {
-            $user = $con->select(true, "users")->where(["id" => $searchParams])->fetchRow();
-        } elseif (is_array($searchParams) && count($searchParams) != 0) {
-            $user = $con->select(true, "users")->where($searchParams)->fetchRow();
-        } else {
+        parent::__construct($data);
+
+        if ($shallow) return;
+
+        try {
+            $this->complete();
+        } catch (Exception) {
             return;
         }
 
-        if (count($user) == 0)
-            return;
-
         $this->exists = true;
-
-        $this->id = $user["id"];
-        $this->name = $user["name"];
-        $this->nickname = $user["nickname"];
-        $this->password = $user["password"];
-        $this->type = UserType::from($user["type"]);
-        $this->lastFingerprint = json_decode($user["last_fingerprint"] ?? "[]", true);
-
-        $this->notificationManager = new NotificationManager($this);
     }
 
     public function __toString(): string {
@@ -74,21 +74,17 @@ class User {
         return array_map(fn ($e) => json_decode($e["fingerprint"], true), $this->con->select("fingerprint", "sessions")->where(["user" => $this->id])->fetchAll());
     }
 
-    public function updateLastFingerprint(array $fingerprint) {
-        $this->con->update("users", ["last_fingerprint" => utf8json($fingerprint)])->where(["id" => $this->id])->execute();
-    }
-
-    public static function getUser(): User|bool {
+    public static function getUser(): ?User {
         if (!isset($_SESSION[self::$sessionKey])) {
-            return false;
+            return null;
         }
 
         $user = new User($_SESSION[self::$sessionKey]);
 
-        if (isset($_SESSION["fingerprint"])) $user->updateLastFingerprint($_SESSION["fingerprint"]);
+        if (isset($_SESSION["fingerprint"])) $user->update("lastFingerprint", $_SESSION["fingerprint"]);
 
         if (!$user->exists) {
-            return false;
+            return null;
         }
 
         return $user;

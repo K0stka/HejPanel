@@ -1,6 +1,8 @@
 <?php
 
 class PageManager {
+    public array $validPages;
+
     public string $pageName;
     public string $pageTitle;
 
@@ -16,23 +18,34 @@ class PageManager {
     public ?string $subpagePath = null;
 
     public function __construct(array $validPages, array $pageNames) {
+        $validPagesNormalized = [];
+        foreach ($validPages as $page => $validSubpages) {
+            if (is_numeric($page)) {
+                $validPagesNormalized[$validSubpages] = "";
+            } else {
+                $validPagesNormalized[$page] = $validSubpages;
+            }
+        }
+
+        $this->validPages = $validPagesNormalized;
+
         // Pages logic
-        if (isset($_GET["page"]) && isset($validPages[$_GET["page"]])) {
+        if (isset($_GET["page"]) && isset($this->validPages[$_GET["page"]])) {
             $this->page = $_GET["page"];
         } else {
-            $this->page = array_key_first($validPages);
+            $this->page = array_key_first($this->validPages);
         }
 
         $this->pagePath = "php/pages/" . $this->page . ".php";
 
         // Subpage logic
-        if (isset($_GET['subpage']) && is_array($validPages[$this->page]) && in_array($_GET['subpage'], $validPages[$this->page])) {
+        if (isset($_GET['subpage']) && is_array($this->validPages[$this->page]) && in_array($_GET['subpage'], $this->validPages[$this->page])) {
             $this->subpage = $_GET['subpage'];
             $this->subpagePath = "php/subpages/$this->page-$this->subpage.php";
-        } else if (isset($validPages[$this->page]) && is_array($validPages[$this->page]) && !empty($validPages[$this->page])) {
-            $this->subpage = $validPages[$this->page][array_key_first($validPages[$this->page])];
+        } else if (isset($this->validPages[$this->page]) && is_array($this->validPages[$this->page]) && !empty($this->validPages[$this->page])) {
+            $this->subpage = $this->validPages[$this->page][array_key_first($this->validPages[$this->page])];
             $this->subpagePath = "php/subpages/$this->page-$this->subpage.php";
-        } elseif (isset($validPages[$this->page]) && $validPages[$this->page] == "QUERY") {
+        } elseif (isset($this->validPages[$this->page]) && $this->validPages[$this->page] == "QUERY") {
             $this->subpageQuery = isset($_GET["subpage"]) && trim($_GET["subpage"]) != "" ? $_GET["subpage"] : null;
         }
 

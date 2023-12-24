@@ -1,7 +1,7 @@
-<h1>Ahoj <?= $user ?></h1>
+<h1>Ahoj <?= $app->user ?></h1>
 <?php
-out(array_filter((array)$user, fn ($e) => !$e instanceof Conn and !$e instanceof NotificationManager));
+out(array_filter((array)$app->user, fn ($e) => !$e instanceof Conn));
 ?>
 <button id="logout">Odhlásit se</button>
 <?php
-$jsManager->require("account");
+$app->jsManager->require("account");

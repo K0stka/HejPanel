@@ -10,11 +10,7 @@ class ActionManager {
 
     public bool $requiredAction = false;
 
-    public function __construct(User|bool $user) {
-        if (!$user) {
-            return;
-        }
-
+    public function __construct(User $user) {
         global $con;
         $this->con = $con;
 
@@ -28,7 +24,7 @@ class ActionManager {
     }
 
     private function getAction(): array {
-        $actionData = $this->con->query("SELECT id, type, data FROM actions WHERE user_id =", [$this->user->id], "AND fulfilled = false ORDER BY priority DESC LIMIT 1")->fetchRow();
+        $actionData = $this->con->select(["id", "type", "data"], "actions")->where(["user_id" => $this->user->id, "fulfilled" => "false"])->orderBy("priority", Order::maxToMin)->limit(1)->fetchRow();
 
         if (empty($actionData)) return [null, null, null];
 

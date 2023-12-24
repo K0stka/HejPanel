@@ -7,23 +7,26 @@ require_once("php/api/src/api.php");
 
 $api = new Api(); // Initiate api instance
 
-$user = User::getUser();
+// Create app object
+$app = new AppManager();
+$app->authenticate(User::getUser());
 
-$authenticated = new ApiEndpointCondition(function () use ($user) {
-    return $user != false;
+
+$authenticated = new ApiEndpointCondition(function () use ($app) {
+    return $app->authenticated;
 }, new ApiErrorResponse("Pro dokončení této akce musíš být přihlášený", 403));
 
-$notAuthenticated = new ApiEndpointCondition(function () use ($user) {
-    return $user == false;
+$notAuthenticated = new ApiEndpointCondition(function () use ($app) {
+    return !$app->authenticated;
 }, new ApiErrorResponse("Tuto akci nemůžeš provést, jelikož už jsi přihlášený", 403));
 
-$notAuthenticatedAsAdmin = new ApiEndpointCondition(function () use ($user) {
-    return $user == false || $user->type == UserType::temp;
+$notAuthenticatedAsAdmin = new ApiEndpointCondition(function () use ($app) {
+    return !$app->authenticated || $app->user->type == UserType::temp;
 }, new ApiErrorResponse("Tuto akci nemůžeš provést, jelikož už jsi přihlášený", 403));
 
-$api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::string, "password" => DataType::string], [$notAuthenticatedAsAdmin], function () use ($user) {
-    if ($user != false) User::logout();
-    unset($user);
+$api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::string, "password" => DataType::string], [$notAuthenticatedAsAdmin], function () use ($app) {
+    if ($app->authenticated) User::logout();
+    $app->user = null;
 
     $user = new User(["nickname" => $_POST["nickname"]]);
 
@@ -36,6 +39,7 @@ $api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::stri
     }
 
     User::login($user->id);
+    $app->authenticate($user);
 
     return new ApiSuccessResponse();
 });
@@ -67,15 +71,15 @@ $api->addEndpoint(Method::POST, ["type" => "register", "name" => Type::name, "ni
     return new ApiSuccessResponse();
 });
 
-$api->addEndpoint(Method::POST, ["type" => "setSubscription", "data" => DataType::json], [$authenticated], function () use ($con, $user) {
+$api->addEndpoint(Method::POST, ["type" => "setSubscription", "data" => DataType::json], [$authenticated], function () {
     $_SESSION["subscription"] = $_POST["data"];
 
     return new ApiSuccessResponse();
 });
 
-$api->addEndpoint(Method::POST, ["type" => "fingerprint", "fingerprint" => DataType::array], [$authenticated], function () use ($con, $user) {
+$api->addEndpoint(Method::POST, ["type" => "fingerprint", "fingerprint" => DataType::array], [$authenticated], function () {
     $_SESSION["fingerprint"] = $_POST["fingerprint"];
-    $_POST["fingerprint"]["ip"] = getUserIP();
+    $_POST["fingerprint"]["ip"] = getClientIP();
 
     return new ApiSuccessResponse();
 });

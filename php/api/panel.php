@@ -8,22 +8,25 @@ require_once("php/classes/panel.php");
 
 $api = new Api(); // Initiate api instance
 
-$user = User::getUser();
+// Create app object
+$app = new AppManager();
+$app->authenticate(User::getUser());
 
-$authenticated = new ApiEndpointCondition(function () use ($user) {
-    return $user != false;
+$authenticated = new ApiEndpointCondition(function () use ($app) {
+    return $app->user != false;
 }, new ApiErrorResponse("Pro dokončení této akce musíš být přihlášený", 403));
 
-$isAdmin = new ApiEndpointCondition(function () use ($user) {
-    return $user->type == UserType::admin || $user->type == UserType::superadmin;
+$isAdmin = new ApiEndpointCondition(function () use ($app) {
+    return $app->user->type == UserType::admin || $app->user->type == UserType::superadmin;
 }, new ApiErrorResponse("Nemáš dostatečná práva pro provedení této akce", 403));
 
-$api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date, "show_till" => Type::date, "fingerprint" => DataType::array, "panel_type" => array_map(fn ($e) => $e->value, PanelType::cases()), "content" => DataType::string, "note" => DataType::string], [], function () use ($user, $con) {
-    $_POST["fingerprint"]["ip"] = getUserIP();
-    if ($user == false) {
-        $user = new User(User::register("Temp" . substr(strval(time()), -6), "temp" . time(), "", UserType::temp));
-        User::login($user->id);
-        $user->updateLastFingerprint($_POST["fingerprint"]);
+$api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date, "show_till" => Type::date, "fingerprint" => DataType::array, "panel_type" => array_map(fn ($e) => $e->value, PanelType::cases()), "content" => DataType::string, "note" => DataType::string], [], function () use ($app, $con) {
+    $_POST["fingerprint"]["ip"] = getClientIP();
+
+    if ($app->user == false) {
+        $app->user = new User(User::register("Temp" . substr(strval(time()), -6), "temp" . time(), "", UserType::temp));
+        User::login($app->user->id);
+        $app->user->update("lastFingerprint", $_POST["fingerprint"]);
     }
 
     $_SESSION["fingerprint"] = $_POST["fingerprint"];
@@ -44,7 +47,7 @@ $api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date
     }
 
     $con->insert("panels", [
-        "posted_by" => $user->id,
+        "posted_by" => $app->user->id,
         "show_from" => $_POST["show_from"],
         "show_till" => $_POST["show_till"],
         "type" => $panelType->value,
