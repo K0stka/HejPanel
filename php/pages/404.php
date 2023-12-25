@@ -3,7 +3,7 @@
 require_once("../conf.php");
 
 $app->cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
-$app->jsManager->require("ajax", "index", "api", "transitions");
+$app->jsManager->require("ajax", "index", "api", "transitions", "bind");
 ?>
 <!DOCTYPE html>
 <html lang="cs">
@@ -24,7 +24,7 @@ $app->jsManager->require("ajax", "index", "api", "transitions");
     <meta name="mobile-web-app-capable" content="yes">
 
     <link rel="manifest" href="<?= $prefix ?>/assets/manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="<?= COLOR ?>">
     <meta name="description" content="<?= DESCRIPTION ?>">
 
     <link rel="icon" href="<?= $prefix ?>/assets/icons/icon.png">

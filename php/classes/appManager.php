@@ -11,52 +11,64 @@ class AppManager {
     public ModuleManager $jsManager;
     public ModuleManager $cssManager;
 
+    public BindManager $bind;
+
     public ?array $tables = null;
 
-    function authenticate(?User $user) {
+    public function __construct() {
+        $this->cssManager = new ModuleManager(ModuleType::CSS, false);
+        $this->jsManager = new ModuleManager(ModuleType::JS, false, true);
+
+        $this->bind = new BindManager();
+    }
+
+    public function authenticate(?User $user) {
         if ($user) {
             $this->authenticated = true;
             $this->user = $user;
 
             // $this->actionManager = new ActionManager($this->user); Not needed here
 
-            // $this->notificationManager = new NotificationManager($this->user); Not needed here
+            $this->notificationManager = new NotificationManager($this->user); //Not needed here
         }
     }
 
-    function initiateRouter(array $validSubpagesByUserType, array $pageNames) {
-        $this->cssManager = new ModuleManager(ModuleType::CSS, false);
-
-        $this->jsManager = new ModuleManager(ModuleType::JS, false);
-        $this->jsManager->defer(true);
-
+    public function initiateRouter(array $validSubpagesByUserType, array $pageNames) {
         $this->pageManager = new PageManager(
             $validSubpagesByUserType[($this->user ? $this->user->type->value : UserType::cases()[0]->value)],
             $pageNames
         );
     }
 
-    function synchronizeTables() {
+    public function synchronizeTables() {
     }
 
-    function updateManifest() {
+    public function updateManifest() {
         global $folder;
         $manifest = '{
-            "name": "' . NAME . '",
-            "short_name": "' . NAME . '",
-            "start_url": "/' . $folder . '/",
-            "scope": "/' . $folder . '/",
-            "background_color": "' . COLOR . '",
-            "theme_color": "' . COLOR . '",
-            "description": "' . DESCRIPTION . '",
-            "orientation": "portrait",
-            "display": "standalone",
-            "lang": "cs-CZ",
-            "icons": [
-                { "purpose": "maskable", "sizes": "512x512", "src": "icons/icon512_maskable.png", "type": "image/png" },
-                { "purpose": "any", "sizes": "512x512", "src": "icons/icon512_rounded.png", "type": "image/png" }
-            ]
-        }';
+	"name": "' . NAME . '",
+	"short_name": "' . NAME . '",
+	"start_url": "/' . $folder . '/",
+	"scope": "/' . $folder . '/",
+	"background_color": "' . COLOR . '",
+	"theme_color": "' . COLOR . '",
+	"description": "' . DESCRIPTION . '",
+	"orientation": "portrait",
+	"display": "standalone",
+	"lang": "cs-CZ",
+	"icons": [
+		{ "purpose": "maskable", "sizes": "512x512", "src": "icons/icon512_maskable.png", "type": "image/png" },
+		{ "purpose": "any", "sizes": "512x512", "src": "icons/icon512_rounded.png", "type": "image/png" }
+	]
+}
+';
         file_put_contents("assets/manifest.json", $manifest);
+    }
+
+    public function clearMinifiedPackages() {
+        $files = array_filter(scandir("generated/packages"), fn ($e) => is_file("generated/packages/" . $e));
+        foreach ($files as $file) {
+            unlink("generated/packages/" . $file);
+        }
     }
 }

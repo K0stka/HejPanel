@@ -1,7 +1,7 @@
 <?php
 
 spl_autoload_register(function ($name) {
-    $components = ["PanelReview"];
+    $components = ["PanelReview", "AdminSetting"];
     if (in_array($name, $components)) {
         require_once("php/components/" . lcfirst($name) . ".php");
     } else {

@@ -15,7 +15,7 @@ ob_start();
 
 if ($app->pageManager->isNormalRequest) { // Only for initial page load
     $app->cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
-    $app->jsManager->require("ajax", "index", "api", "transitions");
+    $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
 ?>
     <!DOCTYPE html>
     <html lang="cs">
@@ -46,7 +46,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
         <meta name="mobile-web-app-capable" content="yes">
 
         <link rel="manifest" href="<?= $prefix ?>/assets/manifest.json<?= $v ?>">
-        <meta name="theme-color" content="#ffffff">
+        <meta name="theme-color" content="<?= COLOR ?>">
         <meta name="description" content="<?= DESCRIPTION ?>">
 
         <link rel="icon" href="<?= $prefix ?>/assets/icons/icon.png">
@@ -69,10 +69,10 @@ if ($app->pageManager->page == "panel") {
     include($app->pageManager->pagePath);
 } else {
     // Not used
-    // if ($app->user && $app->user->type != UserType::temp && !($_SESSION["subscription"] ?? null)) {
-    //     $app->jsManager->passToJS(["PUBLIC_KEY" => $app->user->notificationManager::PUBLIC_KEY]);
-    //     $app->jsManager->require("notifications");
-    // }
+    if ($app->user && $app->user->type != UserType::temp && !($_SESSION["subscription"] ?? null)) {
+        $app->jsManager->passToJS(["PUBLIC_KEY" => $app->notificationManager::PUBLIC_KEY]);
+        $app->jsManager->require("notifications");
+    }
     if ($app->user && !($_SESSION["fingerprint"] ?? null)) {
         $app->jsManager->require("fingerprint");
     }
@@ -134,3 +134,5 @@ if ($app->pageManager->isNormalRequest) {
     $app->cssManager->fetch(false);
     $app->jsManager->fetch(false);
 }
+
+$app->bind->handleEventHandlers();

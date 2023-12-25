@@ -9,7 +9,7 @@ enum UserType: string {
 class User extends MySQLtoPHPautomapper {
     protected Conn $con;
 
-    private static string $sessionKey = "user";
+    public const SESSION_KEY = "user";
 
     public bool $exists = false;
 
@@ -75,11 +75,11 @@ class User extends MySQLtoPHPautomapper {
     }
 
     public static function getUser(): ?User {
-        if (!isset($_SESSION[self::$sessionKey])) {
+        if (!isset($_SESSION[self::SESSION_KEY])) {
             return null;
         }
 
-        $user = new User($_SESSION[self::$sessionKey]);
+        $user = new User($_SESSION[self::SESSION_KEY]);
 
         if (isset($_SESSION["fingerprint"])) $user->update("lastFingerprint", $_SESSION["fingerprint"]);
 
@@ -91,11 +91,11 @@ class User extends MySQLtoPHPautomapper {
     }
 
     public static function login(int $userId) {
-        $_SESSION[self::$sessionKey] = $userId;
+        $_SESSION[self::SESSION_KEY] = $userId;
     }
 
     public static function logout() {
-        unset($_SESSION[self::$sessionKey]);
+        unset($_SESSION[self::SESSION_KEY]);
     }
 
     public static function register(string $name, string $nickname, string $passwordHash, UserType $userType): int {

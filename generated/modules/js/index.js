@@ -167,6 +167,12 @@ const onReady = () => {
 				}
 		});
 	});
+
+	document.querySelectorAll("*[bind]").forEach((e) => {
+		e.addEventListener("click", function () {
+			emitEvent(e.getAttribute("bind"));
+		});
+	});
 };
 
 document.addEventListener("DOMContentLoaded", onReady);

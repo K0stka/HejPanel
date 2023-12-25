@@ -1,3 +1,4 @@
 /uploads
 /generated/packages/
 .vscode/settings.json
+.env.php

@@ -23,7 +23,7 @@ if (DEV) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
 
-    define("SERVICE_WORKER_ENABLED", false);
+    define("SERVICE_WORKER_ENABLED", true);
 
     $v = "?v=1";
 
