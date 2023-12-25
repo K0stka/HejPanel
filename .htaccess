@@ -31,10 +31,11 @@ ErrorDocument 404 /HejPanel/php/pages/404.php
 </If>
 <Else>
 ErrorDocument 404 /hejpanel/php/pages/404.php
+</Else>
 
+RewriteCond %{HTTP_HOST} krychlic
 RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-</Else>
 
 <IfModule mod_expires.c>  
   ExpiresActive on
