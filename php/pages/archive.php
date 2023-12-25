@@ -8,9 +8,12 @@ $fingerprintMap = User::getFingerprintToUsersMap();
 
 foreach ($panels as $panel) {
 ?>
-    <?= PanelReview::render($panel, $fingerprintMap, function () {
+    <?= PanelReview::render($panel, $fingerprintMap, function () use ($app, $panel) {
     ?>
-        <button>Zobrazit</button>
+        <button <?= $app->bind->onClick(function () use ($panel) {
+                    $panel->update("showOverride", ShowOverride::show);
+                })->then(RELOAD) ?>>
+            Zobrazit</button>
     <?php
     }) ?>
 <?php

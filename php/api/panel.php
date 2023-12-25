@@ -51,7 +51,7 @@ $api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date
             [
                 "postedBy" => $app->user->id,
                 "showFrom" => $_POST["show_from"] . " 00:00:00",
-                "showTill" => $_POST["show_till"] . " 00:00:00",
+                "showTill" => $_POST["show_till"] . " 23:59:59",
                 "type" => $panelType->value,
                 "content" => $_POST["content"],
                 "note" => escapeConservative($_POST["note"], true)
@@ -66,7 +66,7 @@ $api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date
                 "approvedBy" => $app->user->id,
                 "approvedAt" => date(MYSQL_DATETIME),
                 "showFrom" => $_POST["show_from"] . " 00:00:00",
-                "showTill" => $_POST["show_till"] . " 00:00:00",
+                "showTill" => $_POST["show_till"] . " 23:59:59",
                 "type" => $panelType->value,
                 "content" => $_POST["content"],
                 "note" => escapeConservative($_POST["note"], true)

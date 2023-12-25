@@ -78,8 +78,8 @@ $api->addEndpoint(Method::POST, ["type" => "setSubscription", "data" => DataType
 });
 
 $api->addEndpoint(Method::POST, ["type" => "fingerprint", "fingerprint" => DataType::array], [$authenticated], function () {
-    $_SESSION["fingerprint"] = $_POST["fingerprint"];
     $_POST["fingerprint"]["ip"] = getClientIP();
+    $_SESSION["fingerprint"] = $_POST["fingerprint"];
 
     return new ApiSuccessResponse();
 });

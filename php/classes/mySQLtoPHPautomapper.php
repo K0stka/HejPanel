@@ -124,11 +124,11 @@ class MySQLtoPHPautomapper {
             case StoredAs::nullableDatetime:
                 return $what ? $what->format(MYSQL_DATETIME) : MySQL::NULL;
             case StoredAs::bool:
-                return $what ? 1 : 0;
+                return ($what == true ? 1 : ($what == false ? false : MYSQL::NULL));
             case StoredAs::json:
                 return utf8json($what);
             case StoredAs::enum:
-                return $what->value;
+                return $what->value != "" ? $what->value : MySQL::NULL;
             case StoredAs::foreignId:
                 return $what->id;
         }

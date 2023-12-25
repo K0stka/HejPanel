@@ -23,6 +23,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
     <head>
         <script>
             const base_url = "<?= $prefix ?>";
+            const PUBLIC_KEY = "<?= PUBLIC_KEY ?>";
 
             <?php
             Validator::generateJsValues();
@@ -68,12 +69,10 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
 if ($app->pageManager->page == "panel") {
     include($app->pageManager->pagePath);
 } else {
-    // Not used
-    if ($app->user && $app->user->type != UserType::temp && !($_SESSION["subscription"] ?? null)) {
-        $app->jsManager->passToJS(["PUBLIC_KEY" => PUBLIC_KEY]);
+    if ($app->authenticated && $app->user->type != UserType::temp && !($_SESSION["subscription"] ?? null)) {
         $app->jsManager->require("notifications");
     }
-    if ($app->user && !($_SESSION["fingerprint"] ?? null)) {
+    if ($app->authenticated && !($_SESSION["fingerprint"] ?? null)) {
         $app->jsManager->require("fingerprint");
     }
     ?>

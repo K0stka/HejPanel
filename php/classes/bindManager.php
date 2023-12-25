@@ -1,4 +1,7 @@
 <?php
+
+define("RELOAD", "fadeTo(window.location.href);");
+
 class BindManager {
     private array $eventHandlers = [];
 
