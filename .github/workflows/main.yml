@@ -1,0 +1,17 @@
+on: push
+name: 🚀 Deploy website on push
+jobs:
+    web-deploy:
+        name: 🎉 Deploy
+        runs-on: ubuntu-latest
+        steps:
+            - name: 🚚 Get latest code
+              uses: actions/checkout@v3
+
+            - name: 📂 Sync files
+              uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+              with:
+                  server: hosting2334422.online.pro
+                  username: k0stka@krychlic.com
+                  password: ${{ secrets.FTP_PASSWORD }}
+                  server-dir: hejpanel

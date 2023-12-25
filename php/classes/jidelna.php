@@ -14,6 +14,8 @@ class Jidelna {
     }
 
     public function fetchDay(DateTime $day) {
+        if ($day->format("N") > 5) return ["result" => "error"];
+
         $cacheHit = $this->readFromCache($day);
         if (!empty($cacheHit)) return $cacheHit;
 
