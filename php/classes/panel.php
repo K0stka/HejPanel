@@ -15,7 +15,7 @@ class Panel extends MySQLtoPHPautomapper {
 
     public bool $approved;
     public User $approvedBy;
-    public DateTime $approvedAt;
+    public ?DateTime $approvedAt;
 
     public DateTime $showFrom;
     public DateTime $showTill;
@@ -34,7 +34,7 @@ class Panel extends MySQLtoPHPautomapper {
         "posted_at" => ["postedAt", StoredAs::datetime],
         "approved" => ["approved", StoredAs::bool],
         "approved_by" => ["approvedBy", StoredAs::foreignId, "User"],
-        "approved_at" => ["approvedAt", StoredAs::datetime],
+        "approved_at" => ["approvedAt", StoredAs::nullableDatetime],
         "show_from" => ["showFrom", StoredAs::datetime],
         "show_till" => ["showTill", StoredAs::datetime],
         "type" => ["type", StoredAs::enum, "PanelType"],

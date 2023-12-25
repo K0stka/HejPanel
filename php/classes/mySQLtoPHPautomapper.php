@@ -5,6 +5,7 @@ enum StoredAs {
     case string;
     case int;
     case datetime;
+    case nullableDatetime;
     case bool;
     case json;
     case enum;
@@ -116,6 +117,8 @@ class MySQLtoPHPautomapper {
                 return $what;
             case StoredAs::datetime:
                 return $what->format('Y-m-d H:i:s');
+            case StoredAs::nullableDatetime:
+                return $what ? $what->format('Y-m-d H:i:s') : MySQL::NULL;
             case StoredAs::bool:
                 return $what ? 1 : 0;
             case StoredAs::json:
@@ -134,6 +137,8 @@ class MySQLtoPHPautomapper {
             case StoredAs::int:
                 return intval($what);
             case StoredAs::datetime:
+                return DateTime::createFromFormat('Y-m-d H:i:s', $what ?? "1970-1-1 00:00:00");
+            case StoredAs::nullableDatetime:
                 return $what ? DateTime::createFromFormat('Y-m-d H:i:s', $what) : null;
             case StoredAs::bool:
                 return $what;
