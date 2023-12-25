@@ -116,9 +116,9 @@ class MySQLtoPHPautomapper {
             case StoredAs::int:
                 return $what;
             case StoredAs::datetime:
-                return $what->format('Y-m-d H:i:s');
+                return $what->format(MYSQL_DATETIME);
             case StoredAs::nullableDatetime:
-                return $what ? $what->format('Y-m-d H:i:s') : MySQL::NULL;
+                return $what ? $what->format(MYSQL_DATETIME) : MySQL::NULL;
             case StoredAs::bool:
                 return $what ? 1 : 0;
             case StoredAs::json:
@@ -137,9 +137,9 @@ class MySQLtoPHPautomapper {
             case StoredAs::int:
                 return intval($what);
             case StoredAs::datetime:
-                return DateTime::createFromFormat('Y-m-d H:i:s', $what ?? "1970-1-1 00:00:00");
+                return DateTime::createFromFormat(MYSQL_DATETIME, $what ?? "1970-1-1 00:00:00");
             case StoredAs::nullableDatetime:
-                return $what ? DateTime::createFromFormat('Y-m-d H:i:s', $what) : null;
+                return $what ? DateTime::createFromFormat(MYSQL_DATETIME, $what) : null;
             case StoredAs::bool:
                 return $what;
             case StoredAs::json:

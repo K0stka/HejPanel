@@ -8,6 +8,7 @@ define("DATE_DM_FORMAT", "j. n.");
 define("DATE_DMY_FORMAT", "j. n. Y");
 define("TIME_HM_FORMAT", "G:i");
 define("TIME_HMS_FORMAT", "G:i:s");
+define("MYSQL_DATETIME", "Y-m-d H:i:s");
 
 // Define side-wide constants
 define('PREFIX', str_replace(["php\conf.php", "php/conf.php"], '', __FILE__));

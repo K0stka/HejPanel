@@ -77,30 +77,30 @@ class Panel extends MySQLtoPHPautomapper {
     public static function getPanelsByIds(array $ids): array {
         global $con;
         if (empty($ids)) return [];
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= ", [date("Y-m-d")], " AND show_till >= ", [date("Y-m-d")], ") AND (", join(" OR ", array_map(fn ($e) => "id = " . $e, $ids)), ")")->orderBy("show_from", Order::minToMax)->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ") AND (", join(" OR ", array_map(fn ($e) => "id = " . $e, $ids)), ")")->orderBy("show_from", Order::minToMax)->fetchAll());
     }
 
     /** @return Panel[] */
     public static function getVisiblePanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= ", [date("Y-m-d")], " AND show_till >= ", [date("Y-m-d")], ")")->orderBy("show_from", Order::minToMax)->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")")->orderBy("show_from", Order::minToMax)->fetchAll());
     }
 
     public static function getVisiblePanelsIDs(): array {
         global $con;
-        return $con->select("id", "panels")->addSQL("WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= ", [date("Y-m-d")], " AND show_till >= ", [date("Y-m-d")], ")")->orderBy("show_from", Order::minToMax)->fetchColumn();
+        return $con->select("id", "panels")->addSQL("WHERE show_override = 'show' OR (show_override IS NULL AND approved = 'true' AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")")->orderBy("show_from", Order::minToMax)->fetchColumn();
     }
 
     /** @return Panel[] */
     public static function getExpiredPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_till < ", [date("Y-m-d")], " or (approved = 'false' AND approved_by IS NOT NULL) or show_override = 'false'")->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_till <= ", [date(MYSQL_DATETIME)], " or (approved = 'false' AND approved_by IS NOT NULL) or show_override = 'false'")->fetchAll());
     }
 
     /** @return Panel[] */
     public static function getWaitingPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_till < ", [date("Y-m-d")], " AND approved_at IS NULL")->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_till <= ", [date(MYSQL_DATETIME)], " AND approved_at IS NULL")->fetchAll());
     }
 
     public static function countWaitingPanels(): int {
