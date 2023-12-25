@@ -30,6 +30,9 @@ if (DEV) {
     $rootDir = (substr($_SERVER['SERVER_NAME'], -9) == "localhost" ? "http://localhost/" : "http://192.168.137.1/");
     $folder = "HejPanel";
 } else {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+
     define("SERVICE_WORKER_ENABLED", true);
 
     $v = "?v=2";

@@ -21,7 +21,7 @@ class Conn {
             $this->mysqli->set_charset("utf8mb4");
         } catch (Exception $e) {
             error_log($e->getMessage());
-            if (DEV || true) {
+            if (DEV) {
                 global $query;
                 printError("Error querying the database", ["Message" => $e->getMessage()]);
             } else {
@@ -40,7 +40,7 @@ class Conn {
         $paramsTypes = "";
         $params = [];
         $exceptionHandler = function (Exception $e, array $args, string $query, array $params) {
-            if (DEV || true) {
+            if (DEV) {
                 printError("Error querying the database", ["Message" => $e->getMessage(), "Args" => $args, "Query" => $query, "Params" => $params]);
             } else {
                 printError("Error querying the database");
