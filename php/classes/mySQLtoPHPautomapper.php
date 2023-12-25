@@ -103,6 +103,10 @@ class MySQLtoPHPautomapper {
             $this->con->update($this->tableName, [$reverseMapping[0] => self::toMySQL($reverseMapping[1], $value)])->where([$this->index => $this->{$this->index}])->execute();
     }
 
+    public function insert() {
+        $this->{$this->index} = $this->con->insert($this->tableName, $this->serializeToMySQLValuesAndKeys());
+    }
+
     public function __destruct() {
         if (!$this->updateAllOnDestroy) return;
 

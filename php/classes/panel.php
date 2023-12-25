@@ -100,12 +100,12 @@ class Panel extends MySQLtoPHPautomapper {
     /** @return Panel[] */
     public static function getWaitingPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_till <= ", [date(MYSQL_DATETIME)], " AND approved_at IS NULL")->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_till >= ", [date(MYSQL_DATETIME)], " AND approved_at IS NULL")->fetchAll());
     }
 
     public static function countWaitingPanels(): int {
         global $con;
-        return $con->select(["COUNT(*)" => "count"], "panels")->addSQL("WHERE show_till <= ", [date(MYSQL_DATETIME)], " AND approved_at IS NULL")->fetchRow()["count"];
+        return $con->select(["COUNT(*)" => "count"], "panels")->addSQL("WHERE show_till >= ", [date(MYSQL_DATETIME)], " AND approved_at IS NULL")->fetchRow()["count"];
     }
 
     public static function getEmptyPanel(): Panel {

@@ -154,7 +154,7 @@ class Conn {
     }
 
     public function insert(string $into, array $values): int {
-        $this->queryTemp = ["INSERT INTO $into " . join(", ", array_keys($values)) . " VALUES ("];
+        $this->queryTemp = ["INSERT INTO $into (" . join(", ", array_keys($values)) . ") VALUES ("];
 
         foreach ($values as $value) {
             $this->queryTemp[] = [$value];
@@ -165,8 +165,7 @@ class Conn {
 
         $this->queryTemp[] = ")";
 
-        $this->query($this->queryTemp);
-        $this->queryTemp = [];
+        $this->execute();
 
         return $this->insertID();
     }

@@ -99,8 +99,14 @@ class User extends MySQLtoPHPautomapper {
     }
 
     public static function register(string $name, string $nickname, string $passwordHash, UserType $userType): int {
-        global $con;
-        return $con->insert("users", ["name" => $name, "nickname" => $nickname, "password" => $passwordHash, "type" => $userType->value]);
+        $user = new User([
+            "name" => $name,
+            "nickname" => $nickname,
+            "password" => $passwordHash,
+            "type" => $userType->value
+        ], true);
+        $user->insert();
+        return $user->id;
     }
 
     /** @return User[] */

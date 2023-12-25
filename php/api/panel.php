@@ -46,14 +46,19 @@ $api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date
             break;
     }
 
-    $con->insert("panels", [
-        "posted_by" => $app->user->id,
-        "show_from" => $_POST["show_from"],
-        "show_till" => $_POST["show_till"],
-        "type" => $panelType->value,
-        "content" => $_POST["content"],
-        "note" => escapeConservative($_POST["note"], true)
-    ]);
+    $panel = new Panel(
+        [
+            "postedBy" => $app->user->id,
+            "showFrom" => $_POST["show_from"] . " 00:00:00",
+            "showTill" => $_POST["show_till"] . " 00:00:00",
+            "type" => $panelType->value,
+            "content" => $_POST["content"],
+            "note" => escapeConservative($_POST["note"], true)
+        ],
+        true
+    );
+
+    $panel->insert();
 
     return new ApiSuccessResponse();
 });
