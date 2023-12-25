@@ -65,6 +65,16 @@ class AppManager {
         file_put_contents("assets/manifest.json", $manifest);
     }
 
+    public function incrementVersion() {
+        global $v;
+
+        $str = file_get_contents('php/cong.php');
+
+        $str = str_replace("\$v = \"$v\";", "\$v = \"?v=" . (intval(substr($v, 3)) + 1) . "\";", $str);
+
+        file_put_contents('php/cong.php', $str);
+    }
+
     public function clearMinifiedPackages() {
         $files = array_filter(scandir("generated/packages"), fn ($e) => is_file("generated/packages/" . $e));
         foreach ($files as $file) {

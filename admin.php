@@ -91,6 +91,15 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                 "window.location.reload();"
             ) ?>
             <?= AdminSetting::render(
+                "App version",
+                "Current version: " . substr($v, 3),
+                "Increment version",
+                function () use ($app) {
+                    $app->incrementVersion();
+                },
+                "window.location.reload();"
+            ) ?>
+            <?= AdminSetting::render(
                 "MySQL database structure",
                 "WARNING - REMOVES ALL DATA",
                 "Update tables",
