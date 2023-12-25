@@ -14,4 +14,4 @@ jobs:
                   server: hosting2334422.online.pro
                   username: k0stka@krychlic.com
                   password: ${{ secrets.FTP_PASSWORD }}
-                  server-dir: hejpanel
+                  server-dir: ./hejpanel/
