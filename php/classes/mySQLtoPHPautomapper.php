@@ -142,7 +142,7 @@ class MySQLtoPHPautomapper {
             case StoredAs::enum:
                 return eval("return $additionalParam::from(\"$what\");");
             case StoredAs::foreignId:
-                return eval("return new $additionalParam($what ?? -1);");
+                return eval("return new $additionalParam(" . ($what ?? -1) . ");");
         }
     }
 }
