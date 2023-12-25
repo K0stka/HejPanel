@@ -7,7 +7,7 @@ let cacheId = "";
 let appShellFiles = [];
 
 const appStaticFiles = ["/assets/pwa/index.php", "/assets/icons/icon.png", "/assets/icons/icon-192x192.png"]; // Cached on install in the format: prefix + i
-const appDynamicFiles = ["/css/reset-fonts-phone-transitions-dialog-index.css", "/js/ajax-index-api-transitions.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
+const appDynamicFiles = ["/css/reset-fonts-transitions-dialog-index-phone.css", "/js/ajax-index-api-transitions-bind.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
 
 let allowCache = []; // Cached on first request in the format: prefix + i
 

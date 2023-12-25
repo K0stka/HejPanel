@@ -5,7 +5,7 @@ require_once("../../php/conf.php");
 $app = new AppManager();
 $app->initiateRouter([UserType::temp->value => [""]], []);
 
-$app->cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
+$app->cssManager->require("reset", "fonts", "transitions", "dialog", "index", "phone");
 $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
 ?>
 <!DOCTYPE html>

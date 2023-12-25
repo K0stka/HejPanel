@@ -14,7 +14,7 @@ $app->initiateRouter($validPagesPerUserType, $pageNames);
 ob_start();
 
 if ($app->pageManager->isNormalRequest) { // Only for initial page load
-    $app->cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
+    $app->cssManager->require("reset", "fonts", "transitions", "dialog", "index", "phone");
     $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
 ?>
     <!DOCTYPE html>
