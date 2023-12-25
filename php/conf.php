@@ -48,8 +48,8 @@ $prefix =  $rootDir . $folder;
 require_once("php/classes/user.php");
 $validPagesPerUserType = [
     UserType::temp->value => ["panel", "submit", "login", "register"],
-    UserType::admin->value => ["live", "current", "review", "archive", "account", "panel"],
-    UserType::superadmin->value => ["live", "current", "review", "archive", "users", "account", "panel"]
+    UserType::admin->value => ["live", "submit", "current", "review", "archive", "account", "panel"],
+    UserType::superadmin->value => ["live", "submit", "current", "review", "archive", "users", "account", "panel"]
 ];
 
 $pageNames = array(

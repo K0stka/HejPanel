@@ -46,17 +46,34 @@ $api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date
             break;
     }
 
-    $panel = new Panel(
-        [
-            "postedBy" => $app->user->id,
-            "showFrom" => $_POST["show_from"] . " 00:00:00",
-            "showTill" => $_POST["show_till"] . " 00:00:00",
-            "type" => $panelType->value,
-            "content" => $_POST["content"],
-            "note" => escapeConservative($_POST["note"], true)
-        ],
-        true
-    );
+    if ($app->user->type == UserType::temp) {
+        $panel = new Panel(
+            [
+                "postedBy" => $app->user->id,
+                "showFrom" => $_POST["show_from"] . " 00:00:00",
+                "showTill" => $_POST["show_till"] . " 00:00:00",
+                "type" => $panelType->value,
+                "content" => $_POST["content"],
+                "note" => escapeConservative($_POST["note"], true)
+            ],
+            true
+        );
+    } else {
+        $panel = new Panel(
+            [
+                "postedBy" => $app->user->id,
+                "approved" => true,
+                "approvedBy" => $app->user->id,
+                "approvedAt" => date(MYSQL_DATETIME),
+                "showFrom" => $_POST["show_from"] . " 00:00:00",
+                "showTill" => $_POST["show_till"] . " 00:00:00",
+                "type" => $panelType->value,
+                "content" => $_POST["content"],
+                "note" => escapeConservative($_POST["note"], true)
+            ],
+            true
+        );
+    }
 
     $panel->insert();
 
