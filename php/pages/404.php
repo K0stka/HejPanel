@@ -2,6 +2,9 @@
 // Include default dependencies
 require_once("../conf.php");
 
+$app = new AppManager();
+$app->initiateRouter([UserType::temp->value => [""]], []);
+
 $app->cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
 $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
 ?>
@@ -17,7 +20,7 @@ $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
         }
     </script>
 
-    <title><?= NAME ?></title>
+    <title>404 | <?= NAME ?></title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,11 +41,12 @@ $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
 
 <body>
     <header>
+        <img src="<?= $prefix ?>/assets/icons/icon.png" class="logo">
         <?= NAME ?>
     </header>
     <div class="mainWrapper">
         <main>
-            <div>Chyba 404</div>
+            <h1>Chyba 404</h1>
             Nejsme schopni kontaktovat server, zkontrolujte prosím připojení k internetu a zkuste to znovu.<br><br>
             (Požadovaná adresa: <?= "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>)<br>
             (Technické specifikace požadavku: <?= utf8json($_GET) ?>)

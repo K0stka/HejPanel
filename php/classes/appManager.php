@@ -3,8 +3,8 @@ class AppManager {
     public bool $authenticated = false;
     public ?User $user = null;
 
-    public ?ActionManager $actionManager = null;
-    public ?NotificationManager $notificationManager = null;
+    public ActionManager $actionManager;
+    public NotificationManager $notificationManager;
 
     public PageManager $pageManager;
 

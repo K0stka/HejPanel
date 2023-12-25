@@ -70,7 +70,7 @@ if ($app->pageManager->page == "panel") {
 } else {
     // Not used
     if ($app->user && $app->user->type != UserType::temp && !($_SESSION["subscription"] ?? null)) {
-        $app->jsManager->passToJS(["PUBLIC_KEY" => $app->notificationManager::PUBLIC_KEY]);
+        $app->jsManager->passToJS(["PUBLIC_KEY" => PUBLIC_KEY]);
         $app->jsManager->require("notifications");
     }
     if ($app->user && !($_SESSION["fingerprint"] ?? null)) {

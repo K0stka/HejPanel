@@ -2,9 +2,8 @@
 // Include default dependencies
 require_once("../../php/conf.php");
 
-// Initiate module managers
-$app->cssManager = new ModuleManager(ModuleType::CSS, false);
-$app->jsManager = new ModuleManager(ModuleType::JS, false);
+$app = new AppManager();
+$app->initiateRouter([UserType::temp->value => [""]], []);
 
 $app->cssManager->require("reset", "fonts", "phone", "transitions", "dialog", "index");
 $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
@@ -48,16 +47,17 @@ $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
 
 <body>
     <header>
-        Zkoušení
+        <img src="<?= $prefix ?>/assets/icons/icon.png" class="logo">
+        <?= NAME ?>
     </header>
     <div class="mainWrapper">
         <main>
-            <div class="title">Jsi offline</div>
+            <h1>Jsi offline</h1>
             Prosím zkontroluj svůl přístup k internetu a zkus to znovu.
         </main>
     </div>
     <footer>
-        <a href="<?= $prefix ?>" class="footerBtn">
+        <a href="<?= $prefix ?>" data-hierarchy="0">
             Obnovit stránku
         </a>
     </footer>
