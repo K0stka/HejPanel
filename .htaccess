@@ -2,9 +2,6 @@ RewriteEngine On
 
 FileETag MTime Size
 
-#RewriteCond %{HTTPS} off
-#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-
 RewriteRule ^php/pages/404.php php/pages/404.php [END,L]
 
 RewriteRule ^admin admin.php [END,L]
@@ -33,7 +30,10 @@ RewriteRule ^(.*)/?$ index.php?page=$1 [END,L]
 ErrorDocument 404 /HejPanel/php/pages/404.php
 </If>
 <Else>
-ErrorDocument 404 /HejPanel/php/pages/404.php
+ErrorDocument 404 /hejpanel/php/pages/404.php
+
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 </Else>
 
 <IfModule mod_expires.c>  

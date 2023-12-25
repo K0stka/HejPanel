@@ -15,3 +15,10 @@ jobs:
                   username: k0stka@krychlic.com
                   password: ${{ secrets.FTP_PASSWORD }}
                   server-dir: ./hejpanel/
+                  exclude: |
+                      **/.env.php
+                      **/.git*
+                      **/.composer*
+                      **/.git*/**
+                      **/uploads/**
+                      **/generated/packages/**
