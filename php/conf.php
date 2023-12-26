@@ -61,7 +61,7 @@ $pageNames = array(
     "review" => "Čeká na povolení",
     "archive" => "Archiv panelů",
     "account" => "Účet",
-    "users" => "Uživatelé"
+    "users" => "Dočasní uživatelé"
 );
 
 

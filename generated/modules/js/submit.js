@@ -96,6 +96,8 @@ if (submitBtn) {
 		if (VALIDATE_FORM(submitForm, "error")) {
 			GET_FINGERPRINT().then((fp) => {
 				if (selectedImage) {
+					if (API_MANAGER.apiBusy) return;
+
 					let fileName = "";
 					API_MANAGER.schedule(
 						new ApiTask(
@@ -125,7 +127,10 @@ if (submitBtn) {
 								note: document.querySelector("#note").value,
 							},
 							new ApiCallback(() => {
-								createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na hejpanelu");
+								const dialog = createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na HejPanelu.");
+								dialog.addEventListener("close", () => {
+									fadeTo(base_url + "/");
+								});
 							}),
 						),
 					);
@@ -141,7 +146,10 @@ if (submitBtn) {
 							note: document.querySelector("#note").value,
 						},
 						new ApiCallback(() => {
-							createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na hejpanelu");
+							const dialog = createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na HejPanelu.");
+							dialog.addEventListener("close", () => {
+								fadeTo(base_url + "/");
+							});
 						}),
 					);
 				}

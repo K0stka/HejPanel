@@ -169,6 +169,7 @@ form,
 
 input,
 button,
+.button,
 textarea {
 	border: 2px var(--primary) solid;
 	border-radius: 1rem;
@@ -216,31 +217,39 @@ textarea {
 	height: 10rem;
 }
 
-button {
+button,
+.button {
 	background: var(--primary);
 	color: var(--background);
 	font-size: var(--normal);
 	cursor: pointer;
 	transition: var(--t);
 	width: auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
-button:hover {
+button:hover,
+.button:hover {
 	background: var(--background);
 	color: var(--primary);
 }
 
-button.active:hover {
+button.active:hover,
+.button.active:hover {
 	background: var(--primary);
 	color: var(--background);
 }
 
-button.non-active {
+button.non-active,
+.button.non-active {
 	background: var(--background);
 	color: var(--primary);
 }
 
-button.non-active:hover {
+button.non-active:hover,
+.button.non-active:hover {
 	background: var(--primary);
 	color: var(--background);
 }
@@ -367,6 +376,8 @@ button.non-active:hover {
 	right: var(--medium);
 	transform: translateY(-50%);
 	background: var(--background);
+	display: flex;
+	gap: var(--small);
 }
 
 .user-chip {
@@ -444,12 +455,28 @@ button.non-active:hover {
 	transition: transform var(--t);
 }
 
+.tooltip.horizontal {
+	display: flex;
+	gap: var(--small);
+	padding: 2px 0;
+	flex-direction: row;
+	width: max-content;
+	top: calc(50% - 1px);
+	left: calc(100% + 2px);
+}
+
 *:has(.tooltip):not(:has(* *.tooltip)) {
 	position: relative;
 }
 
 *:has(.tooltip):hover > .tooltip {
 	transform: translate(-50%, -50%) scale(1);
+	pointer-events: all;
+	cursor: help;
+}
+
+*:has(.tooltip.horizontal):hover > .tooltip.horizontal {
+	transform: translate(-100%, -50%) scale(1);
 	pointer-events: all;
 	cursor: help;
 }

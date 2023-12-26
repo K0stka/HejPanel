@@ -47,6 +47,8 @@ const createModal = (header, text) => {
 	document.body.appendChild(dialog);
 
 	dialog.showModal();
+
+	return dialog;
 };
 
 const closeModal = (e = null) => {
@@ -55,7 +57,15 @@ const closeModal = (e = null) => {
 
 	e.classList.add("is-hidden");
 
-	e.addEventListener("animationend", () => e.remove());
+	let event = new CustomEvent("close", { detail: {} });
+
+	e.addEventListener("animationend", () => {
+		if (event)
+			// Was triggering twice for some reason?
+			e.dispatchEvent(event);
+		event = null;
+		e.remove();
+	});
 };
 
 const focusLast = (input) => {

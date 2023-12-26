@@ -90,7 +90,7 @@ const navigate = async (url, target_history_level = 0, top = 0, left = 0, direct
 
 	const newMain = document.querySelector("main");
 
-	if(newMain) {
+	if (newMain) {
 		if ((direction == -1 || direction == 1) && !fade) {
 			if (direction == -1) {
 				newMain.classList.add("fromLeft");
@@ -104,9 +104,9 @@ const navigate = async (url, target_history_level = 0, top = 0, left = 0, direct
 		} else {
 			newMain.classList.add("fromFade");
 		}
-	
+
 		// SCROLL RESTORATION
-	
+
 		newMain.scrollTo({ top: top, left: left });
 	}
 

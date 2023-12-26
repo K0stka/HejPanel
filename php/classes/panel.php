@@ -60,18 +60,14 @@ class Panel extends MySQLtoPHPautomapper {
 
         if ($shallow) return;
 
-        try {
-            $this->complete();
-        } catch (Exception) {
-            return;
-        }
+        $this->complete();
     }
 
     public function render(): string {
         switch ($this->type) {
             case PanelType::image:
                 global $prefix;
-                return "<div class=\"panel panel-image\"><img src=\"$prefix/contentAPI/$this->content\"></div>";
+                return "<div class=\"panel panel-image\"><img src=\"$prefix/content/?panel_id=$this->id\"></div>";
             case PanelType::text:
                 return "<div class=\"panel panel-text\">$this->content</div>";
         }

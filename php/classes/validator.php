@@ -46,7 +46,7 @@ class Validator {
             case DataType::string:
                 return is_string($data);
             case DataType::int:
-                return is_int($data);
+                return is_numeric($data);
             default:
                 $response = new ApiErrorResponse("Invalid data type " . $DataType->value);
                 $response->send();

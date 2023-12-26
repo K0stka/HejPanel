@@ -69,6 +69,8 @@ class MySQLtoPHPautomapper {
         $index = $this->index;
         if (isset($this->$index)) {
             $completeData = $this->con->select($missing, $this->tableName)->where([$index => $this->$index])->fetchRow();
+
+            if (empty($completeData)) throw new Exception("Cannot complete object");
         } else {
             $completeData = $this->con->select($missing, $this->tableName)->where($this->serializeToMySQLValuesAndKeys())->fetchAll();
 

@@ -27,7 +27,7 @@ class ApiFileResponse extends ApiResponse {
         else http_response_code($this->http_code);
 
         if (file_exists($this->filePath)) {
-            header('Content-Length: ' . filesize($this->filePath));
+            header('Content-Length: ' . filesize($this->filePath) + 1); // Magical + 1 :D ?
             if ($this->mode == FileResponseMode::Download) {
                 header('Content-Disposition: attachment; filename="' . $this->fileName . '"');
             } else {
