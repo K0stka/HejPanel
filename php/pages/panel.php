@@ -40,7 +40,7 @@ $dayData = $jidelna->fetchDay(new DateTime());
 </div>
 <div class="panel-counter" id="panel-counter"></div>
 <div class="panel-container" id="panel-container">
-    <div class="panel panel-text animate-in" id="panel-loading">
+    <div class="panel panel-text panel-hidden animate-in" id="panel-loading">
         Velmi rychle procházíme vnitřní dokumentaci školy pro ty nejnovější novinky 😉
     </div>
 </div>
