@@ -13,6 +13,29 @@ NodeList.prototype.filter = Array.prototype.filter;
 FileList.prototype.map = Array.prototype.map;
 DOMTokenList.prototype.filter = Array.prototype.filter;
 
+function areSameSet(A, B) {
+	let n = A.length;
+
+	if (B.length != n) return false;
+
+	// Create a hash table to
+	// number of instances
+	let m = new Map();
+
+	// for each element of A
+	// increase it's instance by 1.
+	for (let i = 0; i < n; i++) m.set(A[i], m.get(A[i]) == null ? 1 : m.get(A[i]) + 1);
+
+	// for each element of B
+	// decrease it's instance by 1.
+	for (let i = 0; i < n; i++) m.set(B[i], m.get(B[i]) - 1);
+
+	// Iterate through map and check if
+	// any entry is non-zero
+	for (let [key, value] of m.entries()) if (value != 0) return false;
+	return true;
+}
+
 function hasJsonStructure(str) {
 	if (typeof str === "object") return true;
 	if (typeof str !== "string") return false;

@@ -332,6 +332,10 @@ button.non-active:hover,
 	animation: panel-in ease-in-out 1s;
 }
 
+.panel.panel-fade-out {
+	animation: panel-fade-out ease-in-out 0s;
+}
+
 @keyframes panel-in {
 	from {
 		left: 100vw;
@@ -347,6 +351,15 @@ button.non-active:hover,
 	}
 	to {
 		right: 100vw;
+	}
+}
+
+@keyframes panel-fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
 	}
 }
 
