@@ -67,32 +67,31 @@ const updatePanels = async (newPanelIds) => {
 			panels.every((panel, i) => {
 				if (panel.id == id) {
 					removedPanelPointer = i;
+
+					if (panel.element.classList.contains("animate-in")) {
+						panel.element.classList.remove("animate-in");
+						panel.element.addEventListener("animationend", () => {
+							panel.element.remove();
+						});
+					} else {
+						panel.element.remove();
+					}
 					return false;
 				}
 				return true;
 			});
 			if (removedPanelPointer <= panelPointer) {
 				panelPointer--;
-				console.log("Panel pointer slip");
+				console.log("%cPanel pointer slip", "color: orange;");
 			}
 
 			panels = panels.filter((p) => p.id != id);
-
-			let panel = document.getElementById("panel-" + id);
-			if (panel.classList.contains("animate-in")) {
-				panel.classList.remove("animate-in");
-				panel.addEventListener("animationend", () => {
-					panel.remove();
-				});
-			} else {
-				panel.remove();
-			}
 		});
 	}
 };
 
 const cyclePanels = () => {
-	if (panels.length <= 1) return;
+	if (panels.length == 0) return;
 
 	panelPointer = (panelPointer + 1) % panels.length;
 

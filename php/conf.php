@@ -36,7 +36,7 @@ if (DEV) {
 
     define("SERVICE_WORKER_ENABLED", true);
 
-    $v = "?v=3";
+    $v = "?v=1";
 
     $rootDir = "https://krychlic.com/";
     $folder = "hejpanel";

@@ -88,7 +88,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                 function () use ($app) {
                     $app->updateManifest();
                 },
-                "window.location.reload();"
+                "window.location.reload(true);"
             ) ?>
             <?= AdminSetting::render(
                 "App version",
@@ -97,7 +97,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                 function () use ($app) {
                     $app->incrementVersion();
                 },
-                "window.location.reload();"
+                "window.location.reload(true);"
             ) ?>
             <?= AdminSetting::render(
                 "MySQL database structure",
