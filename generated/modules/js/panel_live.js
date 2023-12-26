@@ -79,10 +79,14 @@ const updatePanels = async (newPanelIds) => {
 			panels = panels.filter((p) => p.id != id);
 
 			let panel = document.getElementById("panel-" + id);
-			panel.classList.add("panel-fade-out");
-			panel.addEventListener("animationend", () => {
+			if (panel.classList.contains("animate-in")) {
+				panel.classList.remove("animate-in");
+				panel.addEventListener("animationend", () => {
+					panel.remove();
+				});
+			} else {
 				panel.remove();
-			});
+			}
 		});
 	}
 };
