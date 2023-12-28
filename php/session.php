@@ -3,8 +3,10 @@ class MysqlSession implements SessionHandlerInterface {
     private Conn $con;
     private int $lifetime;
 
+    // PHP Key => MySQL Key
     private array $saveSeparately = [
-        "user" => "user",
+        User::SESSION_KEY_ID => "user",
+        User::SESSION_KEY_AUTH => "auth",
         "subscription" => "subscription",
         "fingerprint" => "fingerprint",
     ];

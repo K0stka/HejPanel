@@ -9,9 +9,8 @@ enum UserType: string {
 class User extends MySQLtoPHPautomapper {
     protected Conn $con;
 
-    public const SESSION_KEY = "user";
-
-    public bool $exists = false;
+    public const SESSION_KEY_ID = "user";
+    public const SESSION_KEY_AUTH = "auth";
 
     public int $id;
     public string $name;
@@ -19,6 +18,7 @@ class User extends MySQLtoPHPautomapper {
     public string $password;
     public UserType $type;
     public array $lastFingerprint;
+    public int $authVersion;
 
     public int $fingerprintGroupId = -1;
 
@@ -31,43 +31,23 @@ class User extends MySQLtoPHPautomapper {
         "nickname" => ["nickname", StoredAs::string],
         "password" => ["password", StoredAs::string],
         "type" => ["type", StoredAs::enum, "UserType"],
-        "last_fingerprint" => ["lastFingerprint", StoredAs::json]
+        "last_fingerprint" => ["lastFingerprint", StoredAs::json],
+        "auth_version" => ["authVersion", StoredAs::int]
     ];
 
-    public function __construct(array|int $data, bool $shallow = false) {
+    public function __construct(array|int|bool $data = false, bool $shallow = false) {
         global $con;
         $this->con = $con;
 
         parent::__construct($data);
 
-        if ($shallow) return;
+        if ($shallow || $data == false) return;
 
-        try {
-            $this->complete();
-        } catch (Exception) {
-            return;
-        }
-
-        $this->exists = true;
+        $this->complete();
     }
 
     public function __toString(): string {
         return $this->name ?? "Unknown user error";
-    }
-
-    public function renderChip() {
-?>
-        <div class="user-chip auto-color" style="background: <?= assignColorById($this->fingerprintGroupId) ?>;">
-            <?= $this->name ?> (skupina <?= $this->fingerprintGroupId ?>)
-            <div class="tooltip" style="white-space: nowrap;">
-                IP: <?= $this->lastFingerprint["ip"] ?><br>
-                Zařízení: <?= $this->lastFingerprint["mobile"] == "true" ? $this->lastFingerprint["model"] : "Neznámé" ?><br>
-                Architektura: <?= $this->lastFingerprint["architecture"] ?><br>
-                Platforma: <?= $this->lastFingerprint["platform"] . " v" . $this->lastFingerprint["platformVersion"] ?><br>
-                User agenti:<br><?= join(",<br>", array_map(fn ($e) => "&nbsp;&nbsp;" . $e["brand"] . " v" . $e["version"], $this->lastFingerprint["brands"])) ?>
-            </div>
-        </div>
-<?php
     }
 
     public function getFingerprints(): array {
@@ -75,30 +55,32 @@ class User extends MySQLtoPHPautomapper {
     }
 
     public static function getUser(): ?User {
-        if (!isset($_SESSION[self::SESSION_KEY])) {
+        if (!isset($_SESSION[self::SESSION_KEY_ID])) {
             return null;
         }
 
-        $user = new User($_SESSION[self::SESSION_KEY]);
+        $user = new User($_SESSION[self::SESSION_KEY_ID]);
+
+        if ($user->authVersion != $_SESSION[self::SESSION_KEY_AUTH]) {
+            self::logout();
+            return null;
+        }
 
         if (isset($_SESSION["fingerprint"])) $user->update("lastFingerprint", $_SESSION["fingerprint"]);
-
-        if (!$user->exists) {
-            return null;
-        }
 
         return $user;
     }
 
-    public static function login(int $userId) {
-        $_SESSION[self::SESSION_KEY] = $userId;
+    public function login() {
+        $_SESSION[self::SESSION_KEY_ID] = $this->id;
+        $_SESSION[self::SESSION_KEY_AUTH] = $this->authVersion;
     }
 
     public static function logout() {
-        unset($_SESSION[self::SESSION_KEY]);
+        unset($_SESSION[self::SESSION_KEY_ID], $_SESSION[self::SESSION_KEY_AUTH]);
     }
 
-    public static function register(string $name, string $nickname, string $passwordHash, UserType $userType): int {
+    public static function register(string $name, string $nickname, string $passwordHash, UserType $userType): User {
         $user = new User([
             "name" => $name,
             "nickname" => $nickname,
@@ -106,7 +88,11 @@ class User extends MySQLtoPHPautomapper {
             "type" => $userType->value
         ], true);
         $user->insert();
-        return $user->id;
+        return $user;
+    }
+
+    public function authDetailsChanged() {
+        $this->update("authVersion", $this->authVersion + 1);
     }
 
     /** @return User[] */
@@ -133,5 +119,20 @@ class User extends MySQLtoPHPautomapper {
         }
         $this->fingerprintGroupId = -1;
         return -1;
+    }
+
+    public function renderChip() {
+?>
+        <div class="user-chip auto-color" style="background: <?= assignColorById($this->fingerprintGroupId) ?>;">
+            <?= $this->name ?> (skupina <?= $this->fingerprintGroupId ?>)
+            <div class="tooltip" style="white-space: nowrap;">
+                IP: <?= $this->lastFingerprint["ip"] ?><br>
+                Zařízení: <?= $this->lastFingerprint["mobile"] == "true" ? $this->lastFingerprint["model"] : "Neznámé" ?><br>
+                Architektura: <?= $this->lastFingerprint["architecture"] ?><br>
+                Platforma: <?= $this->lastFingerprint["platform"] . " v" . $this->lastFingerprint["platformVersion"] ?><br>
+                User agenti:<br><?= join(",<br>", array_map(fn ($e) => "&nbsp;&nbsp;" . $e["brand"] . " v" . $e["version"], $this->lastFingerprint["brands"])) ?>
+            </div>
+        </div>
+<?php
     }
 }

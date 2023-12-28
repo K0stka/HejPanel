@@ -1,3 +1,5 @@
+const CAROUSEL_SPEED = 10000; // MS per revolution
+
 const panelTime = document.querySelector("#panel-time");
 
 if (panelTime) {
@@ -39,7 +41,7 @@ const updatePanels = async (newPanelIds) => {
 
 	const panelIdsToAdd = newPanelIds.filter((id) => !panelIds.includes(id));
 	if (panelIdsToAdd.length > 0) {
-		const newPanels = (await PANEL_API.get({ t: "b", ids: panelIdsToAdd }, new ApiCallback(() => {}))).data;
+		const newPanels = (await PANEL_API.get({ i: panelIdsToAdd }, new ApiCallback(() => {}))).data;
 		newPanels.forEach((panel) => {
 			console.log("%cAdding panel " + panel.id, "color: lime");
 
@@ -116,5 +118,5 @@ if (panelContainer) {
 
 	setInterval(() => {
 		PANEL_API.get({ t: "c" }, false).then((newPanelIds) => updatePanels(newPanelIds).then(cyclePanels));
-	}, 10000);
+	}, CAROUSEL_SPEED);
 }

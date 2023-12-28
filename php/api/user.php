@@ -28,9 +28,9 @@ $api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::stri
     if ($app->authenticated) User::logout();
     $app->user = null;
 
-    $user = new User(["nickname" => $_POST["nickname"]]);
-
-    if (!$user->exists) {
+    try {
+        $user = new User(["nickname" => $_POST["nickname"]]);
+    } catch (Exception) {
         return new ApiErrorResponse("Špatné přihlašovací údaje", 403);
     }
 
@@ -38,7 +38,7 @@ $api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::stri
         return new ApiErrorResponse("Špatné přihlašovací údaje", 403);
     }
 
-    User::login($user->id);
+    $user->login();
     $app->authenticate($user);
 
     return new ApiSuccessResponse();
@@ -51,8 +51,11 @@ $api->addEndpoint(Method::POST, ["type" => "logout"], [$authenticated], function
 });
 
 $api->addEndpoint(Method::POST, ["type" => "register", "name" => Type::name, "nickname" => Type::nickname, "password" => Type::password, "code" => Type::code], [$notAuthenticated], function () use ($con) {
-    if ((new User(["nickname" => $_POST["nickname"]]))->exists) {
+    try {
+        new User(["nickname" => $_POST["nickname"]]);
+
         return new ApiErrorResponse("Uživatel s touto přezdívkou již existuje", 403);
+    } catch (Exception) {
     }
 
     $code = $con

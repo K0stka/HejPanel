@@ -52,13 +52,13 @@ class Panel extends MySQLtoPHPautomapper {
     ];
 
 
-    public function __construct(int|array $data, bool $shallow = false) {
+    public function __construct(array|int|bool $data = false, bool $shallow = false) {
         global $con;
         $this->con = $con;
 
         parent::__construct($data);
 
-        if ($shallow) return;
+        if ($shallow || $data == false) return;
 
         $this->complete();
     }

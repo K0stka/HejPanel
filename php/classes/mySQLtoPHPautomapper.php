@@ -24,6 +24,8 @@ class MySQLtoPHPautomapper {
     protected bool $updateAllOnDestroy = false;
 
     protected function __construct(&$data) {
+        if ($data == false) return;
+
         if (is_int($data)) $data = [$this->index => $data];
 
         foreach ($this->mapFromTo as $key => $value) {
@@ -70,11 +72,15 @@ class MySQLtoPHPautomapper {
         if (isset($this->$index)) {
             $completeData = $this->con->select($missing, $this->tableName)->where([$index => $this->$index])->fetchRow();
 
-            if (empty($completeData)) throw new Exception("Cannot complete object");
+            if (empty($completeData)) {
+                out($missing);
+                out($completeData);
+                throw new Exception("Cannot complete object using index");
+            }
         } else {
             $completeData = $this->con->select($missing, $this->tableName)->where($this->serializeToMySQLValuesAndKeys())->fetchAll();
 
-            if (empty($completeData) || count($completeData) > 1) throw new Exception("Cannot complete object");
+            if (empty($completeData) || count($completeData) > 1) throw new Exception("Cannot complete object using auto detect");
 
             $completeData = $completeData[0];
         }
@@ -153,7 +159,7 @@ class MySQLtoPHPautomapper {
             case StoredAs::enum:
                 return eval("return $additionalParam::from(\"$what\");");
             case StoredAs::foreignId:
-                return eval("return new $additionalParam(" . ($what ?? -1) . ");");
+                return eval("return new $additionalParam(" . ($what ?? "false") . ");");
         }
     }
 }

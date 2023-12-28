@@ -9,18 +9,28 @@ $api = new Api(); // Initiate api instance
 $app = new AppManager();
 $app->authenticate(User::getUser());
 
+$missingFile = new ApiFileResponse(PREFIX . "/assets/images/missingPanel.svg", "Missing panel.svg");
+
 $authenticated = new ApiEndpointCondition(function () use ($app) {
     return $app->authenticated;
 }, new ApiErrorResponse("Pro dokončení této akce musíš být přihlášený", 403));
 
-$api->addEndpoint(Method::GET, ["panel_id" => DataType::int], [], function () {
-    try {
-        $panel = new Panel(intval($_GET["panel_id"]));
+$api->addEndpoint(Method::GET, [], [], function () use ($missingFile) {
+    if (empty($_GET) || count($_GET) > 1 || $_GET[array_key_first($_GET)] != "") return $missingFile;
 
-        if ($panel->type != PanelType::image) throw new Exception();
+    $id = array_key_first($_GET);
+
+    if (!is_numeric($id)) return $missingFile;
+
+    try {
+        $panel = new Panel(intval($id));
     } catch (Exception) {
-        return new ApiFileResponse(PREFIX . "/assets/images/missingPanel.svg", "Missing panel.svg");
+        return $missingFile;
     }
+
+    if ($panel->type != PanelType::image) return $missingFile;
+
+    if (!$panel->showOverride && (!$panel->approved || $panel->showTill < new DateTime() || $panel->showFrom > new DateTime())) return $missingFile;
 
     return new ApiFileResponse(PREFIX . "/uploads/panels/" . $panel->content, "Panel_" . $panel->id . ".webp");
 });

@@ -24,8 +24,8 @@ $api->addEndpoint(Method::POST, ["type" => "addPanel", "show_from" => Type::date
     $_POST["fingerprint"]["ip"] = getClientIP();
 
     if ($app->user == false) {
-        $app->user = new User(User::register("Temp" . substr(strval(time()), -6), "temp" . time(), "", UserType::temp));
-        User::login($app->user->id);
+        $app->user = User::register("Temp" . substr(strval(time()), -6), "temp" . time(), "", UserType::temp);
+        $app->user->login();
         $app->user->update("lastFingerprint", $_POST["fingerprint"]);
     }
 
@@ -88,8 +88,8 @@ $api->addEndpoint(Method::GET, ["t" => "a"], [], function () {
 });
 
 // Get all visible panels with ids
-$api->addEndpoint(Method::GET, ["t" => "b", "ids" => DataType::int_array], [], function () {
-    $panels = Panel::getPanelsByIds($_GET["ids"]);
+$api->addEndpoint(Method::GET, ["i" => DataType::int_array], [], function () {
+    $panels = Panel::getPanelsByIds($_GET["i"]);
     if (empty($panels)) $panels = [Panel::getEmptyPanel()];
     return new ApiResponse(["data" => array_map(fn ($e) => $e->serialize(), $panels)]);
 });
