@@ -58,22 +58,6 @@ function is_json($string) {
     return json_last_error() === JSON_ERROR_NONE;
 }
 
-function cache($seconds_to_cache = 300) { // Generate cache header
-    header("Cache-Control: max-age=$seconds_to_cache,private");
-}
-
-function eTag($int_time) { // Generate E-tag 
-    $etag = md5($int_time);
-
-    header("Last-Modified: " . gmdate("D, d M Y H:i:s", $int_time) . " GMT");
-    header("Etag: $etag");
-
-    if (@strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $int_time || @trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
-        header("HTTP/1.1 304 Not Modified");
-        exit;
-    }
-}
-
 function utf8json($array, $prettyPrint = false) { // json_encode() alternative
     $json = json_encode($array, $prettyPrint ? JSON_PRETTY_PRINT : 0);
     return preg_replace_callback(

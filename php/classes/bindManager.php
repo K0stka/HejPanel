@@ -1,6 +1,20 @@
 <?php
 
-define("RELOAD", "fadeTo(window.location.href);");
+function RELOAD(): string {
+    return "fadeTo(window.location.href);";
+}
+function FORCE_RELOAD(): string {
+    return "window.location.reload(true);";
+}
+function FADE_TO(string $relativePathWithSlash): string {
+    return "fadeTo(base_url + '" . $relativePathWithSlash . "');";
+}
+function CREATE_MODAL(string $header, string $body): string {
+    return "createModal('$header', '$body')";
+}
+function ON_CLOSE(string $callback): string {
+    return ".addEventListener(\"close\", () => { $callback });";
+}
 
 class BindManager {
     private array $eventHandlers = [];

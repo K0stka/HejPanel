@@ -15,7 +15,7 @@ if (loginBtn) {
 					password: password.value,
 				},
 				new ApiCallback(() => {
-					fadeTo(base_url + "/", 0);
+					fadeTo(base_url + "/");
 				}),
 			);
 		}

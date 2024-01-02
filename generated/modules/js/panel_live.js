@@ -1,6 +1,9 @@
-const CAROUSEL_SPEED = 10000; // MS per revolution
+const CAROUSEL_SPEED = 10; // S per revolution
 
 const panelTime = document.querySelector("#panel-time");
+const panelJidelna = document.querySelector("#panel-jidelna");
+
+let carousel_paused = false;
 
 if (panelTime) {
 	panelTime.innerHTML = new Date().toLocaleTimeString();
@@ -11,6 +14,7 @@ if (panelTime) {
 
 const panelContainer = document.querySelector("#panel-container");
 const panelCounter = document.querySelector("#panel-counter");
+const radialGraph = document.querySelector("#panel-radial-graph");
 
 const renderPanel = (panelId, panelType, panelContent) => {
 	const panel = document.createElement("div");
@@ -25,7 +29,7 @@ const renderPanel = (panelId, panelType, panelContent) => {
 			break;
 		case "image":
 			panel.classList.add("panel-image");
-			panel.innerHTML = '<img src="$prefix/contentAPI/' + panelContent + '">';
+			panel.innerHTML = '<img src="' + base_url + "/api/content/" + panelContent + '" class="backdrop"><img src="' + base_url + "/api/content/" + panelContent + '">';
 			break;
 		default:
 			panel.classList.add("panel-text");
@@ -35,25 +39,28 @@ const renderPanel = (panelId, panelType, panelContent) => {
 };
 
 const updatePanels = async (newPanelIds) => {
+	if (typeof newPanelIds != "object") return;
+
 	if (areSameSet(panelIds, newPanelIds)) return;
 
 	console.log("%cUpdating panels...", "color: gray");
 
 	const panelIdsToAdd = newPanelIds.filter((id) => !panelIds.includes(id));
 	if (panelIdsToAdd.length > 0) {
-		const newPanels = (await PANEL_API.get({ i: panelIdsToAdd }, new ApiCallback(() => {}))).data;
-		newPanels.forEach((panel) => {
-			console.log("%cAdding panel " + panel.id, "color: lime");
+		await PANEL_API.get({ i: panelIdsToAdd }, null, null).then((newPanels) => {
+			newPanels.forEach((panel) => {
+				console.log("%cAdding panel " + panel.id, "color: lime");
 
-			panelIds.push(panel.id);
+				panelIds.push(panel.id);
 
-			const newPanel = renderPanel(panel.id, panel.type, panel.content);
+				const newPanel = renderPanel(panel.id, panel.type, panel.content);
 
-			panelContainer.appendChild(newPanel);
+				panelContainer.appendChild(newPanel);
 
-			panels.push({
-				id: panel.id,
-				element: newPanel,
+				panels.push({
+					id: panel.id,
+					element: newPanel,
+				});
 			});
 		});
 	}
@@ -99,24 +106,50 @@ const cyclePanels = () => {
 
 	panelCounter.innerHTML = panelPointer + 1 + "/" + panels.length;
 
-	panels.forEach((e) => e.element.classList.remove("animate-in"));
+	panels.forEach((e) => {
+		e.element.classList.add("panel-hidden");
+		e.element.classList.remove("animate-in");
+	});
 
 	panels[panelPointer].element.classList.add("animate-in");
 };
 
-let panelPointer = 0;
-let panelIds = ["loading"];
-let panels = [
-	{
-		id: "loading",
-		element: document.querySelector("#panel-loading"),
-	},
-];
+const fetchJidelna = async () => {
+	PANEL_API.get({ j: null }, null, null).then(updateJidelna);
+};
 
-if (panelContainer) {
-	PANEL_API.get({ t: "c" }, false).then((newPanelIds) => updatePanels(newPanelIds).then(cyclePanels));
+const updateJidelna = (jidelna) => {
+	if (jidelna.result && jidelna.result == "error") {
+		panelJidelna.innerHTML = "<b>Nemohli jsme načíst data z jídelny 😞</b>";
+	} else {
+		panelJidelna.innerHTML = '<div class="panel-food-row"><b>Polévka:</b> ' + jidelna.X1 + '</div><div class="panel-food-row"><b>Oběd 1:</b> ' + jidelna.O1 + '</div><div class="panel-food-row"><b>Oběd 2:</b> ' + jidelna.O2 + '</div><div class="panel-food-row"><b>Oběd 3:</b> ' + jidelna.O3 + '</div><div class="panel-food-row"><b>Svačina:</b> ' + jidelna.SV + "</div>";
+	}
+};
 
-	setInterval(() => {
-		PANEL_API.get({ t: "c" }, false).then((newPanelIds) => updatePanels(newPanelIds).then(cyclePanels));
-	}, CAROUSEL_SPEED);
-}
+// Initial values
+let panelPointer = -1;
+let panelIds = PANELS_PRELOAD;
+let panels = PANELS_PRELOAD.map((id) => ({ id: id, element: document.querySelector("#panel-" + id) }));
+cyclePanels();
+updateJidelna(JIDELNA_PRELOAD);
+
+// Carousel
+let carouselTick = 0;
+setInterval(() => {
+	if (document.hidden || carousel_paused) return;
+
+	carouselTick++;
+	if (panels.length < 2) radialGraph.style.opacity = 0;
+	else radialGraph.style.opacity = 1;
+	radialGraph.style.setProperty("--value", (carouselTick / CAROUSEL_SPEED) * 2 + "%");
+
+	if (carouselTick / 50 >= CAROUSEL_SPEED) {
+		PANEL_API.get({ t: "c" }, null, null).then((newPanelIds) => updatePanels(newPanelIds).then(cyclePanels));
+		carouselTick = 0;
+	}
+}, 20);
+
+// Jidelna
+setInterval(() => {
+	fetchJidelna();
+}, 3600000);

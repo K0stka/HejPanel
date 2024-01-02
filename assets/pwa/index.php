@@ -6,7 +6,7 @@ $app = new AppManager();
 $app->initiateRouter([UserType::temp->value => [""]], []);
 
 $app->cssManager->require("reset", "fonts", "transitions", "dialog", "index", "phone");
-$app->jsManager->require("ajax", "index", "api", "transitions", "bind");
+$app->jsManager->require("ajax", "util", "index", "api", "transitions", "bind");
 ?>
 <!DOCTYPE html>
 <html lang="cs">
@@ -57,7 +57,7 @@ $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
         </main>
     </div>
     <footer>
-        <a href="<?= $prefix ?>" data-hierarchy="0">
+        <a href="<?= $prefix ?>">
             Obnovit stránku
         </a>
     </footer>

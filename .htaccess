@@ -48,10 +48,8 @@ ErrorDocument 404 /hejpanel/php/pages/404.php
   ExpiresByType text/css "access plus 1 month"
   ExpiresByType text/javascript "access plus 1 month"
   ExpiresByType application/javascript "access plus 1 month"
-  ExpiresByType application/x-shockwave-flash "access plus 1 month"
   ExpiresByType image/ico "access plus 1 month"
   ExpiresByType image/x-icon "access plus 1 month"
-  ExpiresByType text/html "access plus 600 seconds"
 </IfModule>  
 
 <IfModule mod_deflate.c>

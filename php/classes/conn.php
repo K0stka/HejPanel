@@ -113,7 +113,12 @@ class Conn {
 
     public function fetchColumn(): array {
         if (!empty($this->queryTemp)) $this->execute();
-        return array_map(fn ($e) => reset($e), $this->stmt->get_result()->fetch_all(MYSQLI_ASSOC));
+        return array_map(fn ($e) => $e[0], $this->stmt->get_result()->fetch_all(MYSQLI_NUM));
+    }
+
+    public function fetchValue(): mixed {
+        if (!empty($this->queryTemp)) $this->execute();
+        return $this->stmt->get_result()->fetch_row()[0] ?? null;
     }
 
     public function insertID(): int {

@@ -24,7 +24,7 @@ ob_start();
 
 if ($app->pageManager->isNormalRequest) { // Only for initial page load
     $app->cssManager->require("reset", "fonts", "transitions", "dialog", "index", "phone");
-    $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
+    $app->jsManager->require("ajax", "util", "index", "api", "transitions", "bind");
 ?>
     <!DOCTYPE html>
     <html lang="cs">
@@ -79,7 +79,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                 function () use ($app) {
                     $app->clearMinifiedPackages();
                 },
-                "fadeTo(base_url + \"/admin\");"
+                RELOAD(),
             ) ?>
             <?= AdminSetting::render(
                 "Manifest",
@@ -88,7 +88,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                 function () use ($app) {
                     $app->updateManifest();
                 },
-                "window.location.reload(true);"
+                RELOAD()
             ) ?>
             <?= AdminSetting::render(
                 "App version",
@@ -97,16 +97,16 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                 function () use ($app) {
                     $app->incrementVersion();
                 },
-                "window.location.reload(true);"
+                RELOAD()
             ) ?>
             <?= AdminSetting::render(
                 "MySQL database structure",
                 "WARNING - REMOVES ALL DATA",
                 "Update tables",
                 function () use ($app) {
-                    $app->synchronizeTables();
+                    // $app->synchronizeTables();
                 },
-                "fadeTo(base_url + \"/admin\");"
+                CREATE_MODAL("ERROR", "Not implemented"),
             ) ?>
             <?= AdminSetting::render(
                 "Push notification",
@@ -119,7 +119,24 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                         }
                     );
                 },
-                ""
+                CREATE_MODAL("SUCCESS", "Notifications successfully sent")
+            ) ?>
+            <?= AdminSetting::render(
+                "Remove orphan files",
+                "Remove files that are not assigned to any panel.<br>Orphan files: " . $con->select(["COUNT(*)" => "count"], "files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->fetchValue(),
+                "Send",
+                function () use ($con) {
+                    $files = $con->select("file", "files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->fetchColumn();
+
+                    foreach ($files as $file) {
+                        unlink(PREFIX . "uploads/" . $file);
+                    }
+
+                    $con->delete("files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->execute();
+
+                    return $files;
+                },
+                CREATE_MODAL("Successfully removed ' + output.length + ' files", "Files removed: ' + output.join(', ') + '") . ON_CLOSE(RELOAD())
             ) ?>
         </main>
     </div>

@@ -7,8 +7,8 @@ class ApiContinuousResponse extends ApiResponse {
     }
 
     public function open() {
-        foreach ($this->headers as $header) {
-            header($header);
+        foreach ($this->headers as $headerName => $headerValue) {
+            header("$headerName: $headerValue");
         }
     }
 

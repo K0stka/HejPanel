@@ -71,19 +71,19 @@ class NotificationManager {
 
     private static function getAllSubscriptions(): array {
         global $con;
-        $subscriptions = $con->select(["subscription", User::SESSION_KEY], "sessions")->addSQL("WHERE subscription != NULL")->groupBy("subscription")->fetchAll();
+        $subscriptions = $con->select(["subscription", User::SESSION_KEY_ID], "sessions")->addSQL("WHERE subscription != NULL")->groupBy("subscription")->fetchAll();
 
         if (empty($subscriptions)) return [];
 
         return array_map(fn ($e) => [
-            "user" => new User($e[User::SESSION_KEY], true),
+            "user" => new User($e[User::SESSION_KEY_ID], true),
             "subscription" => Subscription::create(json_decode($e["subscription"], true), ["ttl" => self::TTL])
         ], $subscriptions);
     }
 
     private static function getSubscriptions(User $user): array {
         global $con;
-        $existingSubscriptions = $con->select("subscription", "sessions")->where([User::SESSION_KEY => $user->id])->addSQL("AND subscription != NULL")->fetchAll();
+        $existingSubscriptions = $con->select("subscription", "sessions")->where([User::SESSION_KEY_ID => $user->id])->addSQL("AND subscription != NULL")->fetchAll();
 
         if (empty($existingSubscriptions)) return [];
 

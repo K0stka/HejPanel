@@ -1,26 +1,32 @@
 // IMPORTANT: SERVICEWORKER DISABLED IN DEV
 
 // FALLBACK VALUES
+const channel = new BroadcastChannel("notifications");
+
+let IS_LOCALHOST = false;
+let hidden = false;
 let base_url = "";
 let cacheName = "cache";
 let cacheId = "";
 let appShellFiles = [];
 
 const appStaticFiles = ["/assets/pwa/index.php", "/assets/icons/icon.png", "/assets/icons/icon-192x192.png"]; // Cached on install in the format: prefix + i
-const appDynamicFiles = ["/css/reset-fonts-transitions-dialog-index-phone.css", "/js/ajax-index-api-transitions-bind.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
+const appDynamicFiles = ["/css/reset-fonts-transitions-dialog-index-phone.css", "/js/util-ajax-index-api-transitions-bind.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
 
 let allowCache = []; // Cached on first request in the format: prefix + i
 
-const allowDirectories = ["/assets/", "/css/", "/external/", "/js/"]; // Cached on first request if url contains i
+const allowDirectories = ["/assets/", "/css/", "/js/"]; // Cached on first request if url contains i
 
 self.addEventListener("install", (e) => {
 	base_url = new URL(location).searchParams.get("base_url");
 	cacheId = new URL(location).searchParams.get("cacheId");
 	cacheName = cacheName + cacheId;
 
+	IS_LOCALHOST = base_url.includes("localhost") || base_url.includes("192.168.137.1");
+
 	console.log("%c[SW " + cacheId + "] Installing service worker version " + cacheId, "color: orange");
 
-	if (base_url.includes("localhost") || base_url.includes("192.168.137.1")) {
+	if (IS_LOCALHOST) {
 		self.skipWaiting();
 		return;
 	}
@@ -46,7 +52,7 @@ self.addEventListener("install", (e) => {
 });
 
 self.addEventListener("fetch", (e) => {
-	if (base_url.includes("localhost") || base_url.includes("192.168.137.1")) return;
+	if (IS_LOCALHOST) return;
 
 	if (e.request.method === "GET") {
 		if (allowCache.includes(e.request.url) || allowDirectories.some((dir) => e.request.url.includes(dir)) || (!navigator.onLine && !base_url.includes("localhost"))) {
@@ -78,7 +84,7 @@ self.addEventListener("fetch", (e) => {
 
 self.addEventListener("activate", (e) => {
 	console.log("%c[SW " + cacheId + "] Activating service worker version " + cacheId, "color:pink");
-	if (base_url.includes("localhost") || base_url.includes("192.168.137.1")) {
+	if (IS_LOCALHOST) {
 		self.clients.claim();
 		return;
 	}
@@ -101,22 +107,26 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("push", (e) => {
 	const notification = e.data.json();
-	console.log(notification);
 
-	// window.fadeTo(notification.url, 0);
-	// window.createModal(notification.title, notification.body);
-
-	e.waitUntil(
-		self.registration.showNotification(notification.title, {
-			body: notification.body,
-			icon: base_url + "/assets/icons/icon-192x192.png",
-			data: {
-				notifURL: notification.url,
-			},
-		}),
-	);
+	if (hidden) {
+		e.waitUntil(
+			self.registration.showNotification(notification.title, {
+				body: notification.body,
+				icon: base_url + "/assets/icons/icon-192x192.png",
+				data: {
+					notifURL: notification.url,
+				},
+			}),
+		);
+	} else {
+		channel.postMessage({ title: notification.title, body: notification.body, url: notification.url });
+	}
 });
 
 self.addEventListener("notificationclick", (e) => {
 	e.waitUntil(clients.openWindow(e.notification.data.notifURL));
+});
+
+self.addEventListener("message", (event) => {
+	hidden = event.data.hidden;
 });

@@ -74,9 +74,9 @@ ini_set("session.use_strict_mode", 1);
 
 session_set_cookie_params([
     "lifetime" => $lifetime,
-    // "domain" => $prefix, FOR SOME REASON BREAKS EVERYTHING?
+    // "domain" => $rootDir, // Breaks because browsers do not thing it's the correct address?
     "path" => "/",
-    // "secure" => true, // Breaks everything when using localhost over IP
+    "secure" => true, // Breaks if using localhost over IP (or anything without HTTPS)
     "httponly" => true,
 ]);
 

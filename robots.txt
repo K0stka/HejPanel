@@ -2,4 +2,4 @@ User-agent: *
 Allow: /panel
 Allow: /submit
 Disallow: /*
-Sitemap: https://krychlic.com/sitemap.xml
+Sitemap: https://krychlic.com/hejpanel/sitemap.xml

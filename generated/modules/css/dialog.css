@@ -2,12 +2,11 @@
 
 dialog {
 	transition: 0.5s;
-
 	background: var(--background);
 	color: var(--text);
-
 	border-radius: 1rem;
-	min-width: 60vw;
+	min-width: 50rem;
+	max-width: 80vw;
 	border: none;
 	padding: 0;
 }

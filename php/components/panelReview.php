@@ -5,7 +5,7 @@ class PanelReview {
 ?>
         <div class="panel-review">
             <div class="panel-review-preview">
-                <div style="width: 1920px;height: 1080px;position:absolute;top:0;left:0;overflow:hidden;" class="auto-scale" data-target-width="100">
+                <div class="object-fit-fill" style="width:1920px;height:1080px">
                     <?= $panel->render() ?>
                 </div>
             </div>

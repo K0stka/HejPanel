@@ -9,13 +9,7 @@ class ApiEndpointCondition {
         $this->failureResponse = $failureResponse;
     }
 
-    public function validate(): bool {
-        $condition = $this->condition;
-        if ($condition()) {
-            return true;
-        } else {
-            $this->failureResponse->send();
-            return false;
-        }
+    public function validate() {
+        if (!($this->condition)()) $this->failureResponse->send();
     }
 }

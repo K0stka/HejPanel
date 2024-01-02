@@ -1,4 +1,4 @@
 <h1>Ahoj <?= $app->user ?></h1>
-<button id="logout">Odhlásit se</button>
-<?php
-$app->jsManager->require("account");
+<button <?= $app->bind->onClick(function () {
+            User::logout();
+        })->then(FADE_TO("/login")) ?>>Odhlásit se</button>

@@ -38,14 +38,8 @@ $api->addEndpoint(Method::POST, ["type" => "login", "nickname" => DataType::stri
         return new ApiErrorResponse("Špatné přihlašovací údaje", 403);
     }
 
-    $user->login();
+    $user->bindToSession();
     $app->authenticate($user);
-
-    return new ApiSuccessResponse();
-});
-
-$api->addEndpoint(Method::POST, ["type" => "logout"], [$authenticated], function () {
-    User::logout();
 
     return new ApiSuccessResponse();
 });
@@ -88,7 +82,3 @@ $api->addEndpoint(Method::POST, ["type" => "fingerprint", "fingerprint" => DataT
 });
 
 $api->listen(); // Execute all the api logic (automaticaly handles respones)
-
-// Optional - will only trigger if no endpoint was triggered, because sending a response stops further code from running
-$response = new ApiErrorResponse("Nebylo odesláno dostatek vstupů");
-$response->send();

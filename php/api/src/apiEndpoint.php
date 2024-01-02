@@ -18,12 +18,8 @@ class ApiEndpoint {
 
     public function validateConditions() {
         foreach ($this->conditions as $condition) {
-            if (!$condition->validate()) {
-                return false;
-            }
+            $condition->validate();
         }
-
-        return true;
     }
 
     public function execute() {
@@ -31,8 +27,7 @@ class ApiEndpoint {
         $return = $temp();
         if ($return instanceof ApiResponse) $return->send();
         else {
-            $response = new ApiErrorResponse("Invalid return value: " . utf8json($return));
-            $response->send();
+            (new ApiErrorResponse(ApiMessage::invalidScriptReturnValue->value . utf8json($return)))->send();
         }
     }
 }

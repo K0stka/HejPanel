@@ -26,7 +26,7 @@ if (DEV) {
 
     define("SERVICE_WORKER_ENABLED", false);
 
-    $v = "?v=1";
+    $v = "";
 
     $rootDir = (substr($_SERVER['SERVER_NAME'], -9) == "localhost" ? "http://localhost/" : "http://192.168.137.1/");
     $folder = "HejPanel";

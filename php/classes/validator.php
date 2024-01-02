@@ -1,15 +1,13 @@
 <?php
 
 enum Type: string {
-    case name = "name";
-    case nickname = "nickname";
-    case mail = "mail";
-    case password = "password";
-    case passwordOrEmpty = "passwordOrEmpty";
-    case date = "date";
-    case string = "string";
-    case number = "number";
-    case code = "code";
+    case name = "^[a-žA-Ž ]{3,100}$";
+    case nickname = "^[a-žA-Ž0-9_]{5,100}$";
+    case mail = "^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$";
+    case password = "(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$";
+    case passwordOrEmpty = "^$|(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$";
+    case date = "^\d{4}-\d{1,2}-\d{1,2}$";
+    case code = "^[A-Z0-9]{20}$";
 }
 
 enum DataType {
@@ -21,18 +19,8 @@ enum DataType {
 }
 
 class Validator {
-    private static array $regexStrings = [
-        "name" => "^[a-žA-Ž ]{3,100}$",
-        "nickname" => "^[a-žA-Ž0-9_]{5,100}$",
-        "mail" => "^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$",
-        "password" => "(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$",
-        "passwordOrEmpty" => "^$|(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$",
-        "date" => "^\d{4}-\d{1,2}-\d{1,2}$",
-        "code" => "^[A-Z0-9]{20}$",
-    ];
-
     public static function validate(string $value, Type $type) {
-        return preg_match("/" . self::$regexStrings[$type->value] . "/", $value) == 1;
+        return preg_match("/" . $type->value . "/", $value) == 1;
     }
 
     public static function validateDataType($data, DataType $DataType) {
@@ -48,16 +36,15 @@ class Validator {
             case DataType::int:
                 return is_numeric($data);
             default:
-                $response = new ApiErrorResponse("Invalid data type " . $DataType->value);
-                $response->send();
+                printError("Tried to validate invalid data type", ["dataType" => $DataType->value]);
         }
     }
 
     public static function generateJsValues() {
-        /** @var Type $key */
         $output = "const REGEXES = {";
-        foreach (self::$regexStrings as $key => $value) {
-            $output .= $key . ": new RegExp(\""  . $value . "\"),\n";
+        /** @var Type $type */
+        foreach (Type::cases() as $type) {
+            $output .= $type->name . ": new RegExp(\""  . $type->value . "\"),\n";
         }
         $output .= "};";
 
@@ -68,6 +55,6 @@ class Validator {
         global $con;
         return new ApiEndpointCondition(function (string $id) use ($con, $tableName) {
             return !empty($con->select("id", $tableName)->where(["id" => $id])->fetchRow());
-        }, new ApiErrorResponse(""));
+        }, new ApiErrorResponse(DEV ? "Given id does not exist in the table $tableName" : ""));
     }
 }

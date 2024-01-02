@@ -67,9 +67,9 @@ class Panel extends MySQLtoPHPautomapper {
         switch ($this->type) {
             case PanelType::image:
                 global $prefix;
-                return "<div class=\"panel panel-image\"><img src=\"$prefix/content/?panel_id=$this->id\"></div>";
+                return "<div class=\"panel panel-image\" id=\"panel-$this->id\"><img src=\"$prefix/api/content/$this->id\" class=\"backdrop\"><img src=\"$prefix/api/content/$this->id\"></div>";
             case PanelType::text:
-                return "<div class=\"panel panel-text\">$this->content</div>";
+                return "<div class=\"panel panel-text\" id=\"panel-$this->id\">$this->content</div>";
         }
     }
 
@@ -99,7 +99,7 @@ class Panel extends MySQLtoPHPautomapper {
     /** @return Panel[] */
     public static function getExpiredPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'hide' OR (show_override IS NULL AND show_till <= ", [date(MYSQL_DATETIME)], " or (approved = FALSE AND approved_by IS NOT NULL) or show_override = 'false')")->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'hide' OR (show_override IS NULL AND show_till <= ", [date(MYSQL_DATETIME)], " or (approved = FALSE AND approved_by IS NOT NULL) or show_override = 'false')")->orderBy("id", Order::maxToMin)->fetchAll());
     }
 
     /** @return Panel[] */

@@ -1,8 +1,11 @@
 <?php
 require_once("php/classes/validator.php");
 
+require_once("php/api/src/apiMessages.php");
+
 require_once("php/api/src/apiEndpoint.php");
 require_once("php/api/src/apiFileUploadEndpoint.php");
+require_once("php/api/src/apiFileUploadConfiguration.php");
 require_once("php/api/src/apiEndpointCondition.php");
 require_once("php/api/src/apiResponse.php");
 require_once("php/api/src/apiContinuousResponse.php");
@@ -31,9 +34,9 @@ class Api {
             array_push($this->endpoints, new ApiEndpoint($method, $requiredRequestStructure, $conditions, $callback));
     }
 
-    public function addFileUploadEndpoint(array $requiredRequestStructure, string $fileInputName, string $savePath, array $conditions, array $allowedExtentions, $beforeUploadCallback = null, $afterUploadCallback = null) {
+    public function addFileUploadEndpoint(array $requiredRequestStructure, array $conditions, ApiFileUploadConfiguration $config) {
         if ($_SERVER["REQUEST_METHOD"] == "POST") // Only process relevant endpoints
-            array_push($this->endpoints, new ApiFileUploadEndpoint($requiredRequestStructure, $fileInputName, $savePath, $allowedExtentions, $conditions, $beforeUploadCallback, $afterUploadCallback));
+            array_push($this->endpoints, new ApiFileUploadEndpoint($requiredRequestStructure, $conditions, $config));
     }
 
     public function validateRequestStructure(array $requiredRequestStructure) {
@@ -42,23 +45,20 @@ class Api {
                 return false;
             }
 
-            if ($value instanceof \Type && !Validator::validate($this->req[$key], $value)) {
-                // $request = new ApiErrorResponse("Parameter $key is not in the required format " . $value->value);
-                // $request->send();
+            if ($value instanceof Type && !Validator::validate($this->req[$key], $value)) {
+                if (DEV) (new ApiErrorResponse("Parameter $key is not in the required format Type::" . $value->name))->send();
 
                 return false;
             }
 
-            if ($value instanceof \DataType && !Validator::validateDataType($this->req[$key], $value)) {
-                // $request = new ApiErrorResponse("Parameter $key is not in the required format " . $value->value);
-                // $request->send();
+            if ($value instanceof DataType && !Validator::validateDataType($this->req[$key], $value)) {
+                if (DEV) (new ApiErrorResponse("Parameter $key is not in the required format DataType::" . $value->name . ", detected " . gettype($this->req[$key])))->send();
 
                 return false;
             }
 
             if ($value instanceof ApiEndpointCondition) {
-                $fx = $value->condition;
-                if (!$fx($this->req[$key])) {
+                if (!($value->condition)($this->req[$key])) {
                     return false;
                 };
             }
@@ -76,20 +76,21 @@ class Api {
 
     public function listen() {
         global $prefix;
+
         // Allow access from base domain
-        header("Access-Control-Allow-Origin: " . str_replace("Zkouseni", "", $prefix));
+        header("Access-Control-Allow-Origin: $prefix/");
 
         foreach ($this->endpoints as $endpoint) {
             if (!$this->validateRequestStructure($endpoint->requiredRequestStructure)) {
                 continue; // This endpoint was not triggered
             }
 
-            if (!$endpoint->validateConditions()) {
-                return; // Conditions for this endpoint were not met. Response already generated.
-            }
+            $endpoint->validateConditions(); // If conditions for this endpoint were not met, stops further execution & generates error response
 
             $endpoint->execute();
-            return; // Api successfully responded to the request
         }
+
+        // No endpoint was triggered
+        (new ApiErrorResponse(ApiMessage::noEndpointTriggered))->send();
     }
 }

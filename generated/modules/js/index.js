@@ -1,55 +1,5 @@
-// Quality of life changes to vanilla JS
-const objectFilter = (object, callback) => {
-	return Object.fromEntries(Object.entries(object).filter(([key, val]) => callback(val, key)));
-};
-
-const objectForEach = (object, callback) => {
-	Object.entries(object).forEach(([key, val]) => callback(key, val));
-};
-
-NodeList.prototype.forEach = Array.prototype.forEach;
-HTMLCollection.prototype.forEach = Array.prototype.forEach;
-NodeList.prototype.filter = Array.prototype.filter;
-FileList.prototype.map = Array.prototype.map;
-DOMTokenList.prototype.filter = Array.prototype.filter;
-
-function areSameSet(A, B) {
-	let n = A.length;
-
-	if (B.length != n) return false;
-
-	// Create a hash table to
-	// number of instances
-	let m = new Map();
-
-	// for each element of A
-	// increase it's instance by 1.
-	for (let i = 0; i < n; i++) m.set(A[i], m.get(A[i]) == null ? 1 : m.get(A[i]) + 1);
-
-	// for each element of B
-	// decrease it's instance by 1.
-	for (let i = 0; i < n; i++) m.set(B[i], m.get(B[i]) - 1);
-
-	// Iterate through map and check if
-	// any entry is non-zero
-	for (let [key, value] of m.entries()) if (value != 0) return false;
-	return true;
-}
-
-function hasJsonStructure(str) {
-	if (typeof str === "object") return true;
-	if (typeof str !== "string") return false;
-	try {
-		const result = JSON.parse(str);
-		const type = Object.prototype.toString.call(result);
-		return type === "[object Object]" || type === "[object Array]";
-	} catch (err) {
-		return false;
-	}
-}
-
 // https://www.cssscript.com/accessible-modal-dialog-animations/
-const createModal = (header, text) => {
+const createModal = (header, text, disableClose = false) => {
 	let noAnim = false;
 	document.querySelectorAll("dialog").forEach((e) => {
 		e.remove();
@@ -57,13 +7,19 @@ const createModal = (header, text) => {
 	});
 
 	const dialog = document.createElement("dialog");
-	dialog.innerHTML = '<div class="dialog-close" onclick="closeModal(this.parentNode)">×</div><div class="dialog-header">' + header + '</div><div class="dialog-content">' + text + "</div>";
+	dialog.innerHTML = (disableClose ? "" : '<div class="dialog-close" onclick="closeModal(this.parentNode)">×</div>') + '<div class="dialog-header">' + header + '</div><div class="dialog-content">' + text + "</div>";
 
-	dialog.addEventListener("click", (event) => {
-		if (event.target === dialog) {
-			closeModal(dialog);
-		}
-	});
+	if (!disableClose) {
+		dialog.addEventListener("click", (event) => {
+			if (event.target === dialog) {
+				closeModal(dialog);
+			}
+		});
+	} else {
+		dialog.addEventListener("cancel", (event) => {
+			event.preventDefault();
+		});
+	}
 
 	if (noAnim) dialog.classList.add("noAnim");
 
@@ -72,6 +28,13 @@ const createModal = (header, text) => {
 	dialog.showModal();
 
 	return dialog;
+};
+
+const createPersistentModal = (header, text) => {
+	const dialog = document.querySelector("dialog[open]") ?? createModal(header, text, true);
+
+	dialog.querySelector(".dialog-header").innerHTML = header;
+	dialog.querySelector(".dialog-content").innerHTML = text;
 };
 
 const closeModal = (e = null) => {
@@ -130,23 +93,9 @@ const onReady = () => {
 		e.style.color = L > 0.179 ? "var(--text)" : "var(--background)";
 	});
 
-	try {
-		document.querySelector("#back").addEventListener("click", (e) => {
-			window.history.go(-1);
-			return false;
-		});
-	} catch (e) {}
-
 	document.querySelectorAll("a").forEach((e) => {
 		e.onclick = (event) => {
-			// Prevent empty redirects
-			event.preventDefault();
-		};
-	});
-
-	document.querySelectorAll("a[data-hierarchy]").forEach((e) => {
-		e.onclick = (event) => {
-			navigate(e.href, e.getAttribute("data-hierarchy"), 0, 0, e.getAttribute("data-direction") ?? 0);
+			navigate(e.href);
 			event.preventDefault();
 		};
 	});
@@ -154,14 +103,24 @@ const onReady = () => {
 	document.querySelectorAll("resource").forEach(async (e) => {
 		const type = e.getAttribute("data-type");
 		const version = e.getAttribute("data-version");
-		const contents = await (await fetch(base_url + "/" + type + "/" + e.getAttribute("data-modules") + "." + type + "?v=" + version)).text();
+
+		const url = base_url + "/" + type + "/" + e.getAttribute("data-modules") + "." + type + "?v=" + version;
+
+		const contents = await (await fetch(url)).text();
+
 		if (type == "js") {
-			eval(contents);
+			try {
+				eval(contents);
+			} catch (e) {
+				API_MANAGER.errorHandlers.server_error.call(contents ?? "", "[...]", url);
+				console.error(e);
+			}
 		} else {
 			const style = document.createElement("style");
 			style.innerHTML = contents;
 			document.head.appendChild(style);
 		}
+
 		e.remove();
 	});
 
@@ -206,6 +165,9 @@ const onReady = () => {
 			emitEvent(e.getAttribute("bind"));
 		});
 	});
+
+	let event = new CustomEvent("onReady", { detail: {} });
+	window.dispatchEvent(event);
 };
 
 document.addEventListener("DOMContentLoaded", onReady);

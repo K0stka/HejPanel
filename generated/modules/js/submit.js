@@ -14,6 +14,22 @@ fileInput.type = "file";
 fileInput.id = "file";
 fileInput.addEventListener("input", (event) => {
 	fileInput.classList.remove("error");
+
+	imagePanel.innerHTML = "";
+
+	if (fileInput.files.length == 0) return;
+
+	const image = URL.createObjectURL(fileInput.files[0]);
+
+	const img = document.createElement("img");
+	const imgBackdrop = document.createElement("img");
+	imgBackdrop.classList.add("backdrop");
+
+	img.src = image;
+	imgBackdrop.src = image;
+
+	imagePanel.appendChild(imgBackdrop);
+	imagePanel.appendChild(img);
 });
 fileInput.setAttribute("required", "");
 
@@ -96,44 +112,36 @@ if (submitBtn) {
 		if (VALIDATE_FORM(submitForm, "error")) {
 			GET_FINGERPRINT().then((fp) => {
 				if (selectedImage) {
-					if (API_MANAGER.apiBusy) return;
+					CONTENT_API.uploadFiles(
+						{
+							fingerprint: fp,
+						},
+						fileInput,
+						"file",
+						new ApiCallback((result) => {
+							createPersistentModal("Nahrávání souboru...", JSON.stringify(result));
+						}),
+						new ApiCallback(() => {}),
+					).then((result) => {
+						if (result.status != "success") return;
 
-					let fileName = "";
-					API_MANAGER.schedule(
-						new ApiTask(
-							CONTENT_API,
-							"uploadFiles",
-							{
-								type: "upload",
-								fingerprint: fp,
-							},
-							fileInput,
-							"file",
-							new ApiCallback(() => {}),
-							new ApiCallback((result) => {
-								fileName = result;
-							}),
-						),
-						new ApiTask(
-							PANEL_API,
-							"post",
+						PANEL_API.post(
 							{
 								type: "addPanel",
 								show_from: document.querySelector("#show-from").value,
 								show_till: document.querySelector("#show-till").value,
 								fingerprint: fp,
 								panel_type: "image",
-								content: fileName,
+								content: result.files[0].response.message,
 								note: document.querySelector("#note").value,
 							},
 							new ApiCallback(() => {
-								const dialog = createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na HejPanelu.");
-								dialog.addEventListener("close", () => {
+								createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na HejPanelu.").addEventListener("close", () => {
 									fadeTo(base_url + "/");
 								});
 							}),
-						),
-					);
+						);
+					});
 				} else {
 					PANEL_API.post(
 						{
@@ -146,8 +154,7 @@ if (submitBtn) {
 							note: document.querySelector("#note").value,
 						},
 						new ApiCallback(() => {
-							const dialog = createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na HejPanelu.");
-							dialog.addEventListener("close", () => {
+							createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na HejPanelu.").addEventListener("close", () => {
 								fadeTo(base_url + "/");
 							});
 						}),

@@ -66,10 +66,9 @@ class Jidelna {
     }
 
     private function transformData(array $data): array {
-        $output = [];
-        $interested_in = ["O1", "O2", "O3", "SV", "X1"];
+        $output = ["O1" => "Není...", "O2" => "Není...", "O3" => "Není...", "SV" => "Není...", "X1" => "Není..."];
         foreach ($data as $data_row) {
-            if (!in_array($data_row["druh"], $interested_in)) continue;
+            if (!isset($output[$data_row["druh"]])) continue;
             $output[$data_row["druh"]] = $data_row["nazev"];
         }
         return $output;

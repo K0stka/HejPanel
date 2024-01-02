@@ -15,7 +15,7 @@ ob_start();
 
 if ($app->pageManager->isNormalRequest) { // Only for initial page load
     $app->cssManager->require("reset", "fonts", "transitions", "dialog", "index", "phone");
-    $app->jsManager->require("ajax", "index", "api", "transitions", "bind");
+    $app->jsManager->require("ajax", "util", "index", "api", "transitions", "bind");
 ?>
     <!DOCTYPE html>
     <html lang="cs">
@@ -34,6 +34,17 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
             ?>
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>');
+
+                    const channel = new BroadcastChannel("notifications");
+                    channel.addEventListener("message", (event) => {
+                        createModal(event.data.title, event.data.body + '<br><button onclick="fadeTo(\'' + event.data.url + '\')">Otevřít</button>');
+                    });
+
+                    document.addEventListener("visibilitychange", () => {
+                        navigator.serviceWorker.controller?.postMessage({
+                            hidden: document.hidden,
+                        });
+                    });
                 }
             <?php
             }
@@ -89,7 +100,7 @@ if ($app->pageManager->page == "panel") {
                     foreach ($app->pageManager->validPages as $pageIndex => $query) {
                         if ($pageIndex == "panel") continue;
                     ?>
-                        <a href="<?= $prefix ?>/<?= $pageIndex ?>" class="navBtn<?= ($pageIndex == $app->pageManager->page ? " active" : "") ?>" data-hierarchy="0" data-direction="-1">
+                        <a href="<?= $prefix ?>/<?= $pageIndex ?>" class="navBtn<?= ($pageIndex == $app->pageManager->page ? " active" : "") ?>">
                             <?= $pageNames[$pageIndex] ?>
                             <?php if ($pageIndex == "review" && ($count = Panel::countWaitingPanels()) > 0) { ?> <div class="notification"> <?= $count ?> </div> <?php } ?>
                         </a>

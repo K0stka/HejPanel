@@ -22,7 +22,8 @@ if (count($moduleManager->files) == 1 && DEV && file_exists("./" . $moduleManage
 }
 
 // Return package
-header('Content-Type: text/' . ($moduleManager->type == ModuleType::CSS ? "css" : "javascript"));
+header("Content-Type: text/" . ($moduleManager->type == ModuleType::CSS ? "css" : "javascript"));
+header("Cache-Control: public, max-age=86400");
 
 // echo ("/* Minified with the help of https://github.com/matthiasmullie/minify */\n");
 echo ("/* Pack version: " . substr($v, 3) . " */\n");

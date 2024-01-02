@@ -12,7 +12,7 @@ foreach ($panels as $panel) {
     ?>
         <button <?= $app->bind->onClick(function () use ($panel) {
                     $panel->update("showOverride", ShowOverride::show);
-                })->then(RELOAD) ?>>
+                })->then(RELOAD()) ?>>
             Zobrazit</button>
     <?php
     }) ?>

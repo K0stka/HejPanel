@@ -1,4 +1,60 @@
-async function getPageContent(url) {
+// CONFIGURATION
+
+const CSS_ANIMATION_HALF_LENGTH_MS = 150;
+
+const SINGLE_PAGE = true;
+
+const TAKE_OVER_HISTORY = false && window.history && history.pushState && !SINGLE_PAGE;
+
+const SAME_LEVEL_DIRECTION = (STARTING_POSITION, TARGET_POSITION) => {
+	return "toRight"; // toRight, toLeft, toIn, toOut, toFade
+};
+
+let NAVIGATING = false;
+
+// UTIL
+const SAME_LEVEL_DIRECTION_END = (STARTING_POSITION, TARGET_POSITION) => {
+	const reverseMap = {
+		toRight: "fromLeft",
+		toLeft: "fromRight",
+		toIn: "fromIn",
+		toOut: "fromOut",
+		toFade: "fromFade",
+	};
+
+	return reverseMap[SAME_LEVEL_DIRECTION(STARTING_POSITION, TARGET_POSITION)];
+};
+
+const GET_PAGE_MAP_POSITION = (url = window.location.href, top = null, left = null) => {
+	const map = url
+		.replace(base_url, "")
+		.replace(/^\/|\/$/g, "")
+		.split("/");
+
+	return {
+		sameOrigin: url.includes(base_url),
+		url: url,
+		levels: map,
+		depth: map.length,
+		top: top ?? document.querySelector("main").scrollTop,
+		left: left ?? document.querySelector("main").scrollLeft,
+	};
+};
+
+const HANDLE_HISTORY_JUMP = (STARTING_POSITION, TARGET_POSITION) => {
+	if (STARTING_POSITION.depth == TARGET_POSITION.depth) {
+		console.log("REPLACING STATE");
+		history.replaceState(0, title, fetchedUrl);
+	} else if (STARTING_POSITION.depth > TARGET_POSITION.depth) {
+		console.log("POPPING " + STARTING_POSITION.depth - TARGET_POSITION.depth + " STATE(S)");
+		for (i = 0; i < STARTING_POSITION.depth - TARGET_POSITION.depth; i++) history.popState();
+	} else if (STARTING_POSITION.depth < TARGET_POSITION.depth) {
+		console.log("PUSHING " + TARGET_POSITION.depth - STARTING_POSITION.depth + " STATE(S)");
+		history.pushState(0, title, fetchedUrl);
+	}
+};
+
+const getPageContent = async (url) => {
 	return new Promise((resolve) => {
 		$.ajax({
 			type: "post",
@@ -6,136 +62,136 @@ async function getPageContent(url) {
 			cache: "no-cache",
 			success: function (result, textStatus, request) {
 				const title = decodeURI(request.getResponseHeader("title")).replaceAll("+", " ");
-				resolve([title, result]);
+				const body = document.createElement("body");
+				body.innerHTML = result;
+				resolve([url, title, body]);
 			},
 			error: function (result) {
-				API_MANAGER.errorHandlers.network_error.call(url, [], result);
-				resolve([document.title, document.body.innerHTML]);
+				API_MANAGER.errorHandlers.network_error.call(result, [], url);
+				resolve([window.location.href, document.title, document.body]);
 			},
 		});
 	});
-}
+};
 
-const navigate = async (url, target_history_level = 0, top = 0, left = 0, direction = 0, fade = false, fetchSamePage = false, isBackNavigation = false) => {
-	const starting_history_level = HISTORY_TREE.length - 1;
-	const main = document.querySelector("main");
-	main.classList = main.classList.filter((e) => e != "toRight" && e != "toLeft" && e != "toIn" && e != "toOut" && e != "toFade" && e != "fromRight" && e != "fromLeft" && e != "fromIn" && e != "fromOut" && e != "fromFade");
+// MAIN FUNCTIONS
 
+const navigate = (url) => {
 	// SAME PAGE NAVIGATION
-	if (url == window.location.href && !fade && !fetchSamePage) {
-		main.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+	if (url == window.location.href) {
+		document.querySelector("main")?.scrollTo({ top: 0, left: 0, behavior: "smooth" });
 		return;
 	}
 
-	// HISTORY TREE EDGE CASE HANDLING
+	NAVIGATE_TO_POSITION(GET_PAGE_MAP_POSITION(url, 0, 0));
+};
 
-	if (starting_history_level > target_history_level) {
-		while (HISTORY_TREE.length - 1 > target_history_level) HISTORY_TREE.pop();
+const fadeTo = (url) => {
+	NAVIGATE_TO_POSITION(GET_PAGE_MAP_POSITION(url, 0, 0), true);
+};
+
+const NAVIGATE_TO_POSITION = async (TARGET_POSITION, forceFade = false) => {
+	if (NAVIGATING) return;
+
+	NAVIGATING = true;
+
+	if (!TARGET_POSITION.sameOrigin) {
+		window.location.href = TARGET_POSITION.url;
+		return;
 	}
 
-	if (starting_history_level + 1 < target_history_level) {
-		console.error("HISTORY_TREE depth delta > 1\nGoing from " + starting_history_level + " to " + target_history_level);
-		while (HISTORY_TREE.length < target_history_level) HISTORY_TREE.push({ url: url, top: 0, left: 0 });
-	}
+	const STARTING_POSITION = GET_PAGE_MAP_POSITION();
 
-	// HISTORY TREE UPDATE
+	const OLD_MAIN = document.querySelector("main");
+	OLD_MAIN.classList = OLD_MAIN.classList.filter((e) => !["toRight", "toLeft", "toIn", "toOut", "toFade", "fromRight", "fromLeft", "fromIn", "fromOut", "fromFade"].includes(e));
 
-	HISTORY_TREE[target_history_level] = { url: url, top: 0, left: 0 };
-
-	// RETURN PAGE STATUS UPDATE
-
-	if (target_history_level - starting_history_level > 0) {
-		HISTORY_TREE[target_history_level - 1].url = window.location.href;
-		HISTORY_TREE[target_history_level - 1].top = main.scrollTop;
-		HISTORY_TREE[target_history_level - 1].left = main.scrollLeft;
-	}
+	console.log("Starting depth: " + STARTING_POSITION.depth + "\nTarget depth: " + TARGET_POSITION.depth + "\nStarting url: " + STARTING_POSITION.url + "\nTarget url: " + TARGET_POSITION.url);
 
 	// LEAVING ANIMATION
 
-	if (target_history_level - starting_history_level == 0 && (direction == -1 || direction == 1) && !fade) {
-		if (direction == -1) {
-			main.classList.add("toRight");
-		} else if (direction == 1) {
-			main.classList.add("toLeft");
-		}
-	} else if (target_history_level - starting_history_level == -1 && !fade) {
-		main.classList.add("toOut");
-	} else if (target_history_level - starting_history_level == 1 && !fade) {
-		main.classList.add("toIn");
+	if (STARTING_POSITION.depth == TARGET_POSITION.depth && !forceFade) {
+		OLD_MAIN.classList.add(SAME_LEVEL_DIRECTION(STARTING_POSITION, TARGET_POSITION));
+	} else if (STARTING_POSITION.depth > TARGET_POSITION.depth && !forceFade) {
+		OLD_MAIN.classList.add("toOut");
+	} else if (STARTING_POSITION.depth < TARGET_POSITION.depth && !forceFade) {
+		OLD_MAIN.classList.add("toIn");
 	} else {
-		main.classList.add("toFade");
+		OLD_MAIN.classList.add("toFade");
 	}
 
 	// FETCH (And make sure that CSS animations are finished)
 
 	const {
-		0: [title, content],
+		0: [fetchedUrl, title, fetchedBody],
 	} = await Promise.all([
-		getPageContent(url),
+		getPageContent(TARGET_POSITION.url),
 		new Promise((resolve) => {
-			setTimeout(resolve, 150);
+			setTimeout(resolve, CSS_ANIMATION_HALF_LENGTH_MS);
 		}),
 	]);
 
-	if (isBackNavigation) {
-		history.pushState(0, title, url);
-	} else {
-		history.replaceState(0, title, url);
+	// HANDLE HISTORY
+
+	if (SINGLE_PAGE && fetchedUrl == TARGET_POSITION.url) {
+		history.replaceState(0, title, fetchedUrl);
+	} else if (TAKE_OVER_HISTORY && fetchedUrl == TARGET_POSITION.url) {
+		console.trace("NOT IMPLEMENTED");
+		history.replaceState(0, title, fetchedUrl);
+	} else if (fetchedUrl == TARGET_POSITION.url) {
+		history.pushState(0, title, fetchedUrl);
 	}
+
 	document.title = title;
 
 	// ENTERING ANIMATION
 
-	document.body.innerHTML = content;
+	const dialogBackup = fetchedBody.querySelector("dialog");
 
-	const newMain = document.querySelector("main");
+	if (dialogBackup) dialogBackup.remove();
 
-	if (newMain) {
-		if ((direction == -1 || direction == 1) && !fade) {
-			if (direction == -1) {
-				newMain.classList.add("fromLeft");
-			} else if (direction == 1) {
-				newMain.classList.add("fromRight");
-			}
-		} else if (target_history_level - starting_history_level == -1 && !fade) {
-			newMain.classList.add("fromOut");
-		} else if (target_history_level - starting_history_level == 1 && !fade) {
-			newMain.classList.add("fromIn");
+	document.body = fetchedBody;
+
+	if (dialogBackup) createModal(dialogBackup.querySelector(".dialog-header").innerHTML, dialogBackup.querySelector(".dialog-content").innerHTML);
+
+	const NEW_MAIN = document.querySelector("main");
+
+	if (NEW_MAIN) {
+		if (STARTING_POSITION.depth == TARGET_POSITION.depth && !forceFade) {
+			NEW_MAIN.classList.add(SAME_LEVEL_DIRECTION_END(STARTING_POSITION, TARGET_POSITION));
+		} else if (STARTING_POSITION.depth > TARGET_POSITION.depth && !forceFade) {
+			NEW_MAIN.classList.add("fromOut");
+		} else if (STARTING_POSITION.depth < TARGET_POSITION.depth && !forceFade) {
+			NEW_MAIN.classList.add("fromIn");
 		} else {
-			newMain.classList.add("fromFade");
+			NEW_MAIN.classList.add("fromFade");
 		}
 
 		// SCROLL RESTORATION
 
-		newMain.scrollTo({ top: top, left: left });
+		NEW_MAIN.scrollTo({ top: TARGET_POSITION.top, left: TARGET_POSITION.left });
 	}
 
+	NAVIGATING = false;
 	onReady();
 };
 
-const fadeTo = (url, target_history_level = null) => {
-	if (!target_history_level) target_history_level = HISTORY_TREE.length - 1;
-	navigate(url, target_history_level, 0, 0, 0, true, true);
-};
+// HISTORY HANDLING
 
-let HISTORY_TREE = [{ url: window.location.href, top: 0, left: 0 }];
+if (TAKE_OVER_HISTORY) {
+	console.trace("NOT IMPLEMENTED");
 
-if (window.history && history.pushState) {
 	window.addEventListener(
 		"load",
 		function () {
-			history.replaceState(-1, document.title, ""); // back state
-			history.pushState(0, document.title, ""); // main state
+			history.replaceState(-1, "BACK", window.location); // back state
+			history.pushState(0, "NORMAL", window.location); // main state
 
 			this.addEventListener(
 				"popstate",
 				function (event, state) {
-					if ((state = event.state) && state == -1) {
-						if (HISTORY_TREE.length > 1) {
-							navigate(HISTORY_TREE[HISTORY_TREE.length - 2].url, HISTORY_TREE.length - 2, HISTORY_TREE[HISTORY_TREE.length - 2].top, HISTORY_TREE[HISTORY_TREE.length - 2].left, 0, false, true, true);
-						} else {
-							navigate(HISTORY_TREE[HISTORY_TREE.length - 1].url, HISTORY_TREE.length - 1, HISTORY_TREE[HISTORY_TREE.length - 1].top, HISTORY_TREE[HISTORY_TREE.length - 1].left, 0, false, true, true);
-						}
+					if (event.state == -1) {
+						console.log(event);
+						history.pushState(0, "NORMAL", window.location);
 					}
 				},
 				false,

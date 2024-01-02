@@ -29,7 +29,7 @@ class AppManager {
 
             // $this->actionManager = new ActionManager($this->user); Not needed here
 
-            $this->notificationManager = new NotificationManager($this->user); //Not needed here
+            $this->notificationManager = new NotificationManager($this->user);
         }
     }
 
@@ -40,7 +40,17 @@ class AppManager {
         );
     }
 
+    // Site management utils
     public function synchronizeTables() {
+        throw new Exception("Not implemented");
+    }
+
+    public function pushNewVersion() {
+        $this->clearMinifiedPackages();
+        $this->updateManifest();
+        $this->updateRobotsTxt();
+        $this->updateSitemap();
+        $this->incrementVersion();
     }
 
     public function updateManifest() {
@@ -63,6 +73,12 @@ class AppManager {
 }
 ';
         file_put_contents("assets/manifest.json", $manifest);
+    }
+
+    public function updateRobotsTxt() {
+    }
+
+    public function updateSitemap() {
     }
 
     public function incrementVersion() {

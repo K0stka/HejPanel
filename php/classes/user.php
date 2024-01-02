@@ -71,7 +71,7 @@ class User extends MySQLtoPHPautomapper {
         return $user;
     }
 
-    public function login() {
+    public function bindToSession() {
         $_SESSION[self::SESSION_KEY_ID] = $this->id;
         $_SESSION[self::SESSION_KEY_AUTH] = $this->authVersion;
     }

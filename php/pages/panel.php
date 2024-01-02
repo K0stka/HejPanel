@@ -1,6 +1,11 @@
 <?php
 $jidelna = new Jidelna();
 $dayData = $jidelna->fetchDay(new DateTime());
+
+$app->jsManager->passToJs(["JIDELNA_PRELOAD" => $dayData]);
+
+$panels = Panel::getVisiblePanels();
+if (empty($panels)) $panels = [Panel::getEmptyPanel()];
 ?>
 
 <div class="panel-info">
@@ -8,41 +13,22 @@ $dayData = $jidelna->fetchDay(new DateTime());
     <div class="panel-time" id="panel-time">
         00:00:00
     </div>
-    <div class="panel-food">
-        <?php
-        if (!isset($dayData["result"]) or $dayData["result"] != "error") {
-        ?>
-            <div class="panel-food-row">
-                <b>Polévka:</b> <?= $dayData["X1"] ?>
-            </div>
-            <div class="panel-food-row">
-                <b>Oběd 1:</b> <?= $dayData["O1"] ?>
-            </div>
-            <div class="panel-food-row">
-                <b>Oběd 2:</b> <?= $dayData["O2"] ?>
-            </div>
-            <div class="panel-food-row">
-                <b>Oběd 3:</b> <?= $dayData["O3"] ?>
-            </div>
-            <div class="panel-food-row">
-                <b>Svačina:</b> <?= $dayData["SV"] ?>
-            </div>
-        <?php
-        } else {
-        ?>
-            <b>
-                Nemohli jsme načíst data z jídelny 😞
-            </b>
-        <?php
-        }
-        ?>
+    <div class="panel-food" id="panel-jidelna">
+        <b>
+            Načítání...
+        </b>
     </div>
 </div>
-<div class="panel-counter" id="panel-counter"></div>
+<div class="panel-counter" id="panel-counter">1/<?= count($panels) ?></div>
+<div class="radial-graph" id="panel-radial-graph"></div>
 <div class="panel-container" id="panel-container">
-    <div class="panel panel-text panel-hidden animate-in" id="panel-loading">
-        Velmi rychle procházíme vnitřní dokumentaci školy pro ty nejnovější novinky 😉
-    </div>
+    <?php
+    foreach ($panels as $panel) echo ($panel->render());
+
+    $app->jsManager->passToJs([
+        "PANELS_PRELOAD" => array_map(fn ($e) => $e->id, $panels),
+    ]);
+    ?>
 </div>
 <?php
 $app->jsManager->require("panel", "panel_live");

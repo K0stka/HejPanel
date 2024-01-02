@@ -13,8 +13,16 @@ function emitEvent(eventId) {
 			e: eventId,
 		},
 		success: function (result) {
-			eval(result);
-			API_MANAGER.free();
+			try {
+				API_MANAGER.free();
+
+				eval(result);
+			} catch (e) {
+				API_MANAGER.free(true);
+
+				API_MANAGER.errorHandlers.php_error.call(result, { e: eventId }, window.location.href);
+				console.error(e);
+			}
 		},
 		error: function (result) {
 			API_MANAGER.errorHandlers.network_error.call(window.location.href, { e: eventId }, result);
