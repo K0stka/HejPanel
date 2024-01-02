@@ -20,5 +20,6 @@ jobs:
                       **/.git*
                       **/.composer*
                       **/.git*/**
+                      **/.vscode*/**
                       **/uploads/**
                       **/generated/packages/**
