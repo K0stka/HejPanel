@@ -39,7 +39,7 @@ header {
 }
 
 .logo {
-	width: 3rem;
+	width: 5rem;
 	margin-right: 1rem;
 	aspect-ratio: 1 / 1;
 }
@@ -470,11 +470,8 @@ button.non-active:hover,
 }
 
 .panel-logo {
-	width: 4rem;
+	width: 6rem;
 	aspect-ratio: 1 / 1;
-	background: var(--primary);
-	padding: 1rem;
-	border-radius: 2rem;
 }
 
 .panel-time {
