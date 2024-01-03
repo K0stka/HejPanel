@@ -497,22 +497,26 @@ button.non-active:hover,
 	color: var(--background);
 	font-weight: var(--bold);
 	font-size: var(--normalplus);
-	right: 4rem;
-	margin-top: 4rem;
-	transform: translateX(50%) translateY(-50%);
+	right: 2rem;
+	margin-top: 2rem;
+	width: 4rem;
+	height: 4rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .radial-graph {
 	transition: var(--t);
 	position: absolute;
-	right: 4rem;
-	margin-top: 4rem;
-	transform: translateX(50%) translateY(-50%);
+	right: 2rem;
+	margin-top: 2rem;
 	z-index: 1;
 	width: 4rem;
 	height: 4rem;
 	border-radius: 50%;
 	background: conic-gradient(var(--background) var(--value), transparent var(--value));
+	mask: radial-gradient(farthest-side, transparent calc(100% - var(--small)), #fff calc(100% - var(--small) + 1px));
 	-webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--small)), #fff calc(100% - var(--small) + 1px));
 	--value: 100%;
 }

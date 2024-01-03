@@ -18,7 +18,8 @@ jobs:
                   exclude: |
                       **/.env.php
                       **/.git*
-                      **/.composer*
+                      **/.composer.json
+                      **/.composer.lock
                       **/.git*/**
                       **/.vscode*/**
                       **/uploads/**

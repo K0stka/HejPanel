@@ -21,7 +21,7 @@ foreach ($panels as $panel) {
                                             $panel->approvedBy = $app->user;
                                             $panel->approvedAt = new DateTime();
                                             $panel->updateAll();
-                                        })->then(RELOAD()) ?>>Pouze tento panel</button>
+                                        }, "1-p:" . $panel->id)->then(RELOAD()) ?>>Pouze tento panel</button>
 
                 <button class="danger" <?= $app->bind->onClick(function () use ($con, $app, $panel, $panels) {
                                             $panelsToRemove = array_map(fn ($e) => "id = " . $e->id, array_filter($panels, function ($e) use ($panel) {
@@ -30,7 +30,7 @@ foreach ($panels as $panel) {
                                             $con->update("panels", ["approved" => 0, "approved_by" => $app->user->id, "approved_at" => date(MYSQL_DATETIME)])
                                                 ->addSQL("WHERE " . join(" OR ", $panelsToRemove))
                                                 ->execute();
-                                        })->then(RELOAD()) ?>>Vše od <?= $panel->postedBy ?></button>
+                                        }, "2-p:" . $panel->id)->then(RELOAD()) ?>>Vše od <?= $panel->postedBy ?></button>
                 <button class="danger" <?= $app->bind->onClick(function () use ($con, $app, $panel, $panels) {
                                             $panelsToRemove = array_map(fn ($e) => "id = " . $e->id, array_filter($panels, function ($e) use ($panel) {
                                                 return $e->postedBy->fingerprintGroupId == $panel->postedBy->fingerprintGroupId;
@@ -38,7 +38,7 @@ foreach ($panels as $panel) {
                                             $con->update("panels", ["approved" => 0, "approved_by" => $app->user->id, "approved_at" => date(MYSQL_DATETIME)])
                                                 ->addSQL("WHERE " . join(" OR ", $panelsToRemove))
                                                 ->execute();
-                                        })->then(RELOAD()) ?>>Vše od skupiny <?= $panel->postedBy->fingerprintGroupId ?></button>
+                                        }, "3-p:" . $panel->id)->then(RELOAD()) ?>>Vše od skupiny <?= $panel->postedBy->fingerprintGroupId ?></button>
             </div>
         </div>
     <?php

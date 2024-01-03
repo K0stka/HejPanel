@@ -3,6 +3,8 @@
 class Jidelna {
     private Conn $con;
 
+    private const MAX_DAYS_PRECACHE = 7;
+
     private array $cache;
     private array $cachedDays;
 
@@ -37,6 +39,9 @@ class Jidelna {
 
         $output = ["result" => "error"];
 
+        $cacheTill = new DateTime("today");
+        $cacheTill->modify("+" . self::MAX_DAYS_PRECACHE . "days");
+
         foreach ($data as $data_day) {
             if (empty($data_day)) continue;
 
@@ -48,7 +53,8 @@ class Jidelna {
 
             if ($date == $day) $output = $transformedData;
 
-            $this->writeToCache($date, $transformedData);
+            if ($date <= $cacheTill)
+                $this->writeToCache($date, $transformedData);
         }
 
         return $output;
@@ -66,7 +72,7 @@ class Jidelna {
     }
 
     private function transformData(array $data): array {
-        $output = ["O1" => "Není...", "O2" => "Není...", "O3" => "Není...", "SV" => "Není...", "X1" => "Není..."];
+        $output = ["O1" => "Není 😞", "O2" => "Není 😞", "O3" => "Není 😞", "SV" => "Není 😞", "X1" => "Není 😞"];
         foreach ($data as $data_row) {
             if (!isset($output[$data_row["druh"]])) continue;
             $output[$data_row["druh"]] = $data_row["nazev"];

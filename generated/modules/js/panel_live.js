@@ -1,20 +1,27 @@
+// Config
+const CAROUSEL_TICKS_PER_SECOND = 50;
 const CAROUSEL_SPEED = 10; // S per revolution
+const FETCH_EVERY_N_SECONDS = 30; // Must be greater than CAROUSEL_SPEED
 
+// DOM
 const panelTime = document.querySelector("#panel-time");
 const panelJidelna = document.querySelector("#panel-jidelna");
-
-let carousel_paused = false;
-
-if (panelTime) {
-	panelTime.innerHTML = new Date().toLocaleTimeString();
-	setInterval(() => {
-		panelTime.innerHTML = new Date().toLocaleTimeString();
-	}, 1000);
-}
 
 const panelContainer = document.querySelector("#panel-container");
 const panelCounter = document.querySelector("#panel-counter");
 const radialGraph = document.querySelector("#panel-radial-graph");
+
+// State
+let panelPointer = -1;
+let panelIds = PANELS_PRELOAD;
+
+let panelsToAdd = [];
+let panelIdsToRemove = [];
+
+let panels = PANELS_PRELOAD.map((id) => ({ id: id, element: document.querySelector("#panel-" + id) }));
+
+let carousel_paused = false;
+let carouselTick = 0;
 
 const renderPanel = (panelId, panelType, panelContent) => {
 	const panel = document.createElement("div");
@@ -38,37 +45,27 @@ const renderPanel = (panelId, panelType, panelContent) => {
 	return panel;
 };
 
-const updatePanels = async (newPanelIds) => {
-	if (typeof newPanelIds != "object") return;
-
-	if (areSameSet(panelIds, newPanelIds)) return;
+const updatePanels = () => {
+	if (panelsToAdd.length == 0 && panelIdsToRemove == 0) return;
 
 	console.log("%cUpdating panels...", "color: gray");
 
-	const panelIdsToAdd = newPanelIds.filter((id) => !panelIds.includes(id));
-	if (panelIdsToAdd.length > 0) {
-		await PANEL_API.get({ i: panelIdsToAdd }, null, null).then((newPanels) => {
-			newPanels.forEach((panel) => {
-				console.log("%cAdding panel " + panel.id, "color: lime");
+	if (panelsToAdd.length > 0) {
+		panelsToAdd.forEach((panel) => {
+			console.log("%cAdding panel " + panel.i, "color: lime");
 
-				panelIds.push(panel.id);
+			const newPanel = renderPanel(panel.i, panel.t, panel.c);
 
-				const newPanel = renderPanel(panel.id, panel.type, panel.content);
+			panelContainer.appendChild(newPanel);
 
-				panelContainer.appendChild(newPanel);
-
-				panels.push({
-					id: panel.id,
-					element: newPanel,
-				});
+			panels.push({
+				id: panel.i,
+				element: newPanel,
 			});
 		});
 	}
 
-	const panelIdsToRemove = panelIds.filter((id) => !newPanelIds.includes(id));
 	if (panelIdsToRemove.length > 0) {
-		panelIds = panelIds.filter((id) => !panelIdsToRemove.includes(id));
-
 		panelIdsToRemove.forEach((id) => {
 			console.log("%cRemoving panel " + id, "color: red");
 
@@ -97,6 +94,9 @@ const updatePanels = async (newPanelIds) => {
 			panels = panels.filter((p) => p.id != id);
 		});
 	}
+
+	panelsToAdd = [];
+	panelIdsToRemove = [];
 };
 
 const cyclePanels = () => {
@@ -114,8 +114,8 @@ const cyclePanels = () => {
 	panels[panelPointer].element.classList.add("animate-in");
 };
 
-const fetchJidelna = async () => {
-	PANEL_API.get({ j: null }, null, null).then(updateJidelna);
+const fetchJidelna = () => {
+	PANEL_API.nonBlockingGet({ j: null }, null, API_MANAGER.error_handlers.warn).then(updateJidelna);
 };
 
 const updateJidelna = (jidelna) => {
@@ -126,28 +126,52 @@ const updateJidelna = (jidelna) => {
 	}
 };
 
-// Initial values
-let panelPointer = -1;
-let panelIds = PANELS_PRELOAD;
-let panels = PANELS_PRELOAD.map((id) => ({ id: id, element: document.querySelector("#panel-" + id) }));
+function updateRadialGraph() {
+	if (panels.length < 2) radialGraph.style.opacity = 0;
+	else radialGraph.style.opacity = 1;
+	radialGraph.style.setProperty("--value", (carouselTick / CAROUSEL_SPEED) * 2 + "%");
+	requestAnimationFrame(updateRadialGraph);
+}
+
+// On load
 cyclePanels();
 updateJidelna(JIDELNA_PRELOAD);
 
+// Timers
+panelTime.innerHTML = new Date().toLocaleTimeString();
+setInterval(() => {
+	panelTime.innerHTML = new Date().toLocaleTimeString();
+}, 1000);
+
+requestAnimationFrame(updateRadialGraph);
+
 // Carousel
-let carouselTick = 0;
 setInterval(() => {
 	if (document.hidden || carousel_paused) return;
 
 	carouselTick++;
-	if (panels.length < 2) radialGraph.style.opacity = 0;
-	else radialGraph.style.opacity = 1;
-	radialGraph.style.setProperty("--value", (carouselTick / CAROUSEL_SPEED) * 2 + "%");
 
-	if (carouselTick / 50 >= CAROUSEL_SPEED) {
-		PANEL_API.get({ t: "c" }, null, null).then((newPanelIds) => updatePanels(newPanelIds).then(cyclePanels));
+	if (carouselTick / CAROUSEL_TICKS_PER_SECOND >= CAROUSEL_SPEED) {
+		updatePanels();
+		cyclePanels();
 		carouselTick = 0;
 	}
-}, 20);
+}, 1000 / CAROUSEL_TICKS_PER_SECOND);
+
+// Hydrator
+setInterval(() => {
+	if (document.hidden || carousel_paused) return;
+
+	PANEL_API.nonBlockingGet({ i: panelIds }, null, null).then((result) => {
+		console.log("Caching panels: " + result.a.map((panel) => panel.i).join(", "), "\nForgetting panels: " + result.r.join(", "));
+
+		panelIds.push(...result.a.map((panel) => panel.i));
+		panelIds = panelIds.filter((id) => !result.r.includes(id));
+
+		panelsToAdd.push(...result.a);
+		panelIdsToRemove.push(...result.r);
+	});
+}, FETCH_EVERY_N_SECONDS * 1000);
 
 // Jidelna
 setInterval(() => {

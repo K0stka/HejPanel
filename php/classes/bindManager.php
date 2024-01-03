@@ -19,19 +19,20 @@ function ON_CLOSE(string $callback): string {
 class BindManager {
     private array $eventHandlers = [];
 
-    public bool $handlerRequest = false;
+    public bool $handleRequest = false;
 
     public function __construct() {
-        $this->handlerRequest = $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["e"]);
+        $this->handleRequest = $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["e"]);
     }
 
-    public function onClick(callable $serverCallback) {
+    public function onClick(callable $serverCallback, ?string $uniqueId = null) {
         $this->eventHandlers[] = [
+            "uniqueId" => $uniqueId,
             "serverCallback" => $serverCallback,
             "clientCallback" => "",
         ];
 
-        echo ("bind=\"" . array_key_last($this->eventHandlers) . "\"");
+        echo ("bind=\"" . ($uniqueId ?? array_key_last($this->eventHandlers)) . "\"");
 
         return $this;
     }
@@ -41,18 +42,18 @@ class BindManager {
     }
 
     public function handleEventHandlers() {
-        if (!$this->handlerRequest) return;
+        if (!$this->handleRequest) return;
 
         ob_clean();
 
         foreach ($this->eventHandlers as $id => $eventHandler) {
-            if ($id == $_POST["e"]) {
+            if ($eventHandler["uniqueId"] ?? $id == $_POST["e"]) {
                 echo ("const output = " . utf8json($eventHandler["serverCallback"]() ?? null) . ";\n");
                 echo ($eventHandler["clientCallback"]);
                 return;
             }
         }
 
-        echo ("Invalid event id " . $_POST["e"]);
+        (new ApiErrorResponse("Invalid event id"))->send();
     }
 }

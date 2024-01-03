@@ -101,25 +101,26 @@ $api->addEndpoint(
     }
 );
 
-// Get all visible panels with ids
 $api->addEndpoint(Method::GET, ["i" => DataType::int_array], [], function () {
-    $panels = Panel::getPanelsByIds($_GET["i"]);
-    if (empty($panels)) $panels = [Panel::getEmptyPanel()];
-    $response = new ApiResponse(array_map(fn ($e) => $e->serialize(), $panels));
-    $response->cache(3600, true);
-    $response->send();
-});
-
-// Get ids of all currently visible panels
-$api->addEndpoint(Method::GET, ["t" => "c"], [], function () {
     $panelIds = Panel::getVisiblePanelsIds();
     if (empty($panelIds)) $panelIds = [Panel::getEmptyPanel()->id];
-    return new ApiResponse($panelIds);
+
+    $clientHas = array_map(fn ($e) => intval($e), $_GET["i"]);
+
+    $panelIdsToAdd = array_diff($panelIds, $clientHas);
+    $panelIdsToRemove = array_diff($clientHas, $panelIds);
+
+    if ($panelIdsToAdd != [-1])
+        $panelsToAdd = array_map(fn ($e) => $e->serializePanel(), Panel::getPanelsByIds($panelIdsToAdd));
+    else
+        $panelsToAdd = [Panel::getEmptyPanel()->serializePanel()];
+
+    return new ApiResponse(["a" => array_values($panelsToAdd), "r" => array_values($panelIdsToRemove)]);
 });
 
 // Get current Jidelna status
 $api->addEndpoint(Method::GET, ["j" => null], [], function () {
-    $response = new ApiSuccessResponse((new Jidelna())->fetchDay(new DateTime()));
+    $response = new ApiSuccessResponse((new Jidelna())->fetchDay(new DateTime("today")));
     $tomorrow00 = strtotime("tomorrow");
     $response->cache($tomorrow00 - time() - 1, true);
     $response->LastModified($tomorrow00 - 86401);

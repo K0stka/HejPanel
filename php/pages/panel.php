@@ -1,6 +1,6 @@
 <?php
 $jidelna = new Jidelna();
-$dayData = $jidelna->fetchDay(new DateTime());
+$dayData = $jidelna->fetchDay(new DateTime("today"));
 
 $app->jsManager->passToJs(["JIDELNA_PRELOAD" => $dayData]);
 

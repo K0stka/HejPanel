@@ -73,8 +73,8 @@ class Panel extends MySQLtoPHPautomapper {
         }
     }
 
-    public function serialize(): array {
-        return ["id" => $this->id, "type" => $this->type->value, "content" => $this->content];
+    public function serializePanel(): array {
+        return ["i" => $this->id, "t" => $this->type->value, "c" => $this->content];
     }
 
     /** @return Panel[] */
@@ -82,7 +82,7 @@ class Panel extends MySQLtoPHPautomapper {
     public static function getPanelsByIds(array $ids): array {
         global $con;
         if (empty($ids)) return [];
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE (show_override = 'show' OR (show_override IS NULL AND approved = TRUE AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")) AND (", join(" OR ", array_map(fn ($e) => "id = " . $e, $ids)), ")")->orderBy("show_from", Order::minToMax)->fetchAll());
+        return array_map(fn ($data) => new Panel($data, true), $con->select(["id", "type", "content"], "panels")->addSQL("WHERE (show_override = 'show' OR (show_override IS NULL AND approved = TRUE AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")) AND (", join(" OR ", array_map(fn ($e) => "id = " . $e, $ids)), ")")->orderBy("show_from", Order::minToMax)->fetchAll());
     }
 
     /** @return Panel[] */

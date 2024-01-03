@@ -43,14 +43,22 @@ class ApiConnector {
 	}
 
 	async get(data, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
-		return await this.fetch("get", data, callback, userErrorCallback);
+		return await this.fetch("get", data, false, callback, userErrorCallback);
 	}
 
 	async post(data, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
-		return await this.fetch("post", data, callback, userErrorCallback);
+		return await this.fetch("post", data, false, callback, userErrorCallback);
 	}
 
-	async fetch(method, data, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
+	async nonBlockingGet(data, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
+		return await this.fetch("get", data, true, callback, userErrorCallback);
+	}
+
+	async nonBlockingPost(data, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
+		return await this.fetch("post", data, true, callback, userErrorCallback);
+	}
+
+	async fetch(method, data, isNonBlocking = false, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
 		const API_MANAGER = this.apiManager;
 		const address = this.address;
 
@@ -59,7 +67,7 @@ class ApiConnector {
 			return;
 		}
 
-		API_MANAGER.busy();
+		if (!isNonBlocking) API_MANAGER.busy();
 
 		let request = {
 			type: method,
@@ -72,17 +80,17 @@ class ApiConnector {
 		return new Promise((resolve, reject) => {
 			request.success = (result) => {
 				if (hasJsonStructure(result)) {
-					API_MANAGER.free();
+					if (!isNonBlocking) API_MANAGER.free();
 					if (callback) callback.call(result, data, address);
 					resolve(result);
 				} else {
-					API_MANAGER.free(true);
+					if (!isNonBlocking) API_MANAGER.free(true);
 					API_MANAGER.errorHandlers.php_error.call(result, data, address);
 					reject(result);
 				}
 			};
 			request.error = (result) => {
-				API_MANAGER.free(true);
+				if (!isNonBlocking) API_MANAGER.free(true);
 
 				if (result.status == 0) {
 					API_MANAGER.errorHandlers.network_error.call(result, data, address);
@@ -326,6 +334,12 @@ class ApiManager {
 
 	schedule(...requests) {
 		this.requests.push(...requests);
+
+		this.nextTask();
+	}
+
+	scheduleTask(api, method, ...parameters) {
+		this.requests.push(new ApiTask(api, method, ...parameters));
 
 		this.nextTask();
 	}
