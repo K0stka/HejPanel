@@ -73,6 +73,43 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
     <div class="mainWrapper">
         <main>
             <?= AdminSetting::render(
+                "Update",
+                "Run suite of actions:<br>- clearMinifiedPackages<br>- updateManifest<br>- updateRobotsTxt<br>- updateSitemap<br>- incrementVersion",
+                "Update app",
+                function () use ($app) {
+                    $app->pushNewVersion();
+                },
+                CREATE_MODAL("Success", "App was updated successfully") . ON_CLOSE(RELOAD())
+            ) ?>
+            <hr>
+            <?= AdminSetting::render(
+                "Remove orphan files",
+                "Remove files that are not assigned to any panel.<br>Orphan files: " . $con->select(["COUNT(*)" => "count"], "files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->fetchValue(),
+                "Send",
+                function () use ($con) {
+                    $files = $con->select("file", "files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->fetchColumn();
+
+                    foreach ($files as $file) {
+                        unlink(PREFIX . "uploads/" . $file);
+                    }
+
+                    $con->delete("files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->execute();
+
+                    return $files;
+                },
+                CREATE_MODAL("Successfully removed ' + output.length + ' files", "Files removed: ' + output.join(', ') + '") . ON_CLOSE(RELOAD())
+            ) ?>
+            <hr>
+            <?= AdminSetting::render(
+                "App version",
+                "Current version: " . substr($v, 3),
+                "Increment version",
+                function () use ($app) {
+                    $app->incrementVersion();
+                },
+                RELOAD()
+            ) ?>
+            <?= AdminSetting::render(
                 "Minified packages cache",
                 "Cached packages:<br>" . join(", ", array_filter(scandir("generated/packages"), fn ($e) => is_file("generated/packages/" . $e))),
                 "Clear minified packages cache",
@@ -91,14 +128,22 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                 RELOAD()
             ) ?>
             <?= AdminSetting::render(
-                "App version",
-                "Current version: " . substr($v, 3),
-                "Increment version",
-                function () use ($app) {
-                    $app->incrementVersion();
+                "Robots",
+                "Generates a new version of the robots.txt file",
+                "Generate robots.txt",
+                function () {
                 },
-                RELOAD()
+                CREATE_MODAL("ERROR", "Not implemented")
             ) ?>
+            <?= AdminSetting::render(
+                "Sitemap",
+                "Generates a new version of the sitemap.xml file",
+                "Generate sitemap",
+                function () {
+                },
+                CREATE_MODAL("ERROR", "Not implemented")
+            ) ?>
+            <hr>
             <?= AdminSetting::render(
                 "MySQL database structure",
                 "WARNING - REMOVES ALL DATA",
@@ -108,6 +153,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                 },
                 CREATE_MODAL("ERROR", "Not implemented"),
             ) ?>
+            <hr>
             <?= AdminSetting::render(
                 "Push notification",
                 "Sends a test push notification to all available subscriptions",
@@ -120,23 +166,6 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
                     );
                 },
                 CREATE_MODAL("SUCCESS", "Notifications successfully sent")
-            ) ?>
-            <?= AdminSetting::render(
-                "Remove orphan files",
-                "Remove files that are not assigned to any panel.<br>Orphan files: " . $con->select(["COUNT(*)" => "count"], "files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->fetchValue(),
-                "Send",
-                function () use ($con) {
-                    $files = $con->select("file", "files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->fetchColumn();
-
-                    foreach ($files as $file) {
-                        unlink(PREFIX . "uploads/" . $file);
-                    }
-
-                    $con->delete("files")->addSQL("WHERE id NOT IN (SELECT content FROM panels WHERE type = \"image\");")->execute();
-
-                    return $files;
-                },
-                CREATE_MODAL("Successfully removed ' + output.length + ' files", "Files removed: ' + output.join(', ') + '") . ON_CLOSE(RELOAD())
             ) ?>
         </main>
     </div>
