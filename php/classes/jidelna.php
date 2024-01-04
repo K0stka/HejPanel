@@ -5,14 +5,13 @@ class Jidelna {
 
     private const MAX_DAYS_PRECACHE = 7;
 
-    private array $cache;
     private array $cachedDays;
 
     public function __construct() {
         global $con;
         $this->con = $con;
 
-        $this->cachedDays = array_map(fn ($e) => $e["date"], $this->con->query("SELECT date FROM jidelna_cache")->fetchAll());
+        $this->cachedDays = $this->con->select("date", "jidelna_cache")->fetchColumn();
     }
 
     public function fetchDay(DateTime $day) {
@@ -61,14 +60,13 @@ class Jidelna {
     }
 
     private function readFromCache(DateTime $day): array {
-        return $this->cache[$day->format("Y-m-d")] ?? (in_array($day->format("Y-m-d"), $this->cachedDays)) ? json_decode($this->con->query("SELECT data FROM jidelna_cache WHERE date = ", [$day->format("Y-m-d")])->fetchRow()["data"], true) : [];
+        return (in_array($day->format("Y-m-d"), $this->cachedDays)) ? json_decode($this->con->query("SELECT data FROM jidelna_cache WHERE date = ", [$day->format("Y-m-d")])->fetchRow()["data"], true) : [];
     }
 
     private function writeToCache(DateTime $day, array $data) {
-        $this->cache[$day->format("Y-m-d")] = $data;
         if (in_array($day->format("Y-m-d"), $this->cachedDays)) return;
         $this->cachedDays[] = $day->format("Y-m-d");
-        $this->con->query("INSERT INTO jidelna_cache (date, data) VALUES (", [$day->format("Y-m-d")], ", ", [utf8json($data)], ")");
+        $this->con->insert("jidelna_cache", ["date" => $day->format("Y-m-d"), "data" => utf8json($data)]);
     }
 
     private function transformData(array $data): array {
