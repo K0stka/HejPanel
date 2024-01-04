@@ -40,7 +40,7 @@ class Conn {
         $paramsTypes = "";
         $params = [];
         $exceptionHandler = function (Exception $e, array $args, string $query, array $params) {
-            if (DEV || true) {
+            if (DEV) {
                 printError("Error querying the database", ["Message" => $e->getMessage(), "Args" => $args, "Query" => $query, "Params" => $params]);
             } else {
                 printError("Error querying the database");
