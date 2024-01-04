@@ -100,6 +100,13 @@ const onReady = () => {
 		};
 	});
 
+	document.querySelectorAll("*[safe-href]").forEach((e) => {
+		e.onclick = (event) => {
+			createModal("Pozor, klikáte na potencionálně nebezpečný odkaz", "Odkaz, na který Vás přesměrujeme nepochází od autora stránky, pokračujete na vlastní nebezpečí.<br>URL: <b>" + e.getAttribute("safe-href") + "</b><br><br><button onclick=\"fadeTo('" + e.getAttribute("safe-href") + "');\">Pokračovat</button>");
+			event.preventDefault();
+		};
+	});
+
 	document.querySelectorAll("resource").forEach(async (e) => {
 		const type = e.getAttribute("data-type");
 		const version = e.getAttribute("data-version");

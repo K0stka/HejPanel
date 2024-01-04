@@ -29,6 +29,7 @@ class Panel extends MySQLtoPHPautomapper {
     public ?ShowOverride $showOverride;
 
     public PanelType $type;
+    public ?string $url;
     public string $content;
 
     public string $note;
@@ -48,6 +49,7 @@ class Panel extends MySQLtoPHPautomapper {
         "show_override" => ["showOverride", StoredAs::enum, "ShowOverride"],
         "type" => ["type", StoredAs::enum, "PanelType"],
         "content" => ["content", StoredAs::string],
+        "url" => ["url", StoredAs::nullableString],
         "note" => ["note", StoredAs::string]
     ];
 
@@ -74,7 +76,7 @@ class Panel extends MySQLtoPHPautomapper {
     }
 
     public function serializePanel(): array {
-        return ["i" => $this->id, "t" => $this->type->value, "c" => $this->content];
+        return ["i" => $this->id, "t" => $this->type->value, "c" => $this->content, "u" => $this->url];
     }
 
     /** @return Panel[] */
@@ -82,7 +84,7 @@ class Panel extends MySQLtoPHPautomapper {
     public static function getPanelsByIds(array $ids): array {
         global $con;
         if (empty($ids)) return [];
-        return array_map(fn ($data) => new Panel($data, true), $con->select(["id", "type", "content"], "panels")->addSQL("WHERE (show_override = 'show' OR (show_override IS NULL AND approved = TRUE AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")) AND (", join(" OR ", array_map(fn ($e) => "id = " . $e, $ids)), ")")->orderBy("show_from", Order::minToMax)->fetchAll());
+        return array_map(fn ($data) => new Panel($data, true), $con->select(["id", "type", "content", "url"], "panels")->addSQL("WHERE (show_override = 'show' OR (show_override IS NULL AND approved = TRUE AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")) AND (", join(" OR ", array_map(fn ($e) => "id = " . $e, $ids)), ")")->orderBy("show_from", Order::minToMax)->fetchAll());
     }
 
     /** @return Panel[] */
@@ -118,6 +120,7 @@ class Panel extends MySQLtoPHPautomapper {
             "id" => -1,
             "type" => "text",
             "content" => "Víte, jak zajistit, že zde vždy bude něco ke čtení?<br>Přesně takto :)",
+            "url" => "null"
         ], true);
     }
 }

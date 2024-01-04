@@ -8,6 +8,7 @@ enum Type: string {
     case passwordOrEmpty = "^$|(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$";
     case date = "^\d{4}-\d{1,2}-\d{1,2}$";
     case code = "^[A-Z0-9]{20}$";
+    case nullableUrl = "^((http(s)?):\/\/[(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)){0,1}$";
 }
 
 enum DataType {
@@ -44,7 +45,7 @@ class Validator {
         $output = "const REGEXES = {";
         /** @var Type $type */
         foreach (Type::cases() as $type) {
-            $output .= $type->name . ": new RegExp(\""  . $type->value . "\"),\n";
+            $output .= $type->name . ": new RegExp(" . utf8json($type->value) . "),\n";
         }
         $output .= "};";
 

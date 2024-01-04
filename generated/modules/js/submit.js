@@ -119,7 +119,7 @@ if (submitBtn) {
 						fileInput,
 						"file",
 						new ApiCallback((result) => {
-							createPersistentModal("Nahrávání souboru...", JSON.stringify(result));
+							createPersistentModal("Nahrávání souboru...", "Nahráno: " + Math.round((result.uploaded / 1024 / 1024) * 100) / 100 + "MB z " + Math.round((result.total / 1024 / 1024) * 100) / 100 + "MB");
 						}),
 						new ApiCallback(() => {}),
 					).then((result) => {
@@ -133,6 +133,7 @@ if (submitBtn) {
 								fingerprint: fp,
 								panel_type: "image",
 								content: result.files[0].response.message,
+								url: document.querySelector("#url").value,
 								note: document.querySelector("#note").value,
 							},
 							new ApiCallback(() => {
@@ -151,6 +152,7 @@ if (submitBtn) {
 							fingerprint: fp,
 							panel_type: "text",
 							content: textInput.value,
+							url: document.querySelector("#url").value,
 							note: document.querySelector("#note").value,
 						},
 						new ApiCallback(() => {

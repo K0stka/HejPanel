@@ -23,7 +23,11 @@
         </div>
         <div id="additional-settings"></div>
         <div class="input-label">
-            <label for="note">Dodatečná poznámka:</label>
+            <label for="show-till">URL adresa (Nepovinné):</label>
+            <input type="string" id="url" data-type="nullableUrl" placeholder="Např.: https://gytool.cz">
+        </div>
+        <div class="input-label">
+            <label for="note">Dodatečná poznámka (Nepovinné):</label>
             <textarea id="note"></textarea>
         </div>
         <button id="submit">Odeslat ke schválení</button>

@@ -44,6 +44,7 @@ $api->addEndpoint(
         "fingerprint" => DataType::array,
         "panel_type" => array_map(fn ($e) => $e->value, PanelType::cases()),
         "content" => DataType::string,
+        "url" => Type::nullableUrl,
         "note" => DataType::string
     ],
     [$ensureAuth],
@@ -66,33 +67,23 @@ $api->addEndpoint(
                 break;
         }
 
-        if ($app->user->type == UserType::temp) {
-            $panel = new Panel(
-                [
-                    "postedBy" => $app->user->id,
-                    "showFrom" => $_POST["show_from"] . " 00:00:00",
-                    "showTill" => $_POST["show_till"] . " 23:59:59",
-                    "type" => $panelType->value,
-                    "content" => $_POST["content"],
-                    "note" => escapeConservative($_POST["note"], true)
-                ],
-                true
-            );
-        } else {
-            $panel = new Panel(
-                [
-                    "postedBy" => $app->user->id,
-                    "approved" => true,
-                    "approvedBy" => $app->user->id,
-                    "approvedAt" => date(MYSQL_DATETIME),
-                    "showFrom" => $_POST["show_from"] . " 00:00:00",
-                    "showTill" => $_POST["show_till"] . " 23:59:59",
-                    "type" => $panelType->value,
-                    "content" => $_POST["content"],
-                    "note" => escapeConservative($_POST["note"], true)
-                ],
-                true
-            );
+        $panel = new Panel(
+            [
+                "postedBy" => $app->user->id,
+                "showFrom" => $_POST["show_from"] . " 00:00:00",
+                "showTill" => $_POST["show_till"] . " 23:59:59",
+                "type" => $panelType->value,
+                "content" => $_POST["content"],
+                "url" => $_POST["url"] != "" ? $_POST["url"] : null,
+                "note" => escapeConservative($_POST["note"], true)
+            ],
+            true
+        );
+
+        if ($app->user->type != UserType::temp) {
+            $panel->approved = true;
+            $panel->approvedBy = $app->user;
+            $panel->approvedAt = new DateTime();
         }
 
         $panel->insert();

@@ -6,6 +6,8 @@ const FETCH_EVERY_N_SECONDS = 30; // Must be greater than CAROUSEL_SPEED
 // DOM
 const panelTime = document.querySelector("#panel-time");
 const panelJidelna = document.querySelector("#panel-jidelna");
+const panelQR = document.querySelector("#panel-qr");
+const panelCTA = document.querySelector("#panel-cta");
 
 const panelContainer = document.querySelector("#panel-container");
 const panelCounter = document.querySelector("#panel-counter");
@@ -18,10 +20,20 @@ let panelIds = PANELS_PRELOAD;
 let panelsToAdd = [];
 let panelIdsToRemove = [];
 
-let panels = PANELS_PRELOAD.map((id) => ({ id: id, element: document.querySelector("#panel-" + id) }));
+let panels = PANEL_DETAILS_PRELOAD.map((p) => ({ id: p.id, url: p.url, element: document.querySelector("#panel-" + p.id) }));
 
 let carousel_paused = false;
 let carouselTick = 0;
+
+const qrcode = new QRCode(panelQR, {
+	text: base_url + "/",
+	width: 128,
+	height: 128,
+	colorDark: "#000000",
+	colorLight: "#ffffff",
+	correctLevel: QRCode.CorrectLevel.H,
+});
+qrcode.clear();
 
 const renderPanel = (panelId, panelType, panelContent) => {
 	const panel = document.createElement("div");
@@ -60,6 +72,7 @@ const updatePanels = () => {
 
 			panels.push({
 				id: panel.i,
+				url: panel.u,
 				element: newPanel,
 			});
 		});
@@ -111,7 +124,21 @@ const cyclePanels = () => {
 		e.element.classList.remove("animate-in");
 	});
 
-	panels[panelPointer].element.classList.add("animate-in");
+	const panel = panels[panelPointer];
+
+	if (panel.url) {
+		panelQR.classList.add("visible");
+		qrcode.clear();
+		qrcode.makeCode(panel.url);
+
+		panelCTA.classList.add("visible");
+		panelCTA.href = panel.url;
+	} else {
+		panelQR.classList.remove("visible");
+		panelCTA.classList.remove("visible");
+	}
+
+	panel.element.classList.add("animate-in");
 };
 
 const fetchJidelna = () => {
@@ -177,3 +204,37 @@ setInterval(() => {
 setInterval(() => {
 	fetchJidelna();
 }, 3600000);
+
+// Touch-pause & double-tap
+let doubleTap = 0; // 0 = no tap, 1 = 1st tap down, 2 = 1st tap up, (3) = 2nd tap down -> triggering
+let doubleTapCooldown = false;
+addEventListener("touchstart", () => {
+	carousel_paused = true;
+
+	if (doubleTap == 0) {
+		doubleTap = 1;
+		setTimeout(function () {
+			doubleTap = 0;
+		}, 500);
+		return false;
+	}
+
+	if (doubleTap == 1) {
+		doubleTap = 0;
+		return;
+	}
+	if (doubleTapCooldown) return;
+
+	doubleTapCooldown = true;
+	updatePanels();
+	cyclePanels();
+	carouselTick = 0;
+	setTimeout(function () {
+		doubleTapCooldown = false;
+	}, 1000); // Panel animate-in animation length
+});
+addEventListener("touchend", () => {
+	carousel_paused = false;
+
+	if (doubleTap == 1) doubleTap = 2;
+});

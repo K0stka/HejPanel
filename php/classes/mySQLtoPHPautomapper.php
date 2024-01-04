@@ -2,6 +2,7 @@
 
 enum StoredAs {
     case string;
+    case nullableString;
     case int;
     case datetime;
     case nullableDatetime;
@@ -122,6 +123,8 @@ class MySQLtoPHPautomapper {
         switch ($type) {
             case StoredAs::string:
                 return $what;
+            case StoredAs::nullableString:
+                return $what ? $what : MYSQL::NULL;
             case StoredAs::int:
                 return $what;
             case StoredAs::datetime:
@@ -142,6 +145,8 @@ class MySQLtoPHPautomapper {
     private static function toPHP(StoredAs $type, $what, $additionalParam = null) {
         switch ($type) {
             case StoredAs::string:
+                return $what;
+            case StoredAs::nullableString:
                 return $what;
             case StoredAs::int:
                 return intval($what);

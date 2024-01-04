@@ -1,11 +1,39 @@
 @media only screen and (max-width: 760px) {
-    .panel-info {
-        position: absolute;
-    }
-    .panel-container {
-        height: 100vh;
-    }
-    .panel {
-        font-size: var(--medium);
-    }
+	.onlyPC {
+		display: none !important;
+	}
+
+	.onlyPHONE {
+		display: initial;
+	}
+
+	.panel-info {
+		display: none;
+	}
+	.panel-container {
+		height: 100vh;
+	}
+	.panel {
+		font-size: var(--medium);
+	}
+	
+	.panel-cta {
+		opacity: 0;
+		transition: var(--t);
+		position: absolute;
+		top: 90vh;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: var(--secondary);
+		padding: var(--normal);
+		border-radius: var(--small);
+		font-size: var(--normalplus);
+		box-sizing: border-box;
+		pointer-events: none;
+	}
+
+	.panel-cta.visible {
+		opacity: 1;
+		pointer-events: all;
+	}
 }

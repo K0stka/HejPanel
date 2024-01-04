@@ -2,7 +2,7 @@
 // Site-wide configuration
 define("NAME", "HejPanel");
 define("DESCRIPTION", "Panel pro rychou a efektivní distribuci informací mezi žáky Gymnázia Hejčín");
-define("COLOR", "#FFAB00");
+define("COLOR", "#0062A3");
 
 define("DATE_DM_FORMAT", "j. n.");
 define("DATE_DMY_FORMAT", "j. n. Y");
