@@ -1,2 +1,11 @@
 @media only screen and (max-width: 760px) {
+    .panel-info {
+        position: absolute;
+    }
+    .panel-container {
+        height: 100vh;
+    }
+    .panel {
+        font-size: var(--medium);
+    }
 }
