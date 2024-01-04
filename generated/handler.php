@@ -2,8 +2,6 @@
 require_once("../php/conf.php");
 require_once("php/classes/moduleManager.php");
 
-use MatthiasMullie\Minify;
-
 if (!isset($_GET["modules"]) || !isset($_GET["type"]) || ModuleType::tryFrom($_GET["type"]) == null) {
     http_response_code(400);
     exit;

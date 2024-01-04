@@ -1,4 +1,3 @@
-
 <?php
 
 enum StoredAs {
