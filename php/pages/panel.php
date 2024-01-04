@@ -8,10 +8,13 @@ $panels = Panel::getVisiblePanels();
 if (empty($panels)) $panels = [Panel::getEmptyPanel()];
 ?>
 
-<div class="panel-info">
+<div class="panel-info" id="panel-info">
     <img src="<?= $prefix ?>/assets/icons/icon.png" class="panel-logo">
-    <div class="panel-time" id="panel-time">
-        00:00:00
+    <div class="panel-time-container">
+        <div class="panel-time" id="panel-time">
+            00:00:00
+        </div>
+        <div class="panel-timetable" id="panel-timetable"></div>
     </div>
     <div class="panel-food" id="panel-jidelna">
         <b>

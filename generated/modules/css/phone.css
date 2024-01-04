@@ -8,7 +8,29 @@
 	}
 
 	.panel-info {
-		display: none;
+		width: 100vw;
+		height: 100vh;
+		position: absolute;
+		z-index: 1;
+		background: var(--background);
+		flex-direction: column;
+		opacity: 0;
+		transition: var(--t);
+		overflow: auto;
+		pointer-events: none;
+	}
+	.panel-info.visible {
+		opacity: 1;
+		pointer-events: all;
+	}
+	.panel-food {
+		gap: var(--normal);
+		justify-content: flex-start;
+	}
+	.panel-food-row {
+		display: flex;
+		gap: var(--small);
+		flex-direction: column;
 	}
 	.panel-container {
 		height: 100vh;

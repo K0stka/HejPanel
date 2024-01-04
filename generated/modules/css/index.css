@@ -488,6 +488,10 @@ button.non-active:hover,
 	overflow: hidden;
 }
 
+.panel-time-container {
+	text-align: center;
+}
+
 .panel-logo {
 	width: 6rem;
 	aspect-ratio: 1 / 1;
@@ -502,9 +506,10 @@ button.non-active:hover,
 .panel-food {
 	display: flex;
 	flex-direction: column;
-	flex-wrap: wrap;
 	max-height: 100%;
 	gap: 0.1rem;
+	font-size: 1.2rem;
+	justify-content: center;
 }
 
 .panel-qr {

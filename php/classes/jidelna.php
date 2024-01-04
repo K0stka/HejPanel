@@ -59,7 +59,7 @@ class Jidelna {
         return $output;
     }
 
-    private function readFromCache(DateTime $day): array {
+    private function readFromCache(DateTime $day): ?array {
         return (in_array($day->format("Y-m-d"), $this->cachedDays)) ? json_decode($this->con->query("SELECT data FROM jidelna_cache WHERE date = ", [$day->format("Y-m-d")])->fetchRow()["data"], true) : [];
     }
 
@@ -70,7 +70,7 @@ class Jidelna {
     }
 
     private function transformData(array $data): array {
-        $output = ["O1" => "Není 😞", "O2" => "Není 😞", "O3" => "Není 😞", "SV" => "Není 😞", "X1" => "Není 😞"];
+        $output = ["O1" => "Není", "O2" => "Není", "O3" => "Není", "SV" => "Není", "X1" => "Není"];
         foreach ($data as $data_row) {
             if (!isset($output[$data_row["druh"]])) continue;
             $output[$data_row["druh"]] = $data_row["nazev"];

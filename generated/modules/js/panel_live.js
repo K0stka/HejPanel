@@ -3,8 +3,149 @@ const CAROUSEL_TICKS_PER_SECOND = 50;
 const CAROUSEL_SPEED = 10; // S per revolution
 const FETCH_EVERY_N_SECONDS = 30; // Must be greater than CAROUSEL_SPEED
 
+// Timetable
+const timetable = [
+	{
+		type: "Hodina",
+		// from: [8, 0],
+		from_milTime: 800,
+		from_time: "8:00",
+		// to: [8, 45],
+		to_milTime: 845,
+		to_time: "8:45",
+	},
+	{
+		type: "Přestávka",
+		// from: [8, 45],
+		from_milTime: 845,
+		from_time: "8:45",
+		// to: [8, 55],
+		to_milTime: 855,
+		to_time: "8:55",
+	},
+	{
+		type: "Hodina",
+		// from: [8, 55],
+		from_milTime: 855,
+		from_time: "8:55",
+		// to: [9, 40],
+		to_milTime: 940,
+		to_time: "9:40",
+	},
+	{
+		type: "Přestávka",
+		// from: [9, 40],
+		from_milTime: 940,
+		from_time: "9:40",
+		// to: [10, 0],
+		to_milTime: 1000,
+		to_time: "10:00",
+	},
+	{
+		type: "Hodina",
+		// from: [10, 0],
+		from_milTime: 1000,
+		from_time: "10:00",
+		// to: [10, 45],
+		to_milTime: 1045,
+		to_time: "10:45",
+	},
+	{
+		type: "Přestávka",
+		// from: [10, 45],
+		from_milTime: 1045,
+		from_time: "10:45",
+		// to: [10, 55],
+		to_milTime: 1055,
+		to_time: "10:55",
+	},
+	{
+		type: "Hodina",
+		// from: [10, 55],
+		from_milTime: 1055,
+		from_time: "10:55",
+		// to: [11, 40],
+		to_milTime: 1140,
+		to_time: "11:40",
+	},
+	{
+		type: "Přestávka",
+		// from: [11, 40],
+		from_milTime: 1140,
+		from_time: "11:40",
+		// to: [11, 50],
+		to_milTime: 1150,
+		to_time: "11:50",
+	},
+	{
+		type: "Hodina",
+		// from: [11, 50],
+		from_milTime: 1150,
+		from_time: "11:50",
+		// to: [12, 35],
+		to_milTime: 1235,
+		to_time: "12:35",
+	},
+	{
+		type: "Přestávka",
+		// from: [12, 35],
+		from_milTime: 1235,
+		from_time: "12:35",
+		// to: [12, 45],
+		to_milTime: 1245,
+		to_time: "12:45",
+	},
+	{
+		type: "Hodina",
+		// from: [12, 45],
+		from_milTime: 1245,
+		from_time: "12:45",
+		// to: [13, 30],
+		to_milTime: 1330,
+		to_time: "13:30",
+	},
+	{
+		type: "Přestávka",
+		// from: [13, 30],
+		from_milTime: 1330,
+		from_time: "13:30",
+		// to: [14, 0],
+		to_milTime: 1400,
+		to_time: "14:00",
+	},
+	{
+		type: "Hodina",
+		// from: [14, 0],
+		from_milTime: 1400,
+		from_time: "14:00",
+		// to: [14, 45],
+		to_milTime: 1445,
+		to_time: "14:45",
+	},
+	{
+		type: "Přestávka",
+		// from: [14, 45],
+		from_milTime: 1445,
+		from_time: "14:45",
+		// to: [15, 40],
+		to_milTime: 1540,
+		to_time: "15:40",
+	},
+	{
+		type: "Hodina",
+		// from: [14, 55],
+		from_milTime: 1455,
+		from_time: "14:55",
+		// to: [15, 40],
+		to_milTime: 1540,
+		to_time: "15:40",
+	},
+];
+
 // DOM
+const panelInfo = document.querySelector("#panel-info");
 const panelTime = document.querySelector("#panel-time");
+const panelTimetable = document.querySelector("#panel-timetable");
 const panelJidelna = document.querySelector("#panel-jidelna");
 const panelQR = document.querySelector("#panel-qr");
 const panelCTA = document.querySelector("#panel-cta");
@@ -164,10 +305,20 @@ function updateRadialGraph() {
 cyclePanels();
 updateJidelna(JIDELNA_PRELOAD);
 
-// Timers
+// Clock & timetable
 panelTime.innerHTML = new Date().toLocaleTimeString();
 setInterval(() => {
-	panelTime.innerHTML = new Date().toLocaleTimeString();
+	const now = new Date();
+	const milTime = now.getHours() * 100 + now.getMinutes();
+
+	panelTime.innerHTML = now.toLocaleTimeString();
+	panelTimetable.innerHTML = "";
+	timetable.forEach((event) => {
+		if (event.from_milTime <= milTime && event.to_milTime > milTime) {
+			panelTimetable.innerHTML = event.type + " (" + event.from_time + " - " + event.to_time + ")";
+			return;
+		}
+	});
 }, 1000);
 
 requestAnimationFrame(updateRadialGraph);
@@ -226,9 +377,17 @@ addEventListener("touchstart", () => {
 	if (doubleTapCooldown) return;
 
 	doubleTapCooldown = true;
-	updatePanels();
-	cyclePanels();
-	carouselTick = 0;
+
+	// Temp:
+	if (panelInfo.classList.contains("visible")) panelInfo.classList.remove("visible");
+	else panelInfo.classList.add("visible");
+
+	carousel_paused = !carousel_paused;
+
+	// updatePanels();
+	// cyclePanels();
+	// carouselTick = 0;
+
 	setTimeout(function () {
 		doubleTapCooldown = false;
 	}, 1000); // Panel animate-in animation length
