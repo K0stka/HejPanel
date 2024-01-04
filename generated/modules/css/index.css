@@ -350,6 +350,8 @@ button.non-active:hover,
 	font-size: 4rem;
 	font-weight: var(--bold);
 	text-align: center;
+	padding: var(--large);
+	box-sizing: border-box;
 }
 
 .panel-image img {
