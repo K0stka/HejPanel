@@ -16,10 +16,10 @@ $app->jsManager->require("ajax", "util", "index", "api", "transitions", "bind");
         const base_url = "<?= $prefix ?>";
 
         <?php
-        if (!DEV) {
+        if (SERVICE_WORKER_ENABLED) {
         ?>
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>');
+                navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>&enabled=<?= SERVICE_WORKER_ENABLED ? "true" : "false" ?>');
             }
         <?php
         }
@@ -32,7 +32,7 @@ $app->jsManager->require("ajax", "util", "index", "api", "transitions", "bind");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <link rel="manifest" href="<?= $prefix ?>/assets/manifest.json">
+    <link rel="manifest" href="<?= $prefix ?>/assets/manifest.json<?= $v ?>">
     <meta name="theme-color" content="<?= COLOR ?>">
     <meta name="description" content="<?= DESCRIPTION ?>">
 

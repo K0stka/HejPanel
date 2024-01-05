@@ -5,10 +5,11 @@ dialog {
 	background: var(--background);
 	color: var(--text);
 	border-radius: 1rem;
-	min-width: 50rem;
-	max-width: 80vw;
+	max-width: 90vw;
+	min-width: min(50rem, 90vw);
 	border: none;
 	padding: 0;
+	box-sizing: border-box;
 }
 dialog[open] {
 	animation: dialog-in 0.5s cubic-bezier(0.5, -0.5, 0.1, 1.5) normal;
@@ -100,7 +101,6 @@ dialog.is-hidden::backdrop {
 }
 .dialog-content {
 	padding: 2rem 1rem;
-	max-width: 100%;
 	word-break: break-word;
 	margin-top: 3.5rem;
 }

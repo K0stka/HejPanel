@@ -33,7 +33,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
             if (SERVICE_WORKER_ENABLED) {
             ?>
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>');
+                    navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>&enabled=<?= SERVICE_WORKER_ENABLED ? "true" : "false" ?>');
 
                     const channel = new BroadcastChannel("notifications");
                     channel.addEventListener("message", (event) => {
@@ -68,15 +68,17 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
         $app->cssManager->fetch();
         $app->jsManager->fetch();
 
-        // Enable sort for future modules
-        $app->cssManager->sort();
-        $app->jsManager->sort();
         ?>
     </head>
 
     <body>
     <?php
 }
+
+// Enable sort for future modules
+$app->cssManager->sort();
+$app->jsManager->sort();
+
 if ($app->pageManager->page == "panel") {
     include($app->pageManager->pagePath);
 } else {
@@ -90,10 +92,17 @@ if ($app->pageManager->page == "panel") {
         <header>
             <img src="<?= $prefix ?>/assets/icons/icon.png" class="logo">
             <?= NAME ?>
+            <?php
+            if ($app->authenticated && $app->user->type != UserType::temp) {
+            ?>
+                <img src="<?= $prefix ?>/assets/images/hamburger.svg" class="hamburger onlyPHONE" id="hamburgerBtn">
+            <?php
+            }
+            ?>
         </header>
         <div class="mainWrapper">
             <?php
-            if ($app->user && $app->user->type != UserType::temp) {
+            if ($app->authenticated && $app->user->type != UserType::temp) {
             ?>
                 <nav>
                     <?php

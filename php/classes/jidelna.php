@@ -41,7 +41,7 @@ class Jidelna {
         $cacheTill = new DateTime("today");
         $cacheTill->modify("+" . self::MAX_DAYS_PRECACHE . "days");
 
-        foreach ($data as $data_day) {
+        foreach ($data ?? [] as $data_day) {
             if (empty($data_day)) continue;
 
             $transformedData = $this->transformData($data_day);

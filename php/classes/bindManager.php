@@ -47,7 +47,7 @@ class BindManager {
         ob_clean();
 
         foreach ($this->eventHandlers as $id => $eventHandler) {
-            if ($eventHandler["uniqueId"] ?? $id == $_POST["e"]) {
+            if (($eventHandler["uniqueId"] ?? $id) == $_POST["e"]) {
                 echo ("const output = " . utf8json($eventHandler["serverCallback"]() ?? null) . ";\n");
                 echo ($eventHandler["clientCallback"]);
                 return;

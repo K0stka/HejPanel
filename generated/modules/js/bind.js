@@ -4,6 +4,8 @@ function emitEvent(eventId) {
 		return;
 	}
 
+	console.log("%c[BINDER] Emitting event:%c " + eventId, "background: blue", "font-weight: bold");
+
 	API_MANAGER.busy();
 	$.ajax({
 		type: "post",

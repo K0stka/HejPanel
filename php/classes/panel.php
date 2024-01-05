@@ -120,7 +120,7 @@ class Panel extends MySQLtoPHPautomapper {
             "id" => -1,
             "type" => "text",
             "content" => "Víte, jak zajistit, že zde vždy bude něco ke čtení?<br>Přesně takto :)",
-            "url" => "null"
+            "url" => null
         ], true);
     }
 }

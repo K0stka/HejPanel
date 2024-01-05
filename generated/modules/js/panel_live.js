@@ -1,12 +1,14 @@
 // Config
 const CAROUSEL_TICKS_PER_SECOND = 50;
-const CAROUSEL_SPEED = 10; // S per revolution
 const FETCH_EVERY_N_SECONDS = 30; // Must be greater than CAROUSEL_SPEED
+const CAROUSEL_SPEED = 10; // S per revolution
+
+const FETCH_JIDELNA_EVERY_N_MINUTES = 30;
 
 // Timetable
 const timetable = [
 	{
-		type: "Hodina",
+		type: "1. hodina",
 		// from: [8, 0],
 		from_milTime: 800,
 		from_time: "8:00",
@@ -24,7 +26,7 @@ const timetable = [
 		to_time: "8:55",
 	},
 	{
-		type: "Hodina",
+		type: "2. hodina",
 		// from: [8, 55],
 		from_milTime: 855,
 		from_time: "8:55",
@@ -42,7 +44,7 @@ const timetable = [
 		to_time: "10:00",
 	},
 	{
-		type: "Hodina",
+		type: "3. hodina",
 		// from: [10, 0],
 		from_milTime: 1000,
 		from_time: "10:00",
@@ -60,7 +62,7 @@ const timetable = [
 		to_time: "10:55",
 	},
 	{
-		type: "Hodina",
+		type: "4. hodina",
 		// from: [10, 55],
 		from_milTime: 1055,
 		from_time: "10:55",
@@ -78,7 +80,7 @@ const timetable = [
 		to_time: "11:50",
 	},
 	{
-		type: "Hodina",
+		type: "5. hodina",
 		// from: [11, 50],
 		from_milTime: 1150,
 		from_time: "11:50",
@@ -96,7 +98,7 @@ const timetable = [
 		to_time: "12:45",
 	},
 	{
-		type: "Hodina",
+		type: "6. hodina",
 		// from: [12, 45],
 		from_milTime: 1245,
 		from_time: "12:45",
@@ -114,7 +116,7 @@ const timetable = [
 		to_time: "14:00",
 	},
 	{
-		type: "Hodina",
+		type: "7. hodina",
 		// from: [14, 0],
 		from_milTime: 1400,
 		from_time: "14:00",
@@ -132,7 +134,7 @@ const timetable = [
 		to_time: "15:40",
 	},
 	{
-		type: "Hodina",
+		type: "8. hodina",
 		// from: [14, 55],
 		from_milTime: 1455,
 		from_time: "14:55",
@@ -144,6 +146,7 @@ const timetable = [
 
 // DOM
 const panelInfo = document.querySelector("#panel-info");
+const panelLogoBtn = document.querySelector("#panel-logo-button");
 const panelTime = document.querySelector("#panel-time");
 const panelTimetable = document.querySelector("#panel-timetable");
 const panelJidelna = document.querySelector("#panel-jidelna");
@@ -160,6 +163,7 @@ let panelIds = PANELS_PRELOAD;
 
 let panelsToAdd = [];
 let panelIdsToRemove = [];
+let panelsApplied = true;
 
 let panels = PANEL_DETAILS_PRELOAD.map((p) => ({ id: p.id, url: p.url, element: document.querySelector("#panel-" + p.id) }));
 
@@ -199,6 +203,8 @@ const renderPanel = (panelId, panelType, panelContent) => {
 };
 
 const updatePanels = () => {
+	panelsApplied = true;
+
 	if (panelsToAdd.length == 0 && panelIdsToRemove == 0) return;
 
 	console.log("%cUpdating panels...", "color: gray");
@@ -283,7 +289,7 @@ const cyclePanels = () => {
 };
 
 const fetchJidelna = () => {
-	PANEL_API.nonBlockingGet({ j: null }, null, API_MANAGER.error_handlers.warn).then(updateJidelna);
+	PANEL_API.nonBlockingGet({ j: null }, null, API_MANAGER.errorHandlers.notice).then(updateJidelna);
 };
 
 const updateJidelna = (jidelna) => {
@@ -300,6 +306,7 @@ function updateRadialGraph() {
 	radialGraph.style.setProperty("--value", (carouselTick / CAROUSEL_SPEED) * 2 + "%");
 	requestAnimationFrame(updateRadialGraph);
 }
+requestAnimationFrame(updateRadialGraph);
 
 // On load
 cyclePanels();
@@ -307,7 +314,7 @@ updateJidelna(JIDELNA_PRELOAD);
 
 // Clock & timetable
 panelTime.innerHTML = new Date().toLocaleTimeString();
-setInterval(() => {
+const clockInterval = setInterval(() => {
 	const now = new Date();
 	const milTime = now.getHours() * 100 + now.getMinutes();
 
@@ -321,10 +328,8 @@ setInterval(() => {
 	});
 }, 1000);
 
-requestAnimationFrame(updateRadialGraph);
-
 // Carousel
-setInterval(() => {
+const carouselInterval = setInterval(() => {
 	if (document.hidden || carousel_paused) return;
 
 	carouselTick++;
@@ -336,10 +341,11 @@ setInterval(() => {
 	}
 }, 1000 / CAROUSEL_TICKS_PER_SECOND);
 
-// Hydrator
-setInterval(() => {
-	if (document.hidden || carousel_paused) return;
+// Panel hydrator
+const hydratorInterval = setInterval(() => {
+	if (document.hidden || carousel_paused || !panelsApplied) return;
 
+	panelsApplied = false;
 	PANEL_API.nonBlockingGet({ i: panelIds }, null, null).then((result) => {
 		console.log("Caching panels: " + result.a.map((panel) => panel.i).join(", "), "\nForgetting panels: " + result.r.join(", "));
 
@@ -352,14 +358,25 @@ setInterval(() => {
 }, FETCH_EVERY_N_SECONDS * 1000);
 
 // Jidelna
-setInterval(() => {
+const jidelnaInterval = setInterval(() => {
 	fetchJidelna();
-}, 3600000);
+}, FETCH_JIDELNA_EVERY_N_MINUTES * 60000);
+
+// Phone panelInfo toggle
+panelLogoBtn.addEventListener("click", () => {
+	doubleTap = 0;
+	if (panelInfo.classList.contains("visible")) panelInfo.classList.remove("visible");
+	else panelInfo.classList.add("visible");
+
+	carousel_paused = !carousel_paused;
+});
 
 // Touch-pause & double-tap
 let doubleTap = 0; // 0 = no tap, 1 = 1st tap down, 2 = 1st tap up, (3) = 2nd tap down -> triggering
 let doubleTapCooldown = false;
-addEventListener("touchstart", () => {
+addEventListener("touchstart", (event) => {
+	if (event.target == panelLogoBtn) return;
+
 	carousel_paused = true;
 
 	if (doubleTap == 0) {
@@ -378,22 +395,25 @@ addEventListener("touchstart", () => {
 
 	doubleTapCooldown = true;
 
-	// Temp:
-	if (panelInfo.classList.contains("visible")) panelInfo.classList.remove("visible");
-	else panelInfo.classList.add("visible");
-
-	carousel_paused = !carousel_paused;
-
-	// updatePanels();
-	// cyclePanels();
-	// carouselTick = 0;
+	updatePanels();
+	cyclePanels();
+	carouselTick = 0;
 
 	setTimeout(function () {
 		doubleTapCooldown = false;
-	}, 1000); // Panel animate-in animation length
+	}, 800); // To prevent spam
 });
 addEventListener("touchend", () => {
+	if (event.target == panelLogoBtn) return;
+
 	carousel_paused = false;
 
 	if (doubleTap == 1) doubleTap = 2;
+});
+
+window.addEventListener("onFinished", () => {
+	clearInterval(clockInterval);
+	clearInterval(carouselInterval);
+	clearInterval(hydratorInterval);
+	clearInterval(jidelnaInterval);
 });

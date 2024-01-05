@@ -20,6 +20,7 @@ class ApiResponse {
     }
 
     public function cache(int $maxAgeSeconds = 3600, bool $public = false) {
+        header_remove("Pragma");
         $this->addHeader("Cache-Control", ($public ? "public" : "private") . ", max-age=$maxAgeSeconds");
         // $this->addHeader("Expires", gmdate("D, d M Y H:i:s", time() + $maxAgeSeconds) . " GMT"); Should not be required?
     }

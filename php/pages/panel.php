@@ -7,9 +7,11 @@ $app->jsManager->passToJs(["JIDELNA_PRELOAD" => $dayData]);
 $panels = Panel::getVisiblePanels();
 if (empty($panels)) $panels = [Panel::getEmptyPanel()];
 ?>
-
 <div class="panel-info" id="panel-info">
-    <img src="<?= $prefix ?>/assets/icons/icon.png" class="panel-logo">
+    <img src="<?= $prefix ?>/assets/icons/icon.png" class="panel-logo onlyPC">
+    <div class="panel-header onlyPHONE">
+        HejPanel
+    </div>
     <div class="panel-time-container">
         <div class="panel-time" id="panel-time">
             00:00:00
@@ -26,7 +28,25 @@ if (empty($panels)) $panels = [Panel::getEmptyPanel()];
             Více informací k panelu
         </b>
     </div>
+    <div class="panel-food-row onlyPHONE">
+        <b>
+            Tipy:
+        </b>
+        <span>
+            Podržením můžete pozastavit procházení panelů.<br>
+            Dvojitým kliknutím přeskočíte panel.<br>
+            <br>
+            Připomínky nebo návrhy na zlepšení můžete psát na <a href="https://www.instagram.com/studentskaradagh/" class="link" target="__blank">Instagram ŠRGH</a>.
+        </span>
+    </div>
+    <div class="panel-additional-info onlyPHONE">
+        <div class="button-group">
+            <a href="<?= $prefix ?>/submit" class="button">Přidat panel</a>
+            <a href="<?= $prefix ?>/login" class="button">Přihlásit se</a>
+        </div>
+    </div>
 </div>
+<img src="<?= $prefix ?>/assets/icons/icon.png" class="panel-logo-button onlyPHONE" id="panel-logo-button">
 <div class="panel-counter" id="panel-counter">1/<?= count($panels) ?></div>
 <div class="radial-graph" id="panel-radial-graph"></div>
 <div class="panel-container" id="panel-container">

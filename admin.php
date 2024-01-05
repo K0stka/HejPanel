@@ -49,7 +49,7 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
             if (SERVICE_WORKER_ENABLED) {
             ?>
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>');
+                    navigator.serviceWorker.register(base_url + '/serviceworker.js?base_url=<?= urlEncode($prefix) ?>&cacheId=<?= substr($v, 3) ?>&enabled=<?= SERVICE_WORKER_ENABLED ? "true" : "false" ?>');
                 }
             <?php
             }

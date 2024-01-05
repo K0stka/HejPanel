@@ -406,8 +406,8 @@ const GET_FINGERPRINT = async () => {
 const API_MANAGER = new ApiManager(new ApiCallback((result, data, address) => createModal("Požadavek byl úspěšně vykonnán", "")), {
 	user_error: new ApiCallback((result, data, address) => createModal("Neplatný požadavek", result.message)),
 	server_error: new ApiCallback((result, data, address) => {
-		createModal("Nespecifikovaná hláška " + result.status, "Prosím kontaktuj správce se sledem událostí, které k tomuto vedli a těmito informacemi:<br><br>ADDRESS:<br>" + address.toString() + "<br><br>" + "SENT:<br>" + JSON.stringify(data) + "<br><br>" + "RECIEVED:<br>" + result.responseJSON.message ?? "Nebyla obtržena žádná chybová hláška");
-		console.error("Fetch request failed with error code: " + result.status + "\nAPI address: " + address + "\n", data, "\n     |\n    \\|/\n", result.responseJSON ?? result.responseText ?? result);
+		createModal("Nespecifikovaná hláška " + result.status, "Prosím kontaktuj správce se sledem událostí, které k tomuto vedli a těmito informacemi:<br><br>ADDRESS:<br>" + address.toString() + "<br><br>" + "SENT:<br>" + JSON.stringify(data) + "<br><br>" + "RECIEVED:<br>" + result.responseJSON?.message ?? "Nebyla obtržena žádná chybová hláška");
+		console.error("Fetch request failed with error code: " + (result.status ?? "???") + "\nAPI address: " + address + "\n", data, "\n     |\n    \\|/\n", result.responseJSON ?? result.responseText ?? result);
 	}),
 	network_error: new ApiCallback((result, data, address) => {
 		createModal("Požadavek selhal", "Nemohli jsme kontaktovat server. Prosím zkontroluj své připojení k internetu a zkus to znovu.");

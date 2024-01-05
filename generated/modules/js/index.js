@@ -119,8 +119,8 @@ const onReady = () => {
 			try {
 				eval(contents);
 			} catch (e) {
-				API_MANAGER.errorHandlers.server_error.call(contents ?? "", "[...]", url);
-				console.error(e);
+				API_MANAGER.errorHandlers.server_error.call({ status: "JS ERROR", responseText: contents } ?? "", "[...]", url);
+				console.trace(e);
 			}
 		} else {
 			const style = document.createElement("style");
@@ -177,4 +177,21 @@ const onReady = () => {
 	window.dispatchEvent(event);
 };
 
+const onFinished = () => {
+	let event = new CustomEvent("onFinished", { detail: {} });
+	window.dispatchEvent(event);
+};
+
+window.addEventListener("onReady", () => {
+	document.querySelector(".hamburger")?.addEventListener("click", function () {
+		const nav = document.querySelector("nav");
+
+		if (!nav) return;
+
+		if (nav.classList.contains("visible")) nav.classList.remove("visible");
+		else nav.classList.add("visible");
+	});
+
+	document.querySelector(".logo")?.addEventListener("click", () => fadeTo(base_url + "/"));
+});
 document.addEventListener("DOMContentLoaded", onReady);

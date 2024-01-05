@@ -3,14 +3,14 @@
 // FALLBACK VALUES
 const channel = new BroadcastChannel("notifications");
 
-let IS_LOCALHOST = false;
+let IS_DISABLED = false;
 let hidden = false;
 let base_url = "";
 let cacheName = "cache";
 let cacheId = "";
 let appShellFiles = [];
 
-const appStaticFiles = ["/assets/pwa/index.php", "/assets/icons/icon.png", "/assets/icons/icon-192x192.png"]; // Cached on install in the format: prefix + i
+const appStaticFiles = ["/assets/pwa/index.php", "/assets/icons/icon.png", "/assets/icons/icon512_maskable.png", "/assets/icons/icon512_rounded.png", "/assets/misc/Nunito-VariableFont_wght.ttf"]; // Cached on install in the format: prefix + i
 const appDynamicFiles = ["/css/reset-fonts-transitions-dialog-index-phone.css", "/js/util-ajax-index-api-transitions-bind.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
 
 let allowCache = []; // Cached on first request in the format: prefix + i
@@ -18,15 +18,16 @@ let allowCache = []; // Cached on first request in the format: prefix + i
 const allowDirectories = ["/assets/", "/css/", "/js/"]; // Cached on first request if url contains i
 
 self.addEventListener("install", (e) => {
-	base_url = new URL(location).searchParams.get("base_url");
-	cacheId = new URL(location).searchParams.get("cacheId");
+	const url = new URL(location);
+	base_url = url.searchParams.get("base_url");
+	cacheId = url.searchParams.get("cacheId");
 	cacheName = cacheName + cacheId;
 
-	IS_LOCALHOST = base_url.includes("localhost") || base_url.includes("192.168.137.1");
+	IS_DISABLED = url.searchParams.get("enabled") != "true";
 
-	console.log("%c[SW " + cacheId + "] Installing service worker version " + cacheId, "color: orange");
+	console.log("%c[SW " + cacheId + "] Installing service worker version%c " + cacheId, "background: orange;color: black", "font-weight: bold");
 
-	if (IS_LOCALHOST) {
+	if (IS_DISABLED) {
 		self.skipWaiting();
 		return;
 	}
@@ -52,10 +53,10 @@ self.addEventListener("install", (e) => {
 });
 
 self.addEventListener("fetch", (e) => {
-	if (IS_LOCALHOST) return;
+	if (IS_DISABLED) return;
 
 	if (e.request.method === "GET") {
-		if (allowCache.includes(e.request.url) || allowDirectories.some((dir) => e.request.url.includes(dir)) || (!navigator.onLine && !base_url.includes("localhost"))) {
+		if (!navigator.onLine || allowCache.includes(e.request.url) || allowDirectories.some((dir) => e.request.url.includes(dir))) {
 			e.respondWith(
 				(async () => {
 					const r = await caches.match(e.request.url); // CHECK CACHE AND RETURN IF FOUND
@@ -63,7 +64,7 @@ self.addEventListener("fetch", (e) => {
 						console.log("%c[SW " + cacheId + "] Returning from cache: " + e.request.url, "color: grey");
 						return r;
 					}
-					if ((allowCache.includes(e.request.url) || allowDirectories.some((dir) => e.request.url.includes(dir))) && (navigator.onLine || base_url.includes("localhost"))) {
+					if ((allowCache.includes(e.request.url) || allowDirectories.some((dir) => e.request.url.includes(dir))) && navigator.onLine) {
 						// ADD TO CACHE IF SPECIFIED
 						console.log("%c[SW " + cacheId + "] Caching new asset: " + e.request.url, "color: lime");
 						const response = await fetch(e.request, { cache: "no-cache" });
@@ -71,10 +72,17 @@ self.addEventListener("fetch", (e) => {
 						cache.put(e.request.url, response.clone());
 						return response;
 					}
+					if (!navigator.onLine && e.request.url == base_url + "/assets/manifest.json?v=" + cacheId) {
+						// RETURN DEFAULT MANIFEST
+						console.log("%c[SW " + cacheId + "] Returning default fallback manifest", "color: red");
+						return new Response("{}");
+					}
 					if (!navigator.onLine) {
 						// RETURN OFFLINE PAGE
-						console.log("[SW " + cacheId + "] Returning offline page - " + e.request.url);
-						return caches.match(base_url + "/assets/pwa/index.php");
+						console.log("%c[SW " + cacheId + "] Returning offline page - " + e.request.url, "color: grey");
+						const r = await caches.match(base_url + "/assets/pwa/index.php");
+						if (r) return r;
+						return new Response("You are offline", { status: 404, statusText: "Offline" });
 					}
 				})(),
 			);
@@ -83,8 +91,8 @@ self.addEventListener("fetch", (e) => {
 });
 
 self.addEventListener("activate", (e) => {
-	console.log("%c[SW " + cacheId + "] Activating service worker version " + cacheId, "color:pink");
-	if (IS_LOCALHOST) {
+	console.log("%c[SW " + cacheId + "] Activating service worker version%c " + cacheId, "background: orange;color: black", "font-weight: bold");
+	if (IS_DISABLED) {
 		self.clients.claim();
 		return;
 	}
@@ -94,12 +102,12 @@ self.addEventListener("activate", (e) => {
 			Promise.all(
 				keyList.map((key) => {
 					if (key == cacheName) return;
-					console.log("%c[SW " + cacheId + "] Removing cache: " + key, "color:pink");
+					console.log("%c[SW " + cacheId + "] Removing cache:%c " + key, "color:red", "font-weight: bold");
 					return caches.delete(key);
 				}),
 			).then(() => {
 				self.clients.claim();
-				console.log("%c[SW " + cacheId + "] Activation completed", "color:pink");
+				console.log("%c[SW " + cacheId + "] Activation completed", "background: orange;color: black");
 			});
 		}),
 	);
@@ -109,6 +117,8 @@ self.addEventListener("push", (e) => {
 	const notification = e.data.json();
 
 	if (hidden) {
+		console.log("%c[SW " + cacheId + "] Push received & created NOTIFICATION:%c " + notification.title + " - " + notification.body, "background: orange;color: black", "font-weight: bold");
+
 		e.waitUntil(
 			self.registration.showNotification(notification.title, {
 				body: notification.body,
@@ -119,6 +129,8 @@ self.addEventListener("push", (e) => {
 			}),
 		);
 	} else {
+		console.log("%c[SW " + cacheId + "] Push received & created MODAL:%c " + notification.title + " - " + notification.body, "background: orange;color: black", "font-weight: bold");
+
 		channel.postMessage({ title: notification.title, body: notification.body, url: notification.url });
 	}
 });

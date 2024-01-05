@@ -154,6 +154,7 @@ form,
 	gap: var(--medium);
 	align-items: center;
 	flex-grow: 0;
+	max-width: 100%;
 }
 
 .input-label {
@@ -193,6 +194,7 @@ textarea {
 	width: 20rem;
 	box-sizing: border-box;
 	transition: border var(--t);
+	text-decoration: none;
 }
 
 .danger {
@@ -277,16 +279,19 @@ button.non-active:hover,
 	border-radius: 1em;
 }
 
-.button-group button {
+.button-group button,
+.button-group .button {
 	border-radius: 0;
 }
 
-.button-group button:first-child {
+.button-group button:first-child,
+.button-group .button:first-child {
 	border-top-left-radius: 1rem;
 	border-bottom-left-radius: 1rem;
 }
 
-.button-group button:last-child {
+.button-group button:last-child,
+.button-group .button:last-child {
 	border-top-right-radius: 1rem;
 	border-bottom-right-radius: 1rem;
 }
@@ -357,6 +362,7 @@ button.non-active:hover,
 .panel-image img {
 	object-fit: contain;
 	overflow: hidden;
+	pointer-events: none;
 }
 
 .panel-image img:not(.backdrop) {
@@ -431,6 +437,8 @@ button.non-active:hover,
 	flex-direction: row;
 	align-items: center;
 	gap: var(--medium);
+	flex-wrap: wrap;
+	justify-content: center;
 }
 
 .panel-review-preview {
@@ -490,6 +498,7 @@ button.non-active:hover,
 
 .panel-time-container {
 	text-align: center;
+	min-width: 12rem;
 }
 
 .panel-logo {
@@ -504,11 +513,11 @@ button.non-active:hover,
 }
 
 .panel-food {
+	font-size: 1.2rem;
 	display: flex;
 	flex-direction: column;
 	max-height: 100%;
 	gap: 0.1rem;
-	font-size: 1.2rem;
 	justify-content: center;
 }
 

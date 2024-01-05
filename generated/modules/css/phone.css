@@ -7,18 +7,166 @@
 		display: initial;
 	}
 
+	header {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		padding: 0;
+		padding-right: 1rem;
+	}
+
+	nav {
+		width: 100vw;
+		border: none;
+		height: auto;
+		top: 5rem;
+		bottom: 0;
+		transition: var(--t);
+		pointer-events: none;
+		opacity: 0;
+	}
+
+	nav.visible {
+		pointer-events: all;
+		opacity: 1;
+	}
+
+	.mainWrapper {
+		height: auto;
+	}
+
+	main,
+	main.shrinkForNav {
+		width: 100vw;
+		max-height: unset;
+		position: relative;
+		margin-left: 0;
+		overflow: visible;
+		padding: var(--large) var(--normal);
+	}
+
+	footer {
+		height: auto;
+		padding: var(--small);
+		position: sticky;
+		top: 120vh;
+	}
+
+	input,
+	textarea {
+		width: 90vw;
+	}
+
+	.preview {
+		width: 100%;
+	}
+
+	.button-group button {
+		width: calc(45vw - calc(var(--small) / 2));
+	}
+
+	.panel-review {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.hamburger {
+		margin-left: auto;
+		height: 3rem;
+		filter: invert();
+		transition: var(--t);
+	}
+
+	body:has(nav.visible) .hamburger {
+		filter: invert(0);
+	}
+
+	.tooltip.horizontal {
+		position: absolute;
+		background: inherit;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%) scale(0);
+		z-index: 1;
+		pointer-events: none;
+		padding: var(--normal);
+		flex-direction: column;
+	}
+
+	*:has(.tooltip.horizontal):hover > .tooltip {
+		transform: translate(-50%, -50%) scale(1) !important;
+		pointer-events: all;
+		cursor: help;
+	}
+
+	.panel-review-preview {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16 / 9;
+	}
+
+	.panel-review-buttons button {
+		width: auto;
+	}
+
 	.panel-info {
 		width: 100vw;
 		height: 100vh;
 		position: absolute;
-		z-index: 1;
+		top: 0;
+		z-index: 3;
 		background: var(--background);
 		flex-direction: column;
 		opacity: 0;
 		transition: var(--t);
 		overflow: auto;
 		pointer-events: none;
+		align-items: stretch;
 	}
+
+	.panel-header {
+		font-weight: var(--bold);
+		color: var(--background);
+		font-size: var(--large);
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		background: var(--primary);
+		margin-top: 1rem;
+		margin-left: 2rem;
+		height: 4rem;
+		border-radius: 1rem;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		max-width: 0;
+		padding: 0;
+		transition: var(--t);
+	}
+
+	body:has(.panel-info.visible) .panel-header {
+		max-width: 100%;
+		padding-left: 3rem;
+	}
+
+	.panel-logo-button {
+		position: absolute;
+		width: 4rem;
+		height: 4rem;
+		top: 2rem;
+		left: 2rem;
+		z-index: 4;
+		box-sizing: border-box;
+		background: var(--background);
+		border-radius: 1rem;
+	}
+
+	.panel-additional-info {
+		margin-top: var(--large);
+		text-align: center;
+		--normal: 1.3rem;
+	}
+
 	.panel-info.visible {
 		opacity: 1;
 		pointer-events: all;
@@ -31,6 +179,7 @@
 		display: flex;
 		gap: var(--small);
 		flex-direction: column;
+		font-size: 1.2rem;
 	}
 	.panel-container {
 		height: 100vh;
@@ -38,7 +187,7 @@
 	.panel {
 		font-size: var(--medium);
 	}
-	
+
 	.panel-cta {
 		opacity: 0;
 		transition: var(--t);

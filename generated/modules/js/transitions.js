@@ -36,8 +36,8 @@ const GET_PAGE_MAP_POSITION = (url = window.location.href, top = null, left = nu
 		url: url,
 		levels: map,
 		depth: map.length,
-		top: top ?? document.querySelector("main").scrollTop,
-		left: left ?? document.querySelector("main").scrollLeft,
+		top: top ?? document.querySelector("main")?.scrollTop ?? 0,
+		left: left ?? document.querySelector("main")?.scrollLeft ?? 0,
 	};
 };
 
@@ -103,21 +103,24 @@ const NAVIGATE_TO_POSITION = async (TARGET_POSITION, forceFade = false) => {
 	const STARTING_POSITION = GET_PAGE_MAP_POSITION();
 
 	const OLD_MAIN = document.querySelector("main");
-	OLD_MAIN.classList = OLD_MAIN.classList.filter((e) => !["toRight", "toLeft", "toIn", "toOut", "toFade", "fromRight", "fromLeft", "fromIn", "fromOut", "fromFade"].includes(e));
+	if (OLD_MAIN) OLD_MAIN.classList = OLD_MAIN.classList.filter((e) => !["toRight", "toLeft", "toIn", "toOut", "toFade", "fromRight", "fromLeft", "fromIn", "fromOut", "fromFade"].includes(e));
 
-	console.log("Starting depth: " + STARTING_POSITION.depth + "\nTarget depth: " + TARGET_POSITION.depth + "\nStarting url: " + STARTING_POSITION.url + "\nTarget url: " + TARGET_POSITION.url);
+	console.log("%c[NAVIGATOR]\n%cStarting depth: " + STARTING_POSITION.depth + "\nTarget depth: " + TARGET_POSITION.depth + "\nStarting url: " + STARTING_POSITION.url + "\nTarget url: " + TARGET_POSITION.url, "background: lightblue;color: black;", "font-weight: bold;");
 
 	// LEAVING ANIMATION
 
-	if (STARTING_POSITION.depth == TARGET_POSITION.depth && !forceFade) {
-		OLD_MAIN.classList.add(SAME_LEVEL_DIRECTION(STARTING_POSITION, TARGET_POSITION));
-	} else if (STARTING_POSITION.depth > TARGET_POSITION.depth && !forceFade) {
-		OLD_MAIN.classList.add("toOut");
-	} else if (STARTING_POSITION.depth < TARGET_POSITION.depth && !forceFade) {
-		OLD_MAIN.classList.add("toIn");
-	} else {
-		OLD_MAIN.classList.add("toFade");
-	}
+	onFinished();
+
+	if (OLD_MAIN)
+		if (STARTING_POSITION.depth == TARGET_POSITION.depth && !forceFade) {
+			OLD_MAIN.classList.add(SAME_LEVEL_DIRECTION(STARTING_POSITION, TARGET_POSITION));
+		} else if (STARTING_POSITION.depth > TARGET_POSITION.depth && !forceFade) {
+			OLD_MAIN.classList.add("toOut");
+		} else if (STARTING_POSITION.depth < TARGET_POSITION.depth && !forceFade) {
+			OLD_MAIN.classList.add("toIn");
+		} else {
+			OLD_MAIN.classList.add("toFade");
+		}
 
 	// FETCH (And make sure that CSS animations are finished)
 
