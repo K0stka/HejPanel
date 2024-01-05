@@ -39,12 +39,6 @@ if (empty($panels)) $panels = [Panel::getEmptyPanel()];
             Připomínky nebo návrhy na zlepšení můžete psát na <a href="https://www.instagram.com/studentskaradagh/" class="link" target="__blank">Instagram ŠRGH</a>.
         </span>
     </div>
-    <div class="panel-additional-info onlyPHONE">
-        <div class="button-group">
-            <a href="<?= $prefix ?>/submit" class="button">Přidat panel</a>
-            <a href="<?= $prefix ?>/login" class="button">Přihlásit se</a>
-        </div>
-    </div>
 </div>
 <img src="<?= $prefix ?>/assets/icons/icon.png" class="panel-logo-button onlyPHONE" id="panel-logo-button">
 <div class="panel-counter" id="panel-counter">1/<?= count($panels) ?></div>
