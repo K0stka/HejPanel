@@ -347,6 +347,8 @@ const hydratorInterval = setInterval(() => {
 
 	panelsApplied = false;
 	PANEL_API.nonBlockingGet({ i: panelIds }, null, null).then((result) => {
+		if ((result.a.length == result.r.length) == 0) return;
+
 		console.log("Caching panels: " + result.a.map((panel) => panel.i).join(", "), "\nForgetting panels: " + result.r.join(", "));
 
 		panelIds.push(...result.a.map((panel) => panel.i));
