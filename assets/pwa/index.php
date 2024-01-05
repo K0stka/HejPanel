@@ -57,7 +57,7 @@ $app->jsManager->require("ajax", "util", "index", "api", "transitions", "bind");
         </main>
     </div>
     <footer>
-        <a href="<?= $prefix ?>">
+        <a href="<?= $prefix ?>/">
             Obnovit stránku
         </a>
     </footer>
