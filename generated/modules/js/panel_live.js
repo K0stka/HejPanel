@@ -377,7 +377,7 @@ panelLogoBtn.addEventListener("click", () => {
 let doubleTap = 0; // 0 = no tap, 1 = 1st tap down, 2 = 1st tap up, (3) = 2nd tap down -> triggering
 let doubleTapCooldown = false;
 addEventListener("touchstart", (event) => {
-	if (event.target == panelLogoBtn) return;
+	if (event.target == panelLogoBtn || panelInfo.classList.contains("visible")) return;
 
 	carousel_paused = true;
 
@@ -406,7 +406,7 @@ addEventListener("touchstart", (event) => {
 	}, 800); // To prevent spam
 });
 addEventListener("touchend", () => {
-	if (event.target == panelLogoBtn) return;
+	if (event.target == panelLogoBtn || panelInfo.classList.contains("visible")) return;
 
 	carousel_paused = false;
 
