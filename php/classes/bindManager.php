@@ -1,7 +1,7 @@
 <?php
 
 function RELOAD(): string {
-    return "fadeTo(window.location.href);";
+    return "NAVIGATE_TO_POSITION(GET_PAGE_MAP_POSITION(), true);";
 }
 function FORCE_RELOAD(): string {
     return "window.location.reload(true);";

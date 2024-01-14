@@ -9,7 +9,15 @@ $fingerprintMap = User::getFingerprintToUsersMap();
 foreach ($panels as $panel) {
 ?>
     <?= PanelReview::render($panel, $fingerprintMap, function () use ($app, $panel) {
+        if ($panel->showOverride != ShowOverride::null) {
     ?>
+            <button <?= $app->bind->onClick(function () use ($panel) {
+                        $panel->update("showOverride", ShowOverride::null);
+                    }, "c-p:" . $panel->id)->then(RELOAD()) ?>>
+                Zrušit přepsání viditelnosti</button>
+        <?php
+        }
+        ?>
         <button class="danger" <?= $app->bind->onClick(function () use ($panel) {
                                     $panel->update("showOverride", ShowOverride::hide);
                                 }, "h-p:" . $panel->id)->then(RELOAD()) ?>>Skrýt</button>

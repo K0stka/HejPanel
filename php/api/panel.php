@@ -52,7 +52,7 @@ $api->addEndpoint(
         $show_from = new DateTime($_POST["show_from"]);
         $show_till = new DateTime($_POST["show_till"]);
 
-        if ($show_from >= $show_till) return new ApiErrorResponse("Neplatný časový rozsah");
+        if ($show_from > $show_till) return new ApiErrorResponse("Neplatný časový rozsah");
 
         switch ($panelType = PanelType::from($_POST["panel_type"])) {
             case PanelType::image:
