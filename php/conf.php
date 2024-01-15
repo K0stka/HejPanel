@@ -39,6 +39,8 @@ if (DEV) {
     $folder = "hejpanel";
 }
 
+$forceReload = 0;
+
 $prefix =  $rootDir . $folder;
 
 // Router settings

@@ -1,7 +1,7 @@
 // Config
 const CAROUSEL_TICKS_PER_SECOND = 50;
 const FETCH_EVERY_N_SECONDS = 30; // Must be greater than CAROUSEL_SPEED
-const CAROUSEL_SPEED = 10; // S per revolution
+const CAROUSEL_SPEED = 15; // S per revolution
 
 const FETCH_JIDELNA_EVERY_N_MINUTES = 30;
 
@@ -9,136 +9,106 @@ const FETCH_JIDELNA_EVERY_N_MINUTES = 30;
 const timetable = [
 	{
 		type: "1. hodina",
-		// from: [8, 0],
 		from_milTime: 800,
 		from_time: "8:00",
-		// to: [8, 45],
 		to_milTime: 845,
 		to_time: "8:45",
 	},
 	{
 		type: "Přestávka",
-		// from: [8, 45],
 		from_milTime: 845,
 		from_time: "8:45",
-		// to: [8, 55],
 		to_milTime: 855,
 		to_time: "8:55",
 	},
 	{
 		type: "2. hodina",
-		// from: [8, 55],
 		from_milTime: 855,
 		from_time: "8:55",
-		// to: [9, 40],
 		to_milTime: 940,
 		to_time: "9:40",
 	},
 	{
 		type: "Přestávka",
-		// from: [9, 40],
 		from_milTime: 940,
 		from_time: "9:40",
-		// to: [10, 0],
 		to_milTime: 1000,
 		to_time: "10:00",
 	},
 	{
 		type: "3. hodina",
-		// from: [10, 0],
 		from_milTime: 1000,
 		from_time: "10:00",
-		// to: [10, 45],
 		to_milTime: 1045,
 		to_time: "10:45",
 	},
 	{
 		type: "Přestávka",
-		// from: [10, 45],
 		from_milTime: 1045,
 		from_time: "10:45",
-		// to: [10, 55],
 		to_milTime: 1055,
 		to_time: "10:55",
 	},
 	{
 		type: "4. hodina",
-		// from: [10, 55],
 		from_milTime: 1055,
 		from_time: "10:55",
-		// to: [11, 40],
 		to_milTime: 1140,
 		to_time: "11:40",
 	},
 	{
 		type: "Přestávka",
-		// from: [11, 40],
 		from_milTime: 1140,
 		from_time: "11:40",
-		// to: [11, 50],
 		to_milTime: 1150,
 		to_time: "11:50",
 	},
 	{
 		type: "5. hodina",
-		// from: [11, 50],
 		from_milTime: 1150,
 		from_time: "11:50",
-		// to: [12, 35],
 		to_milTime: 1235,
 		to_time: "12:35",
 	},
 	{
 		type: "Přestávka",
-		// from: [12, 35],
 		from_milTime: 1235,
 		from_time: "12:35",
-		// to: [12, 45],
 		to_milTime: 1245,
 		to_time: "12:45",
 	},
 	{
 		type: "6. hodina",
-		// from: [12, 45],
 		from_milTime: 1245,
 		from_time: "12:45",
-		// to: [13, 30],
 		to_milTime: 1330,
 		to_time: "13:30",
 	},
 	{
 		type: "Přestávka",
-		// from: [13, 30],
 		from_milTime: 1330,
 		from_time: "13:30",
-		// to: [14, 0],
 		to_milTime: 1400,
 		to_time: "14:00",
 	},
 	{
 		type: "7. hodina",
-		// from: [14, 0],
 		from_milTime: 1400,
 		from_time: "14:00",
-		// to: [14, 45],
 		to_milTime: 1445,
 		to_time: "14:45",
 	},
 	{
 		type: "Přestávka",
-		// from: [14, 45],
 		from_milTime: 1445,
 		from_time: "14:45",
-		// to: [15, 40],
 		to_milTime: 1540,
 		to_time: "15:40",
 	},
 	{
 		type: "8. hodina",
-		// from: [14, 55],
 		from_milTime: 1455,
 		from_time: "14:55",
-		// to: [15, 40],
 		to_milTime: 1540,
 		to_time: "15:40",
 	},
@@ -169,6 +139,11 @@ let panels = PANEL_DETAILS_PRELOAD.map((p) => ({ id: p.id, url: p.url, element: 
 
 let carousel_paused = false;
 let carouselTick = 0;
+
+let panelInfoVisible = false;
+
+// Force reload
+let forceReload = FORCE_RELOAD_PRELOAD;
 
 const qrcode = new QRCode(panelQR, {
 	text: base_url + "/",
@@ -264,11 +239,32 @@ const cyclePanels = () => {
 
 	panelPointer = (panelPointer + 1) % panels.length;
 
+	handlePanelRotation();
+};
+
+const cyclePanelsBackwards = () => {
+	if (panels.length == 0) return;
+
+	panelPointer = panelPointer - 1;
+	if (panelPointer < 0) panelPointer = panels.length - 1;
+
+	handlePanelRotation(true);
+};
+
+const handlePanelRotation = (reverse = false) => {
 	panelCounter.innerHTML = panelPointer + 1 + "/" + panels.length;
 
 	panels.forEach((e) => {
 		e.element.classList.add("panel-hidden");
 		e.element.classList.remove("animate-in");
+
+		if (reverse) {
+			e.element.classList.add("reverse");
+			e.element.classList.remove("normal");
+		} else {
+			e.element.classList.add("normal");
+			e.element.classList.remove("reverse");
+		}
 	});
 
 	const panel = panels[panelPointer];
@@ -347,7 +343,9 @@ const hydratorInterval = setInterval(() => {
 
 	panelsApplied = false;
 	PANEL_API.nonBlockingGet({ i: panelIds }, null, null).then((result) => {
-		if ((result.a.length == result.r.length) == 0) return;
+		if (result.f != forceReload) window.location.reload();
+
+		if (result.a.length == 0 && result.r.length == 0) return;
 
 		console.log("Caching panels: " + result.a.map((panel) => panel.i).join(", "), "\nForgetting panels: " + result.r.join(", "));
 
@@ -366,56 +364,150 @@ const jidelnaInterval = setInterval(() => {
 
 // Phone panelInfo toggle
 panelLogoBtn.addEventListener("click", () => {
-	doubleTap = 0;
-	if (panelInfo.classList.contains("visible")) panelInfo.classList.remove("visible");
-	else panelInfo.classList.add("visible");
-
-	carousel_paused = !carousel_paused;
+	if (panelInfoVisible) {
+		panelInfo.classList.remove("visible");
+		panelInfoVisible = false;
+		carousel_paused = false;
+	} else {
+		panelInfo.classList.add("visible");
+		panelInfoVisible = true;
+		carousel_paused = true;
+	}
 });
 
-// Touch-pause & double-tap
-let doubleTap = 0; // 0 = no tap, 1 = 1st tap down, 2 = 1st tap up, (3) = 2nd tap down -> triggering
-let doubleTapCooldown = false;
-addEventListener("touchstart", (event) => {
-	if (event.target == panelLogoBtn || panelInfo.classList.contains("visible")) return;
+// Touch-pause & hold-pause & easy panelInfo dismiss
+let skipCooldown = false;
+let moved = false;
+let holding = false;
+
+const touchStart = (event) => {
+	if (event.target.closest("dialog")) return;
+	moved = false;
+	holding = false;
+
+	if (event.target == panelLogoBtn || event.target == panelCTA) return;
+
+	setTimeout(() => {
+		holding = true;
+	}, 200);
 
 	carousel_paused = true;
+};
 
-	if (doubleTap == 0) {
-		doubleTap = 1;
-		setTimeout(function () {
-			doubleTap = 0;
-		}, 500);
-		return false;
-	}
+const touchMove = () => {
+	moved = true;
+};
 
-	if (doubleTap == 1) {
-		doubleTap = 0;
-		return;
-	}
-	if (doubleTapCooldown) return;
+const touchEnd = (event) => {
+	if (event.target.closest("dialog")) return;
 
-	doubleTapCooldown = true;
-
-	updatePanels();
-	cyclePanels();
-	carouselTick = 0;
-
-	setTimeout(function () {
-		doubleTapCooldown = false;
-	}, 800); // To prevent spam
-});
-addEventListener("touchend", () => {
-	if (event.target == panelLogoBtn || panelInfo.classList.contains("visible")) return;
+	if (moved && panelInfoVisible) return;
 
 	carousel_paused = false;
 
-	if (doubleTap == 1) doubleTap = 2;
-});
+	if (moved) return;
+
+	if (event.target != panelLogoBtn && panelInfoVisible) {
+		panelInfo.classList.remove("visible");
+		panelInfoVisible = false;
+		return;
+	}
+
+	if (event.target == panelLogoBtn || event.target == panelCTA) return;
+
+	if (!holding && !skipCooldown) {
+		updatePanels();
+		cyclePanels();
+		carouselTick = 0;
+		skipCooldown = true;
+		setTimeout(() => {
+			skipCooldown = false;
+		}, 800);
+	}
+};
+
+addEventListener("touchstart", touchStart);
+addEventListener("touchmove", touchMove);
+addEventListener("touchend", touchEnd);
+
+// Swipe gestures
+let xDown = null;
+let yDown = null;
+
+const gestureTouchStart = (event) => {
+	if (event.target.closest("dialog")) return;
+
+	const firstTouch = event.touches[0];
+	xDown = firstTouch.clientX;
+	yDown = firstTouch.clientY;
+};
+
+const gestureTouchMove = (event) => {
+	if (!xDown || !yDown) {
+		return;
+	}
+
+	const xUp = event.touches[0].clientX;
+	const yUp = event.touches[0].clientY;
+
+	const xDiff = xDown - xUp;
+	const yDiff = yDown - yUp;
+
+	// Has to travel at least 100px
+	if (xDiff * xDiff + yDiff * yDiff < 10000) return;
+
+	if (Math.abs(xDiff) > Math.abs(yDiff)) {
+		if (xDiff > 0) {
+			if (!skipCooldown && !panelInfoVisible) {
+				updatePanels();
+				cyclePanels();
+				carouselTick = 0;
+				skipCooldown = true;
+				setTimeout(() => {
+					skipCooldown = false;
+				}, 800);
+			}
+		} else {
+			if (!skipCooldown && !panelInfoVisible) {
+				updatePanels();
+				cyclePanelsBackwards();
+				carouselTick = 0;
+				skipCooldown = true;
+				setTimeout(() => {
+					skipCooldown = false;
+				}, 800);
+			}
+		}
+	} else {
+		if (yDiff > 0) {
+			if (!panelInfoVisible) {
+				createModal("Nastavení", '<div class="button-group"><button onclick="fadeTo(\'' + base_url + "/submit')\">Přidat panel</button><button onclick=\"fadeTo('" + base_url + "/login')\">Přihlásit se</button></div>");
+			}
+		} else {
+			if (!panelInfoVisible) {
+				panelInfo.classList.add("visible");
+				panelInfoVisible = true;
+				carousel_paused = true;
+			}
+		}
+	}
+
+	xDown = null;
+	yDown = null;
+};
+
+addEventListener("touchstart", gestureTouchStart);
+addEventListener("touchmove", gestureTouchMove);
 
 window.addEventListener("onFinished", () => {
 	clearInterval(clockInterval);
 	clearInterval(carouselInterval);
 	clearInterval(hydratorInterval);
 	clearInterval(jidelnaInterval);
+
+	removeEventListener("touchstart", touchStart);
+	removeEventListener("touchmove", touchMove);
+	removeEventListener("touchend", touchEnd);
+	removeEventListener("touchstart", gestureTouchStart);
+	removeEventListener("touchmove", gestureTouchMove);
 });

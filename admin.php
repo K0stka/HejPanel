@@ -73,6 +73,20 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
     <div class="mainWrapper">
         <main>
             <?= AdminSetting::render(
+                "Force reload HejPanel clients",
+                "Force reload check: " . $forceReload,
+                "Force reload",
+                function () use ($forceReload) {
+                    $str = file_get_contents('php/conf.php');
+
+                    $str = str_replace("\$forceReload = $forceReload;", "\$forceReload = " . ($forceReload + 1) . ";", $str);
+
+                    file_put_contents('php/conf.php', $str);
+                },
+                RELOAD()
+            ) ?>
+            <hr>
+            <?= AdminSetting::render(
                 "Update",
                 "Run suite of actions:<br>- clearMinifiedPackages<br>- updateManifest<br>- updateRobotsTxt<br>- updateSitemap<br>- incrementVersion",
                 "Update app",

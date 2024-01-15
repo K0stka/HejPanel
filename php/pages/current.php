@@ -1,5 +1,16 @@
 <h1>Momentálně viditelné</h1>
+<button <?= $app->bind->onClick(
+            function () use ($forceReload) {
+                $str = file_get_contents('php/conf.php');
 
+                $str = str_replace("\$forceReload = $forceReload;", "\$forceReload = " . ($forceReload + 1) . ";", $str);
+
+                file_put_contents('php/conf.php', $str);
+            },
+            "forceReload"
+        )->then(CREATE_MODAL("Požadavek odeslán úspěšně", "Do zhruba 30s budou všichni aktivní klienti obnoveni")) ?>>
+    Obnovit klienty
+</button><br><br>
 <?php
 
 $panels = Panel::getVisiblePanels();

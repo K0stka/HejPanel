@@ -357,6 +357,7 @@ button.non-active:hover,
 	text-align: center;
 	padding: var(--large);
 	box-sizing: border-box;
+	overflow-wrap: anywhere;
 }
 
 .panel-image img {
@@ -387,12 +388,22 @@ button.non-active:hover,
 
 .panel-hidden {
 	position: absolute;
-	animation: panel-out ease-in-out 1s;
-	animation-fill-mode: forwards;
 }
 
-.panel-hidden.animate-in {
-	animation: panel-in ease-in-out 1s;
+.panel-hidden.normal:not(.animate-in) {
+	animation: panel-out ease-in-out 1s forwards;
+}
+
+.panel-hidden.reverse:not(.animate-in) {
+	animation: panel-out-reverse ease-in-out 1s forwards;
+}
+
+.panel-hidden.normal.animate-in {
+	animation: panel-in ease-in-out 1s forwards;
+}
+
+.panel-hidden.reverse.animate-in {
+	animation: panel-in-reverse ease-in-out 1s forwards;
 }
 
 .panel.panel-fade-out {
@@ -408,12 +419,30 @@ button.non-active:hover,
 	}
 }
 
+@keyframes panel-in-reverse {
+	from {
+		right: 100vw;
+	}
+	to {
+		right: 0;
+	}
+}
+
 @keyframes panel-out {
 	from {
 		right: 0;
 	}
 	to {
 		right: 100vw;
+	}
+}
+
+@keyframes panel-out-reverse {
+	from {
+		left: 0;
+	}
+	to {
+		left: 100vw;
 	}
 }
 
@@ -470,6 +499,8 @@ button.non-active:hover,
 	margin: var(--normal) 0;
 	gap: var(--normal);
 	align-items: center;
+	width: 100%;
+	overflow-wrap: anywhere;
 }
 
 .note {
@@ -513,7 +544,7 @@ button.non-active:hover,
 }
 
 .panel-food {
-	font-size: 1.2rem;
+	font-size: 1.4rem;
 	display: flex;
 	flex-direction: column;
 	max-height: 100%;

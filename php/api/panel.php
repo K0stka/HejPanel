@@ -93,6 +93,8 @@ $api->addEndpoint(
 );
 
 $api->addEndpoint(Method::GET, ["i" => DataType::int_array], [], function () {
+    global $forceReload;
+
     $panelIds = Panel::getVisiblePanelsIds();
     if (empty($panelIds)) $panelIds = [Panel::getEmptyPanel()->id];
 
@@ -106,7 +108,7 @@ $api->addEndpoint(Method::GET, ["i" => DataType::int_array], [], function () {
     else
         $panelsToAdd = [Panel::getEmptyPanel()->serializePanel()];
 
-    return new ApiResponse(["a" => array_values($panelsToAdd), "r" => array_values($panelIdsToRemove)]);
+    return new ApiResponse(["a" => array_values($panelsToAdd), "r" => array_values($panelIdsToRemove), "f" => $forceReload]);
 });
 
 // Get current Jidelna status

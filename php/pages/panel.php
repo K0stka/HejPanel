@@ -2,11 +2,25 @@
 $jidelna = new Jidelna();
 $dayData = $jidelna->fetchDay(new DateTime("today"));
 
-$app->jsManager->passToJs(["JIDELNA_PRELOAD" => $dayData]);
 
 $panels = Panel::getVisiblePanels();
 if (empty($panels)) $panels = [Panel::getEmptyPanel()];
 ?>
+<img src="<?= $prefix ?>/assets/icons/icon.png" class="panel-logo-button onlyPHONE" id="panel-logo-button">
+<div class="panel-counter" id="panel-counter">1/<?= count($panels) ?></div>
+<div class="radial-graph" id="panel-radial-graph"></div>
+<div class="panel-container" id="panel-container">
+    <?php
+    foreach ($panels as $panel) echo ($panel->render());
+
+    $app->jsManager->passToJs([
+        "JIDELNA_PRELOAD" => $dayData,
+        "PANELS_PRELOAD" => array_map(fn ($e) => $e->id, $panels),
+        "PANEL_DETAILS_PRELOAD" => array_map(fn ($e) => ["id" => $e->id, "url" => $e->url], $panels),
+        "FORCE_RELOAD_PRELOAD" => $forceReload,
+    ]);
+    ?>
+</div>
 <div class="panel-info" id="panel-info">
     <img src="<?= $prefix ?>/assets/icons/icon.png" class="panel-logo onlyPC">
     <div class="panel-header onlyPHONE">
@@ -33,25 +47,17 @@ if (empty($panels)) $panels = [Panel::getEmptyPanel()];
             Tipy:
         </b>
         <span>
-            Podržením můžete pozastavit procházení panelů.<br>
-            Dvojitým kliknutím přeskočíte panel.<br>
+            <b>Kliknutím</b> přeskočíte panel.<br>
+            <b>Podržením</b> pozastavíte procházení panelů.<br>
+            <b>Přetažením do stran</b> posunete panely.<br>
+            <b>Přetažením dolů</b> otevřete čas a obědy.
             <br>
+        </span>
+        <br>
+        <span>
             Připomínky nebo návrhy na zlepšení můžete psát na <a href="https://www.instagram.com/studentskaradagh/" class="link" target="__blank">Instagram ŠRGH</a>.
         </span>
     </div>
-</div>
-<img src="<?= $prefix ?>/assets/icons/icon.png" class="panel-logo-button onlyPHONE" id="panel-logo-button">
-<div class="panel-counter" id="panel-counter">1/<?= count($panels) ?></div>
-<div class="radial-graph" id="panel-radial-graph"></div>
-<div class="panel-container" id="panel-container">
-    <?php
-    foreach ($panels as $panel) echo ($panel->render());
-
-    $app->jsManager->passToJs([
-        "PANELS_PRELOAD" => array_map(fn ($e) => $e->id, $panels),
-        "PANEL_DETAILS_PRELOAD" => array_map(fn ($e) => ["id" => $e->id, "url" => $e->url], $panels)
-    ]);
-    ?>
 </div>
 <a class="panel-cta onlyPHONE" id="panel-cta">Více informací</a>
 <?php
