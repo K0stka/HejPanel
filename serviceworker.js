@@ -10,8 +10,8 @@ let cacheName = "cache";
 let cacheId = "";
 let appShellFiles = [];
 
-const appStaticFiles = ["/assets/pwa/index.php", "/assets/icons/icon.png", "/assets/icons/icon512_maskable.png", "/assets/icons/icon512_rounded.png", "/assets/misc/Nunito-VariableFont_wght.ttf"]; // Cached on install in the format: prefix + i
-const appDynamicFiles = ["/css/reset-fonts-transitions-dialog-index-phone.css", "/js/ajax-util-index-api-transitions-bind.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
+const appStaticFiles = ["/assets/icons/icon.png", "/assets/icons/icon512_maskable.png", "/assets/icons/icon512_rounded.png", "/assets/misc/Nunito-VariableFont_wght.ttf"]; // Cached on install in the format: prefix + i
+const appDynamicFiles = ["/assets/pwa/index.php", "/css/reset-fonts-transitions-dialog-index-phone.css", "/js/ajax-util-index-api-transitions-bind.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
 
 let allowCache = []; // Cached on first request in the format: prefix + i
 
@@ -80,7 +80,7 @@ self.addEventListener("fetch", (e) => {
 					if (!navigator.onLine) {
 						// RETURN OFFLINE PAGE
 						console.log("%c[SW " + cacheId + "] Returning offline page - " + e.request.url, "color: grey");
-						const r = await caches.match(base_url + "/assets/pwa/index.php");
+						const r = await caches.match(base_url + "/assets/pwa/index.php?v=" + cacheId);
 						if (r) return r;
 						return new Response("You are offline", { status: 404, statusText: "Offline" });
 					}
