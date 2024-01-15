@@ -58,7 +58,7 @@ class ApiConnector {
 		return await this.fetch("post", data, true, callback, userErrorCallback);
 	}
 
-	async fetch(method, data, isNonBlocking = false, callback = this.apiManager.defaultResponseHandler, userErrorCallback = this.apiManager.errorHandlers.user_error) {
+	async fetch(method, data, isNonBlocking = false, callback = null, userErrorCallback = null) {
 		const API_MANAGER = this.apiManager;
 		const address = this.address;
 
@@ -81,11 +81,11 @@ class ApiConnector {
 			request.success = (result) => {
 				if (hasJsonStructure(result)) {
 					if (!isNonBlocking) API_MANAGER.free();
-					if (callback) callback.call(result, data, address);
+					callback?.call(result, data, address);
 					resolve(result);
 				} else {
 					if (!isNonBlocking) API_MANAGER.free(true);
-					API_MANAGER.errorHandlers.php_error.call(result, data, address);
+					if (!isNonBlocking) API_MANAGER.errorHandlers.php_error.call(result, data, address);
 					reject(result);
 				}
 			};
@@ -93,13 +93,13 @@ class ApiConnector {
 				if (!isNonBlocking) API_MANAGER.free(true);
 
 				if (result.status == 0) {
-					API_MANAGER.errorHandlers.network_error.call(result, data, address);
+					if (!isNonBlocking) API_MANAGER.errorHandlers.network_error.call(result, data, address);
 					reject(result);
 				} else if (result.responseJSON) {
 					userErrorCallback?.call(result.responseJSON, data, address);
 					reject(result.responseJSON);
 				} else {
-					API_MANAGER.errorHandlers.php_error.call(result.responseText, data, address);
+					if (!isNonBlocking) API_MANAGER.errorHandlers.php_error.call(result.responseText, data, address);
 					reject(result.responseText);
 				}
 			};
