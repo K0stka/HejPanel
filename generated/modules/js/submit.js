@@ -12,6 +12,7 @@ input_label_file.classList.add("input-label");
 const fileInput = document.createElement("input");
 fileInput.type = "file";
 fileInput.id = "file";
+fileInput.accept = "image/jpeg,image/png,image/webp,image/bmp,image/gif,image/avif";
 fileInput.addEventListener("input", (event) => {
 	fileInput.classList.remove("error");
 

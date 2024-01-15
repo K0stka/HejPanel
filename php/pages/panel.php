@@ -2,7 +2,6 @@
 $jidelna = new Jidelna();
 $dayData = $jidelna->fetchDay(new DateTime("today"));
 
-
 $panels = Panel::getVisiblePanels();
 if (empty($panels)) $panels = [Panel::getEmptyPanel()];
 ?>

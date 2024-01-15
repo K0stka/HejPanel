@@ -386,6 +386,10 @@ button.non-active:hover,
 	z-index: 0;
 }
 
+.panel.transparent {
+	opacity: 0;
+}
+
 .panel-hidden {
 	position: absolute;
 }

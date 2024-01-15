@@ -254,7 +254,9 @@ const cyclePanelsBackwards = () => {
 const handlePanelRotation = (reverse = false) => {
 	panelCounter.innerHTML = panelPointer + 1 + "/" + panels.length;
 
-	panels.forEach((e) => {
+	const visibleIds = [panelPointer, reverse ? (panelPointer + 1) % panels.length : panelPointer - 1 < 0 ? panels.length - 1 : panelPointer - 1];
+
+	panels.forEach((e, i) => {
 		e.element.classList.add("panel-hidden");
 		e.element.classList.remove("animate-in");
 
@@ -265,6 +267,9 @@ const handlePanelRotation = (reverse = false) => {
 			e.element.classList.add("normal");
 			e.element.classList.remove("reverse");
 		}
+
+		if (visibleIds.includes(i)) e.element.classList.remove("transparent");
+		else e.element.classList.add("transparent");
 	});
 
 	const panel = panels[panelPointer];
@@ -296,12 +301,12 @@ const updateJidelna = (jidelna) => {
 	}
 };
 
-function updateRadialGraph() {
+let updateRadialGraph = () => {
 	if (panels.length < 2) radialGraph.style.opacity = 0;
 	else radialGraph.style.opacity = 1;
 	radialGraph.style.setProperty("--value", (carouselTick / CAROUSEL_SPEED) * 2 + "%");
 	requestAnimationFrame(updateRadialGraph);
-}
+};
 requestAnimationFrame(updateRadialGraph);
 
 // On load
@@ -500,6 +505,8 @@ addEventListener("touchstart", gestureTouchStart);
 addEventListener("touchmove", gestureTouchMove);
 
 window.addEventListener("onFinished", () => {
+	updateRadialGraph = null;
+
 	clearInterval(clockInterval);
 	clearInterval(carouselInterval);
 	clearInterval(hydratorInterval);
