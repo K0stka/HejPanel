@@ -177,6 +177,7 @@
 	.panel-food {
 		gap: var(--normal);
 		justify-content: flex-start;
+		flex-shrink: 0;
 	}
 	.panel-food-row {
 		display: flex;
