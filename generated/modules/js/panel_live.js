@@ -322,7 +322,7 @@ const clockInterval = setInterval(() => {
 	panelTime.innerHTML = now.toLocaleTimeString();
 	panelTimetable.innerHTML = "";
 	timetable.forEach((event) => {
-		if ((event.from_milTime <= milTime && event.to_milTime > milTime) || true) {
+		if (event.from_milTime <= milTime && event.to_milTime > milTime) {
 			panelTimetable.innerHTML = event.type + "<br>(" + event.from_time + " - " + event.to_time + ")";
 			return;
 		}
