@@ -93,12 +93,12 @@ const fadeTo = (url) => {
 const NAVIGATE_TO_POSITION = async (TARGET_POSITION, forceFade = false) => {
 	if (NAVIGATING) return;
 
-	NAVIGATING = true;
-
 	if (!TARGET_POSITION.sameOrigin) {
 		window.location.href = TARGET_POSITION.url;
 		return;
 	}
+
+	NAVIGATING = true;
 
 	const STARTING_POSITION = GET_PAGE_MAP_POSITION();
 
