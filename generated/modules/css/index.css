@@ -516,24 +516,25 @@ button.non-active:hover,
 
 .panel-container {
 	width: 100vw;
-	height: calc(100vh - 12rem);
+	height: calc(100vh - 14rem);
 	overflow: hidden;
 	position: relative;
 }
 
 .panel-info {
-	height: 12rem;
+	height: 14rem;
 	display: flex;
 	align-items: center;
 	padding: var(--normal) var(--medium);
 	box-sizing: border-box;
 	gap: var(--medium);
 	overflow: hidden;
+	position: relative;
 }
 
 .panel-time-container {
 	text-align: center;
-	min-width: 12rem;
+	font-size: 1.4rem;
 }
 
 .panel-logo {
@@ -548,12 +549,18 @@ button.non-active:hover,
 }
 
 .panel-food {
-	font-size: 1.4rem;
+	font-size: 1.5rem;
 	display: flex;
 	flex-direction: column;
 	max-height: 100%;
+	overflow-x: auto;
 	gap: 0.1rem;
-	justify-content: center;
+	position: relative;
+	padding: 0.2rem 0;
+}
+
+.panel-food-row {
+	flex-grow: 1;
 }
 
 .panel-qr {

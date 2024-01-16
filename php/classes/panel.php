@@ -79,6 +79,12 @@ class Panel extends MySQLtoPHPautomapper {
         return ["i" => $this->id, "t" => $this->type->value, "c" => $this->content, "u" => $this->url];
     }
 
+    public function isVisible(): bool {
+        if ($this->showOverride == ShowOverride::show) return true;
+        if ($this->showOverride == ShowOverride::hide) return false;
+        return $this->approved && $this->showFrom <= new DateTime() && $this->showTill >= new DateTime();
+    }
+
     /** @return Panel[] */
     // Warning - Expects already pre-sanitized input
     public static function getPanelsByIds(array $ids): array {

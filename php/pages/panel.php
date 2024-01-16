@@ -38,7 +38,7 @@ if (empty($panels)) $panels = [Panel::getEmptyPanel()];
     </div>
     <div class="panel-qr onlyPC" id="panel-qr">
         <b>
-            Více informací k panelu
+            Příloha panelu
         </b>
     </div>
     <div class="panel-food-row onlyPHONE">
@@ -58,6 +58,6 @@ if (empty($panels)) $panels = [Panel::getEmptyPanel()];
         </span>
     </div>
 </div>
-<a class="panel-cta onlyPHONE" id="panel-cta">Více informací</a>
+<a class="panel-cta onlyPHONE" id="panel-cta">Příloha</a>
 <?php
 $app->jsManager->require("panel", "panel_live", "a_qrcode");

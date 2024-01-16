@@ -10,7 +10,7 @@ $app = new AppManager();
 $app->authenticate(User::getUser());
 
 $missingFile = new ApiFileResponse("/assets/images/missingPanel.svg", "Missing panel.svg");
-$missingFile->cache(60, true);
+$missingFile->cacheWEtag(3600, 0, true);
 
 $authenticated = new ApiEndpointCondition(function () use ($app) {
     return $app->authenticated;
@@ -48,12 +48,12 @@ $api->addEndpoint(Method::GET, [], [], function () use ($missingFile, $con) {
 
     if ($panel->type != PanelType::image) return $missingFile;
 
-    if ($panel->showOverride == false && (!$panel->approved || $panel->showTill < new DateTime() || $panel->showFrom > new DateTime())) return $missingFile;
+    if (!$panel->isVisible()) return $missingFile;
 
     $file = $con->select(["file"], "files")->where(["id" => $panel->content])->fetchRow();
 
     $response = new ApiFileResponse("uploads/" . $file["file"], "Panel " . $panel->id . ".webp");
-    $response->cache(3600, true);
+    $response->cacheWEtag(3600, 1, true);
     $response->send();
 });
 

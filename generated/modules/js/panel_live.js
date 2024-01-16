@@ -322,8 +322,8 @@ const clockInterval = setInterval(() => {
 	panelTime.innerHTML = now.toLocaleTimeString();
 	panelTimetable.innerHTML = "";
 	timetable.forEach((event) => {
-		if (event.from_milTime <= milTime && event.to_milTime > milTime) {
-			panelTimetable.innerHTML = event.type + " (" + event.from_time + " - " + event.to_time + ")";
+		if ((event.from_milTime <= milTime && event.to_milTime > milTime) || true) {
+			panelTimetable.innerHTML = event.type + "<br>(" + event.from_time + " - " + event.to_time + ")";
 			return;
 		}
 	});
@@ -380,6 +380,23 @@ panelLogoBtn.addEventListener("click", () => {
 	}
 });
 
+// Util function for gesture handlers
+const handleCarouselSkip = (reverse = false) => {
+	if (skipCooldown) return;
+
+	updatePanels();
+
+	if (reverse) cyclePanelsBackwards();
+	else cyclePanels();
+
+	carouselTick = 0;
+	skipCooldown = true;
+
+	setTimeout(() => {
+		skipCooldown = false;
+	}, 750);
+};
+
 // Touch-pause & hold-pause & easy panelInfo dismiss
 let skipCooldown = false;
 let moved = false;
@@ -420,14 +437,8 @@ const touchEnd = (event) => {
 
 	if (event.target == panelLogoBtn || event.target == panelCTA) return;
 
-	if (!holding && !skipCooldown) {
-		updatePanels();
-		cyclePanels();
-		carouselTick = 0;
-		skipCooldown = true;
-		setTimeout(() => {
-			skipCooldown = false;
-		}, 800);
+	if (!holding) {
+		handleCarouselSkip();
 	}
 };
 
@@ -463,24 +474,12 @@ const gestureTouchMove = (event) => {
 
 	if (Math.abs(xDiff) > Math.abs(yDiff)) {
 		if (xDiff > 0) {
-			if (!skipCooldown && !panelInfoVisible) {
-				updatePanels();
-				cyclePanels();
-				carouselTick = 0;
-				skipCooldown = true;
-				setTimeout(() => {
-					skipCooldown = false;
-				}, 800);
+			if (!panelInfoVisible) {
+				handleCarouselSkip();
 			}
 		} else {
-			if (!skipCooldown && !panelInfoVisible) {
-				updatePanels();
-				cyclePanelsBackwards();
-				carouselTick = 0;
-				skipCooldown = true;
-				setTimeout(() => {
-					skipCooldown = false;
-				}, 800);
+			if (!panelInfoVisible) {
+				handleCarouselSkip(true);
 			}
 		}
 	} else {
@@ -504,17 +503,21 @@ const gestureTouchMove = (event) => {
 addEventListener("touchstart", gestureTouchStart);
 addEventListener("touchmove", gestureTouchMove);
 
-window.addEventListener("onFinished", () => {
-	updateRadialGraph = null;
+window.addEventListener(
+	"onFinished",
+	() => {
+		updateRadialGraph = () => {};
 
-	clearInterval(clockInterval);
-	clearInterval(carouselInterval);
-	clearInterval(hydratorInterval);
-	clearInterval(jidelnaInterval);
+		clearInterval(clockInterval);
+		clearInterval(carouselInterval);
+		clearInterval(hydratorInterval);
+		clearInterval(jidelnaInterval);
 
-	removeEventListener("touchstart", touchStart);
-	removeEventListener("touchmove", touchMove);
-	removeEventListener("touchend", touchEnd);
-	removeEventListener("touchstart", gestureTouchStart);
-	removeEventListener("touchmove", gestureTouchMove);
-});
+		removeEventListener("touchstart", touchStart);
+		removeEventListener("touchmove", touchMove);
+		removeEventListener("touchend", touchEnd);
+		removeEventListener("touchstart", gestureTouchStart);
+		removeEventListener("touchmove", gestureTouchMove);
+	},
+	{ once: true },
+);

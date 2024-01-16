@@ -25,18 +25,15 @@ class ApiResponse {
         // $this->addHeader("Expires", gmdate("D, d M Y H:i:s", time() + $maxAgeSeconds) . " GMT"); Should not be required?
     }
 
-    public function cacheWEtag(int $maxAgeSeconds = 3600, int $lastModifiedUNIX = 0, bool $public = false) {
+    public function cacheWEtag(int $maxAgeSeconds = 3600, string $etag, bool $public = false) {
         $this->cache($maxAgeSeconds, $public);
 
-        if ($lastModifiedUNIX != 0) {
-            $etag = md5($lastModifiedUNIX);
+        $etag = md5($etag);
 
-            $this->LastModified($lastModifiedUNIX);
-            $this->addHeader("Etag", $etag);
+        $this->addHeader("Etag", $etag);
 
-            $this->handle304 = true;
-            $this->etag = $etag;
-        }
+        $this->handle304 = true;
+        $this->etag = $etag;
     }
 
     public function LastModified(int $lastModifiedUNIX = 0) {
@@ -61,7 +58,10 @@ class ApiResponse {
     }
 
     protected function dieIfCacheHit() {
-        if (@strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $this->lastModifiedUNIX || @trim($_SERVER['HTTP_IF_NONE_MATCH']) == $this->etag) { // Handle cache
+        if (
+            (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && @strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $this->lastModifiedUNIX) ||
+            (isset($_SERVER['HTTP_IF_NONE_MATCH']) && @trim($_SERVER['HTTP_IF_NONE_MATCH']) == $this->etag)
+        ) { // Handle cache
             header("HTTP/1.1 304 Not Modified");
             exit;
         }
