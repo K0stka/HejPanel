@@ -297,7 +297,7 @@ const updateJidelna = (jidelna) => {
 	if (jidelna.result && jidelna.result == "error") {
 		panelJidelna.innerHTML = "<b>Nemohli jsme načíst data z jídelny 😞</b>";
 	} else {
-		panelJidelna.innerHTML = '<div class="panel-food-row"><b>Polévka:</b> ' + jidelna.X1 + '</div><div class="panel-food-row"><b>Oběd 1:</b> ' + jidelna.O1 + '</div><div class="panel-food-row"><b>Oběd 2:</b> ' + jidelna.O2 + '</div><div class="panel-food-row"><b>Oběd 3:</b> ' + jidelna.O3 + '</div><div class="panel-food-row"><b>Svačina:</b> ' + jidelna.SV + "</div>";
+		panelJidelna.innerHTML = '<div class="panel-food-row"><span>Polévka:</span> ' + jidelna.X1 + '</div><div class="panel-food-row"><span>Oběd 1:</span> ' + jidelna.O1 + '</div><div class="panel-food-row"><span>Oběd 2:</span> ' + jidelna.O2 + '</div><div class="panel-food-row"><span>Oběd 3:</span> ' + jidelna.O3 + '</div><div class="panel-food-row"><span>Svačina:</span> ' + jidelna.SV + "</div>";
 	}
 };
 

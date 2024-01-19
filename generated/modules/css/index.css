@@ -23,7 +23,7 @@
 }
 
 .onlyPHONE {
-	display: none;
+	display: none !important;
 }
 
 body {
@@ -561,6 +561,22 @@ button.non-active:hover,
 
 .panel-food-row {
 	flex-grow: 1;
+	font-weight: var(--semibold);
+	display: grid;
+	grid-template-columns: 6.5rem auto;
+}
+
+.panel-food-row:nth-child(2),
+.panel-food-row:nth-child(5) {
+	margin-top: 0.4rem;
+}
+
+.panel-food-row span {
+	font-weight: var(--light);
+}
+
+.panel-phone-info {
+	font-size: 1.2rem;
 }
 
 .panel-qr {

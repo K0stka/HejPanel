@@ -4,7 +4,7 @@
 	}
 
 	.onlyPHONE {
-		display: initial;
+		display: initial !important;
 	}
 
 	header {
@@ -132,7 +132,7 @@
 		color: var(--background);
 		font-size: var(--large);
 		box-sizing: border-box;
-		display: flex;
+		display: flex !important;
 		align-items: center;
 		background: var(--primary);
 		margin-left: 2rem;

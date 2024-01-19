@@ -41,10 +41,11 @@ if (empty($panels)) $panels = [Panel::getEmptyPanel()];
             Příloha panelu
         </b>
     </div>
-    <div class="panel-food-row onlyPHONE">
+    <div class="panel-phone-info onlyPHONE">
         <b>
             Tipy:
         </b>
+        <br>
         <span>
             <b>Kliknutím</b> přeskočíte panel.<br>
             <b>Podržením</b> pozastavíte procházení panelů.<br>
