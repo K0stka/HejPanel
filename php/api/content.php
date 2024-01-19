@@ -58,7 +58,7 @@ $api->addEndpoint(Method::GET, [], [], function () use ($missingFile, $con, $app
 });
 
 $api->addFileUploadEndpoint(["fingerprint" => DataType::json], [$ensureAuth], new ApiFileUploadConfiguration(
-    saveName: fn ($index, $count) => "content_" . $con->select("auto_increment", "INFORMATION_SCHEMA.TABLES")->where(["table_schema" => "hejpanel", "table_name" => "files"])->fetchValue(),
+    saveName: fn ($index, $count) => "content_" . $con->select("auto_increment", "INFORMATION_SCHEMA.TABLES")->where(["TABLE_NAME" => "files"])->fetchValue(),
     maxFileSizeMB: 20,
     allowedFileTypes: AUTOCONVERTIBLE_IMAGES,
     imageSaveAs: FileType::webp,
