@@ -26,6 +26,13 @@
             <label for="show-till">URL adresa (Nepovinné):</label>
             <input type="string" id="url" data-type="nullableUrl" placeholder="Např.: https://gytool.cz">
         </div>
+        <div class="note">
+            Na email Vás budeme kontaktovat pouze<br> pokud se vyskytne nějaký problém s Vaším panelem.
+        </div>
+        <div class="input-label">
+            <label for="show-till">Email (nepovinné):</label>
+            <input type="string" id="mail" data-type="nullableMail">
+        </div>
         <div class="input-label">
             <label for="note">Dodatečná poznámka (Nepovinné):</label>
             <textarea id="note"></textarea>

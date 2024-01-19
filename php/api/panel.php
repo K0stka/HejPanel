@@ -45,6 +45,7 @@ $api->addEndpoint(
         "panel_type" => array_map(fn ($e) => $e->value, PanelType::cases()),
         "content" => DataType::string,
         "url" => Type::nullableUrl,
+        "mail" => Type::nullableMail,
         "note" => DataType::string
     ],
     [$ensureAuth],
@@ -75,6 +76,7 @@ $api->addEndpoint(
                 "type" => $panelType->value,
                 "content" => $_POST["content"],
                 "url" => $_POST["url"] != "" ? $_POST["url"] : null,
+                "mail" => $_POST["mail"] != "" ? $_POST["mail"] : null,
                 "note" => escapeConservative($_POST["note"], true)
             ],
             true

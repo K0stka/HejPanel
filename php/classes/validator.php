@@ -4,6 +4,7 @@ enum Type: string {
     case name = "^[a-žA-Ž ]{3,100}$";
     case nickname = "^[a-žA-Ž0-9_]{5,100}$";
     case mail = "^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$";
+    case nullableMail = "^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}){0,1}$";
     case password = "(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$";
     case passwordOrEmpty = "^$|(?=(.*[0-9]))((?=.*[a-žA-Ž0-9])(?=.*[A-Ž])(?=.*[a-ž]))^.{8,}$";
     case date = "^\d{4}-\d{1,2}-\d{1,2}$";

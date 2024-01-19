@@ -323,7 +323,7 @@ const clockInterval = setInterval(() => {
 	panelTimetable.innerHTML = "";
 	timetable.forEach((event) => {
 		if (event.from_milTime <= milTime && event.to_milTime > milTime) {
-			panelTimetable.innerHTML = event.type + "<br>(" + event.from_time + " - " + event.to_time + ")";
+			panelTimetable.innerHTML = event.type + " (" + event.from_time + " - " + event.to_time + ")";
 			return;
 		}
 	});

@@ -30,6 +30,7 @@ class Panel extends MySQLtoPHPautomapper {
 
     public PanelType $type;
     public ?string $url;
+    public ?string $mail;
     public string $content;
 
     public string $note;
@@ -50,6 +51,7 @@ class Panel extends MySQLtoPHPautomapper {
         "type" => ["type", StoredAs::enum, "PanelType"],
         "content" => ["content", StoredAs::string],
         "url" => ["url", StoredAs::nullableString],
+        "mail" => ["mail", StoredAs::nullableString],
         "note" => ["note", StoredAs::string]
     ];
 

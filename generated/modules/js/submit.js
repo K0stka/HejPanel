@@ -135,6 +135,7 @@ if (submitBtn) {
 								panel_type: "image",
 								content: result.files[0].response.message,
 								url: document.querySelector("#url").value,
+								mail: document.querySelector("#mail").value,
 								note: document.querySelector("#note").value,
 							},
 							new ApiCallback(() => {
@@ -154,6 +155,7 @@ if (submitBtn) {
 							panel_type: "text",
 							content: textInput.value,
 							url: document.querySelector("#url").value,
+							mail: document.querySelector("#mail").value,
 							note: document.querySelector("#note").value,
 						},
 						new ApiCallback(() => {

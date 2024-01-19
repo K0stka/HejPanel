@@ -33,7 +33,7 @@ $ensureAuth = new ApiEndpointCondition(function () use ($app) {
     return true;
 }, new ApiErrorResponse(""));
 
-$api->addEndpoint(Method::GET, [], [], function () use ($missingFile, $con) {
+$api->addEndpoint(Method::GET, [], [], function () use ($missingFile, $con, $app) {
     if (empty($_GET) || count($_GET) > 1 || $_GET[array_key_first($_GET)] != "") return $missingFile;
 
     $id = array_key_first($_GET);
@@ -48,7 +48,7 @@ $api->addEndpoint(Method::GET, [], [], function () use ($missingFile, $con) {
 
     if ($panel->type != PanelType::image) return $missingFile;
 
-    if (!$panel->isVisible()) return $missingFile;
+    if (!$panel->isVisible() && !in_array($app->user->type, [UserType::admin, UserType::superadmin])) return $missingFile;
 
     $file = $con->select(["file"], "files")->where(["id" => $panel->content])->fetchRow();
 

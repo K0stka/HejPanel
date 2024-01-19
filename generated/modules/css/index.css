@@ -538,18 +538,18 @@ button.non-active:hover,
 }
 
 .panel-logo {
-	width: 6rem;
+	width: 8rem;
 	aspect-ratio: 1 / 1;
 }
 
 .panel-time {
 	color: var(--primary);
-	font-size: var(--large);
+	font-size: 4rem;
 	font-weight: var(--bold);
 }
 
 .panel-food {
-	font-size: 1.5rem;
+	font-size: 1.6rem;
 	display: flex;
 	flex-direction: column;
 	max-height: 100%;

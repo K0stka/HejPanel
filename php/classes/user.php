@@ -85,7 +85,8 @@ class User extends MySQLtoPHPautomapper {
             "name" => $name,
             "nickname" => $nickname,
             "password" => $passwordHash,
-            "type" => $userType->value
+            "type" => $userType->value,
+            "authVersion" => 0
         ], true);
         $user->insert();
         return $user;

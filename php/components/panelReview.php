@@ -12,6 +12,7 @@ class PanelReview {
             <div>
                 <div class="two-columns-grid">
                     <span style="font-weight: var(--semibold);">Uživatel:</span><span><?= $panel->postedBy->renderChip() ?></span>
+                    <span style="font-weight: var(--semibold);">Email:</span><span><?= $panel->mail ?? "Není uveden" ?></span>
                     <span style="font-weight: var(--semibold);">Přidáno:</span><span><?= $panel->postedAt->format(DATE_DM_FORMAT . " " . TIME_HM_FORMAT) ?></span>
                     <span style="font-weight: var(--semibold);">Vyvěsit:</span><span><?= getWeekDay($panel->showFrom) . " " . $panel->showFrom->format(DATE_DM_FORMAT) ?> - <?= getWeekDay($panel->showTill) . " " . $panel->showTill->format(DATE_DM_FORMAT) ?></span>
                     <span style="font-weight: var(--semibold);">Viditelnost<br>přepsána:</span><span><?php switch ($panel->showOverride) {
