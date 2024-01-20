@@ -55,7 +55,7 @@ if (empty($panels)) $panels = [Panel::getEmptyPanel()];
         </span>
         <br>
         <span>
-            Připomínky nebo návrhy na zlepšení můžete psát na <a href="https://www.instagram.com/studentskaradagh/" class="link" target="__blank">Instagram ŠRGH</a>.
+            Připomínky nebo návrhy na zlepšení můžete psát na <a href="https://www.instagram.com/studentskaradagh/" class="link" target="__blank">Instagram SRGH</a>.
         </span>
     </div>
 </div>
