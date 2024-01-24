@@ -109,7 +109,7 @@ class Panel extends MySQLtoPHPautomapper {
     /** @return Panel[] */
     public static function getExpiredPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'hide' OR (show_override IS NULL AND ((show_till <= ", [date(MYSQL_DATETIME)], ") OR (approved = TRUE AND show_from > ", [date(MYSQL_DATETIME)], ")))")->orderBy("id", Order::maxToMin)->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'hide' OR (show_override IS NULL AND show_till <= ", [date(MYSQL_DATETIME)], ")")->orderBy("id", Order::maxToMin)->fetchAll());
     }
 
     /** @return Panel[] */

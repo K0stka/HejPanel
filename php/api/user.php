@@ -81,4 +81,11 @@ $api->addEndpoint(Method::POST, ["type" => "fingerprint", "fingerprint" => DataT
     return new ApiSuccessResponse();
 });
 
+$api->addEndpoint(Method::POST, ["h" => DataType::array], [], function () use ($con) {
+    $_POST["h"]["ip"] = getClientIP();
+    $_SESSION["fingerprint"] = $_POST["h"];
+
+    return new ApiSuccessResponse();
+});
+
 $api->listen(); // Execute all the api logic (automaticaly handles respones)

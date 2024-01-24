@@ -11,7 +11,7 @@ let cacheId = "";
 let appShellFiles = [];
 
 const appStaticFiles = ["/assets/icons/icon.png", "/assets/icons/icon512_maskable.png", "/assets/icons/icon512_rounded.png", "/assets/misc/Nunito-VariableFont_wght.ttf"]; // Cached on install in the format: prefix + i
-const appDynamicFiles = ["/assets/pwa/index.php", "/css/reset-fonts-transitions-dialog-index-phone.css", "/js/ajax-util-index-api-transitions-bind.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
+const appDynamicFiles = ["/assets/pwa/index.php", "/css/reset-fonts-transitions-dialog-index-phone.css", "/js/ajax-util-index-api-transitions-bind-hunter.js", "/assets/manifest.json"]; // Cached on install in the format: prefix + i ?v = cacheId
 
 let allowCache = []; // Cached on first request in the format: prefix + i
 

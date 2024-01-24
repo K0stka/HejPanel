@@ -15,7 +15,7 @@ ob_start();
 
 if ($app->pageManager->isNormalRequest) { // Only for initial page load
     $app->cssManager->require("reset", "fonts", "transitions", "dialog", "index", "phone");
-    $app->jsManager->require("ajax", "util", "index", "api", "transitions", "bind");
+    $app->jsManager->require("ajax", "util", "index", "api", "transitions", "bind", "hunter");
 ?>
     <!DOCTYPE html>
     <html lang="cs">
