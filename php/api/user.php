@@ -85,6 +85,12 @@ $api->addEndpoint(Method::POST, ["h" => DataType::array], [], function () use ($
     $_POST["h"]["ip"] = getClientIP();
     $_SESSION["fingerprint"] = $_POST["h"];
 
+    $con->insert("log", [
+        "fingerprint" => json_encode($_POST["h"]),
+        "user" => $_SESSION[User::SESSION_KEY_ID] ?? MYSQL::NULL,
+        "session" => session_id()
+    ]);
+
     return new ApiSuccessResponse();
 });
 
