@@ -18,6 +18,7 @@ foreach ($userAccounts as $userAccount) {
 ?>
     <div class="panel-review auto-color" style="background-color: <?= assignColorById($groupId) ?>;">
         <div class="two-columns-grid">
+            <span style="font-weight: var(--semibold);">ID:</span><span><?= $userAccount->id ?></span>
             <span style="font-weight: var(--semibold);">Jméno:</span><span><?= $userAccount ?></span>
             <span style="font-weight: var(--semibold);">Přihlášen někde:</span><span><?= count($userSessions) == 0 ? "Ne" : "Ano" ?></span>
             <span style="font-weight: var(--semibold);">Skupina:</span><span><?= $groupId ?></span>
