@@ -47,8 +47,8 @@ $prefix =  $rootDir . $folder;
 require_once("php/classes/user.php");
 $validPagesPerUserType = [
     UserType::temp->value => ["panel", "submit", "login", "register"],
-    UserType::admin->value => ["live", "submit", "current", "review", "archive", "account", "panel"],
-    UserType::superadmin->value => ["live", "submit", "current", "review", "archive", "users", "account", "panel"]
+    UserType::admin->value => ["live", "submit", "review", "waiting", "current", "archive", "disapproved", "all", "account", "panel"],
+    UserType::superadmin->value => ["live", "submit", "review", "waiting", "current", "archive", "disapproved", "all", "users", "account", "panel"]
 ];
 
 $pageNames = array(
@@ -56,9 +56,12 @@ $pageNames = array(
     "login" => "Přihlášení",
     "register" => "Registrace",
     "live" => "Živý náhled",
-    "current" => "Momentálně viditelné",
     "review" => "Čeká na povolení",
+    "waiting" => "Čeká na zobrazení",
+    "current" => "Momentálně viditelné",
     "archive" => "Archiv panelů",
+    "disapproved" => "Zamítnuté panely",
+    "all" => "Všechny panely",
     "account" => "Účet",
     "users" => "Dočasní uživatelé"
 );

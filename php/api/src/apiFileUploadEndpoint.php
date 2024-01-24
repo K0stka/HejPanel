@@ -90,6 +90,7 @@ class ApiFileUploadEndpoint extends ApiEndpoint {
                         imagepng($image, $this->file["tmp_name"]);
                         break;
                     case FileType::webp:
+                        imagepalettetotruecolor($image);
                         imagewebp($image, $this->file["tmp_name"]);
                         break;
                     case FileType::bmp:

@@ -15,6 +15,7 @@ class PanelReview {
                     <span style="font-weight: var(--semibold);">Email:</span><span><?= $panel->mail ?? "Není uveden" ?></span>
                     <span style="font-weight: var(--semibold);">Přidáno:</span><span><?= $panel->postedAt->format(DATE_DM_FORMAT . " " . TIME_HM_FORMAT) ?></span>
                     <span style="font-weight: var(--semibold);">Vyvěsit:</span><span><?= getWeekDay($panel->showFrom) . " " . $panel->showFrom->format(DATE_DM_FORMAT) ?> - <?= getWeekDay($panel->showTill) . " " . $panel->showTill->format(DATE_DM_FORMAT) ?></span>
+                    <span style="font-weight: var(--semibold);">Povolen:</span><span><?= $panel->approved ? "Ano" : "Ne" ?></span>
                     <span style="font-weight: var(--semibold);">Viditelnost<br>přepsána:</span><span><?php switch ($panel->showOverride) {
                                                                                                             case ShowOverride::show:
                                                                                                                 echo ("Zobraz");

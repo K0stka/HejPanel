@@ -170,7 +170,7 @@ class ApiConnector {
 			fileInputElement.files.map(async (file, i) => {
 				let formdata = new FormData();
 
-				objectForEach(requestData, (key, value) => formdata.append(key, JSON.stringify(value)));
+				objectForEach(requestData, (key, value) => formdata.append(key, typeof value == "object" ? JSON.stringify(value) : value));
 
 				formdata.append(fileInputName, file);
 

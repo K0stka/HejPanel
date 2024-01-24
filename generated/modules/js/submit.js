@@ -116,6 +116,7 @@ if (submitBtn) {
 					CONTENT_API.uploadFiles(
 						{
 							fingerprint: fp,
+							mail: document.querySelector("#mail").value,
 						},
 						fileInput,
 						"file",

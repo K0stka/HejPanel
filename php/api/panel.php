@@ -25,7 +25,7 @@ $ensureAuth = new ApiEndpointCondition(function () use ($app) {
 
     if (!$app->authenticated) {
         $app->authenticated = true;
-        $app->user = User::register("Temp" . substr(strval(time()), -6), "temp" . time(), "", UserType::temp);
+        $app->user = User::register(($_POST["mail"] != "" ? $_POST["mail"] : ("Temp" . substr(strval(time()), -6))), "temp" . time(), "", UserType::temp);
         $app->user->bindToSession();
         $app->user->update("lastFingerprint", $_POST["fingerprint"]);
     }

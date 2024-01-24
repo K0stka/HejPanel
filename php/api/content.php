@@ -3,6 +3,20 @@ require_once("../conf.php");
 require_once("php/session.php");
 require_once("php/api/src/api.php");
 
+function get_safe_file_name() {
+    global $con;
+    $limit = 50;
+    $guess = time();
+    while ($limit > 0) {
+        if (empty($con->select("id", "files")->where(["file" => "content_$guess.webp"])->fetchRow())) return "content_$guess";
+
+        $guess++;
+        $limit--;
+    }
+
+    (new ApiErrorResponse("Could not generate unique file name"))->send();
+}
+
 $api = new Api(); // Initiate api instance
 
 // Create app object
@@ -23,7 +37,7 @@ $ensureAuth = new ApiEndpointCondition(function () use ($app) {
 
     if (!$app->authenticated) {
         $app->authenticated = true;
-        $app->user = User::register("Temp" . substr(strval(time()), -6), "temp" . time(), "", UserType::temp);
+        $app->user = User::register(($_POST["mail"] != "" ? $_POST["mail"] : ("Temp" . substr(strval(time()), -6))), "temp" . time(), "", UserType::temp);
         $app->user->bindToSession();
         $app->user->update("lastFingerprint", $_POST["fingerprint"]);
     }
@@ -57,8 +71,8 @@ $api->addEndpoint(Method::GET, [], [], function () use ($missingFile, $con, $app
     $response->send();
 });
 
-$api->addFileUploadEndpoint(["fingerprint" => DataType::json], [$ensureAuth], new ApiFileUploadConfiguration(
-    saveName: fn ($index, $count) => "content_" . $con->select("auto_increment", "INFORMATION_SCHEMA.TABLES")->where(["TABLE_NAME" => "files"])->fetchValue(),
+$api->addFileUploadEndpoint(["fingerprint" => DataType::json, "mail" => Type::nullableMail], [$ensureAuth], new ApiFileUploadConfiguration(
+    saveName: fn ($index, $count) => get_safe_file_name(),
     maxFileSizeMB: 20,
     allowedFileTypes: AUTOCONVERTIBLE_IMAGES,
     imageSaveAs: FileType::webp,
