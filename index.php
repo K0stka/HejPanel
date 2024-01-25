@@ -79,6 +79,8 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
 $app->cssManager->sort();
 $app->jsManager->sort();
 
+$app->jsManager->passToJs(["whitelisted" => $app->authenticated]);
+
 if ($app->pageManager->page == "panel") {
     include($app->pageManager->pagePath);
 } else {
@@ -128,7 +130,7 @@ if ($app->pageManager->page == "panel") {
         </div>
         <footer>
             <span>
-                Upozornění: Z důvodu zabránění spamu logujeme otisk Vašeho zařízení.
+                Upozornění: Z důvodu zabránění spamu logujeme otisk Vašeho zařízení a v případě narušování běhu budeme jednat.
             </span>
             <span>
                 V případě problémů/dotazů prosím kontaktujte&nbsp;<a href="mailto:kostkaj@gytool.cz">kostkaj@gytool.cz</a>

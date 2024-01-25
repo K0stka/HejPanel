@@ -62,7 +62,7 @@ class ApiConnector {
 		const API_MANAGER = this.apiManager;
 		const address = this.address;
 
-		if (API_MANAGER.apiBusy) {
+		if (API_MANAGER.apiBusy && !isNonBlocking) {
 			API_MANAGER.errorHandlers.notice.call("Tried to send a request but the API is already busy", data, this.address);
 			return;
 		}

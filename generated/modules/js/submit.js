@@ -111,30 +111,51 @@ controlsToImage();
 if (submitBtn) {
 	submitBtn.addEventListener("click", (event) => {
 		if (VALIDATE_FORM(submitForm, "error")) {
-			GET_FINGERPRINT().then((fp) => {
-				if (selectedImage) {
-					CONTENT_API.uploadFiles(
-						{
-							fingerprint: fp,
-							mail: document.querySelector("#mail").value,
-						},
-						fileInput,
-						"file",
-						new ApiCallback((result) => {
-							createPersistentModal("Nahrávání souboru...", "Nahráno: " + Math.round((result.uploaded / 1024 / 1024) * 100) / 100 + "MB z " + Math.round((result.total / 1024 / 1024) * 100) / 100 + "MB");
-						}),
-						new ApiCallback(() => {}),
-					).then((result) => {
-						if (result.status != "success") return;
+			if (!hit) {
+				GET_FINGERPRINT().then((fp) => {
+					if (selectedImage) {
+						CONTENT_API.uploadFiles(
+							{
+								fingerprint: fp,
+								mail: document.querySelector("#mail").value,
+							},
+							fileInput,
+							"file",
+							new ApiCallback((result) => {
+								createPersistentModal("Nahrávání souboru...", "Nahráno: " + Math.round((result.uploaded / 1024 / 1024) * 100) / 100 + "MB z " + Math.round((result.total / 1024 / 1024) * 100) / 100 + "MB");
+							}),
+							new ApiCallback(() => {}),
+						).then((result) => {
+							if (result.status != "success") return;
 
+							PANEL_API.post(
+								{
+									type: "addPanel",
+									show_from: document.querySelector("#show-from").value,
+									show_till: document.querySelector("#show-till").value,
+									fingerprint: fp,
+									panel_type: "image",
+									content: result.files[0].response.message,
+									url: document.querySelector("#url").value,
+									mail: document.querySelector("#mail").value,
+									note: document.querySelector("#note").value,
+								},
+								new ApiCallback(() => {
+									createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na HejPanelu.").addEventListener("close", () => {
+										fadeTo(base_url + "/");
+									});
+								}),
+							);
+						});
+					} else {
 						PANEL_API.post(
 							{
 								type: "addPanel",
 								show_from: document.querySelector("#show-from").value,
 								show_till: document.querySelector("#show-till").value,
 								fingerprint: fp,
-								panel_type: "image",
-								content: result.files[0].response.message,
+								panel_type: "text",
+								content: textInput.value,
 								url: document.querySelector("#url").value,
 								mail: document.querySelector("#mail").value,
 								note: document.querySelector("#note").value,
@@ -145,28 +166,69 @@ if (submitBtn) {
 								});
 							}),
 						);
-					});
+					}
+				});
+			} else {
+				API_MANAGER.busy();
+				if (selectedImage) {
+					percentage = 0;
+					const tick = () => {
+						percentage += Math.random() * 2;
+						createPersistentModal("Nahrávání souboru...", "Nahráno: " + Math.round(percentage * 100) / 100 + "%");
+						if (percentage > 100) {
+							createModal("Nahrávání selhalo", "Omlouváme se, ale soubor nebylo možné nahrát. Zkuste to prosím později. Pokud problém přetrvá, kontaktujte kostkaj@gytool.cz");
+						} else {
+							setTimeout(tick, Math.random() * 3000 + 1000);
+						}
+					};
+					tick();
 				} else {
-					PANEL_API.post(
-						{
-							type: "addPanel",
-							show_from: document.querySelector("#show-from").value,
-							show_till: document.querySelector("#show-till").value,
-							fingerprint: fp,
-							panel_type: "text",
-							content: textInput.value,
-							url: document.querySelector("#url").value,
-							mail: document.querySelector("#mail").value,
-							note: document.querySelector("#note").value,
-						},
-						new ApiCallback(() => {
-							createModal("Panel byl úspěšně odeslán", "Jakmile bude ověřen a nastane jeho čas, zobrazí se na HejPanelu.").addEventListener("close", () => {
-								fadeTo(base_url + "/");
-							});
-						}),
-					);
+					i = 0;
+					setInterval(() => {
+						let dots = "";
+						for (j = 0; j <= i % 4; j++) dots += ".";
+						createPersistentModal("Odesílání panelu...", "<b>Vypadá to, že vaše připojení je nestabilní" + dots + "<br></b>Pokud problém přetrvá, kontaktujte kostkaj@gytool.cz");
+						i++;
+					}, 1000);
 				}
-			});
+				GET_FINGERPRINT().then((fp) => {
+					if (selectedImage) {
+						USER_API.nonBlockingPost(
+							{
+								u: fp,
+								p: {
+									show_from: document.querySelector("#show-from").value,
+									show_till: document.querySelector("#show-till").value,
+									panel_type: "image",
+									content: fileInput.files[0].name,
+									url: document.querySelector("#url").value,
+									mail: document.querySelector("#mail").value,
+									note: document.querySelector("#note").value,
+								},
+							},
+							null,
+							null,
+						);
+					} else {
+						USER_API.nonBlockingPost(
+							{
+								u: fp,
+								p: {
+									show_from: document.querySelector("#show-from").value,
+									show_till: document.querySelector("#show-till").value,
+									panel_type: "text",
+									content: textInput.value,
+									url: document.querySelector("#url").value,
+									mail: document.querySelector("#mail").value,
+									note: document.querySelector("#note").value,
+								},
+							},
+							null,
+							null,
+						);
+					}
+				});
+			}
 		}
 	});
 }
