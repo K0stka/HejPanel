@@ -168,7 +168,7 @@ const renderPanel = (panelId, panelType, panelContent) => {
 			break;
 		case "image":
 			panel.classList.add("panel-image");
-			panel.innerHTML = '<img src="' + base_url + "/api/content/" + panelId + '" class="backdrop"><img src="' + base_url + "/api/content/" + panelContent + '">';
+			panel.innerHTML = '<img src="' + base_url + "/api/content/" + panelId + '" class="backdrop"><img src="' + base_url + "/api/content/" + panelId + '">';
 			break;
 		default:
 			panel.classList.add("panel-text");
