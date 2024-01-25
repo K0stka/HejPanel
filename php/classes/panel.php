@@ -127,13 +127,13 @@ class Panel extends MySQLtoPHPautomapper {
     /** @return Panel[] */
     public static function getDisapprovedPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE approved = FALSE AND (show_override = 'hide' OR show_override IS NULL)")->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE approved = FALSE AND (show_override = 'hide' OR show_override IS NULL)")->orderBy("id", Order::maxToMin)->fetchAll());
     }
 
     /** @return Panel[] */
     public static function getPanelsWaitingToBeDisplayed(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_from >= ", [date(MYSQL_DATETIME)], " AND approved IS TRUE AND show_override IS NULL")->fetchAll());
+        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_from >= ", [date(MYSQL_DATETIME)], " AND approved IS TRUE AND show_override IS NULL")->orderBy("show_from", Order::minToMax)->fetchAll());
     }
 
     public static function countWaitingPanels(): int {
