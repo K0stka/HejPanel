@@ -24,7 +24,7 @@ $app = new AppManager();
 $app->authenticate(User::getUser());
 
 $missingFile = new ApiFileResponse("/assets/images/missingPanel.svg", "Missing panel.svg");
-$missingFile->cacheWEtag(1, 0, true);
+// $missingFile->cacheWEtag(1, 0, true);
 
 $authenticated = new ApiEndpointCondition(function () use ($app) {
     return $app->authenticated;
