@@ -55,12 +55,13 @@ class MysqlSession implements SessionHandlerInterface {
     }
 
     public function destroy(string $id): bool {
-        $this->con->delete("sessions")->where(["session_id" => $id]);
+        $this->con->delete("sessions")->where(["session_id" => $id])->execute();
         return true;
     }
 
+    #[\ReturnTypeWillChange]
     public function gc(int $maxlifetime): bool {
-        $this->con->delete("sessions")->addSQL("WHERE expires < ", [time()]);
+        $this->con->delete("sessions")->addSQL("WHERE expires < ", [time()])->execute();
         return true;
     }
 }
