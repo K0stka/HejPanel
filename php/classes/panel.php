@@ -67,11 +67,11 @@ class Panel extends MySQLtoPHPautomapper {
         $this->complete();
     }
 
-    public function render(): string {
+    public function render(bool $lazyLoad = false): string {
         switch ($this->type) {
             case PanelType::image:
                 global $prefix;
-                return "<div class=\"panel panel-image\" id=\"panel-$this->id\"><img src=\"$prefix/api/content/$this->id\" class=\"backdrop\"><img src=\"$prefix/api/content/$this->id\"></div>";
+                return "<div class=\"panel panel-image\" id=\"panel-$this->id\"><img src=\"$prefix/api/content/$this->id\" class=\"backdrop\"" . ($lazyLoad ? " loading=\"lazy\"" : "") . "><img src=\"$prefix/api/content/$this->id\"" . ($lazyLoad ? " loading=\"lazy\"" : "") . "></div>";
             case PanelType::text:
                 return "<div class=\"panel panel-text\" id=\"panel-$this->id\">$this->content</div>";
         }

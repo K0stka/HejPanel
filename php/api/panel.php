@@ -45,7 +45,7 @@ $api->addEndpoint(
         "panel_type" => array_map(fn ($e) => $e->value, PanelType::cases()),
         "content" => DataType::string,
         "url" => Type::nullableUrl,
-        "mail" => Type::nullableMail,
+        "mail" => Type::mail,
         "note" => DataType::string
     ],
     [$ensureAuth],

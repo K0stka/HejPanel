@@ -6,7 +6,7 @@ class PanelReview {
         <div class="panel-review">
             <div class="panel-review-preview">
                 <div class="object-fit-fill" style="width:1920px;height:1080px">
-                    <?= $panel->render() ?>
+                    <?= $panel->render(true) ?>
                 </div>
             </div>
             <div>
