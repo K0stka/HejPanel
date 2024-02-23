@@ -20,6 +20,3 @@ An informative web app for Gymnázium Olomouc-Hejčín
     mklink /D C:/path/to/xampp/htdocs/HejPanel C:/path/to/HejPanel
     ```
 8. You should now be able to access HejPanel at [localhost/HejPanel](http://localhost/HejPanel)
-
-> [!IMPORTANT]  
-> The `setup.sql` file is currently incomplete. Right now, it's just enough to get to the main page. Any help to complete this file will be appreciated.
