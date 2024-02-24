@@ -13,8 +13,7 @@ An informative web app for Gymnázium Olomouc-Hejčín
     ```sh
     source C:/path/to/HejPanel/setup.sql
     ```
-6. In the `php` directory of this repo, rename `EXAMPLE.env.php` to `.env.php`
-    - The `setup.sql` file you ran in the previous step created a MySQL user `hejpanel` with the password `hejpanel` and gave them the permissions to the database `hejpanel` - these are the default values configured in `EXAMPLE.env.php`
+6. Optionally review the default configuration specified in `.env.php`
 7. Create a symlink from the location where you cloned this repo to XAMPP's htdocs/HejPanel directory
     ```cmd
     mklink /D C:/path/to/xampp/htdocs/HejPanel C:/path/to/HejPanel
