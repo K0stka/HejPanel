@@ -387,7 +387,7 @@ const clockInterval = setInterval(() => {
 	});
 
 	const seconds = now.getSeconds();
-	if (seconds % 5 === 0) {
+	if (seconds % 6 === 0) {
 		if (seconds % 20 === 0) fetchDepartures();
 		else updateDepartures();
 		toggleJidelnaDepartures();

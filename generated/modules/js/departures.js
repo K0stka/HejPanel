@@ -33,10 +33,6 @@ const departureCacheEntryFactory = (object) => {
 	departureCacheEntry.departure.scheduled = object.scheduled ?? "00:00";
 	departureCacheEntry.departure.blinking = object.blinking ?? false;
 	departureCacheEntry.departure.delay = object.delay ?? 0;
-	/**
-	 * @todo REMOVE IN PROD!!
-	 */
-	// departureCacheEntry.departure.delay = Math.round(Math.random() * 5);
 	departureCacheEntry.id = `${departureCacheEntry.departure.scheduled}-${departureCacheEntry.departure.number}-${departureCacheEntry.departure.destination}`;
 	try {
 		const [hours, minutes] = departureCacheEntry.departure.scheduled.split(":").map((e) => parseInt(e));
@@ -84,8 +80,6 @@ const updateDepartures = () => {
 	const now = new Date();
 	now.setSeconds(0);
 	const nowTime = now.getTime();
-
-	// panelDeparturesElements.ladova.forEach((e) => resetDepartureRow());
 
 	let display = 3;
 	objectForEach(departures.ladova, (key, /** @type {DepartureCacheEntry} */ d) => {
