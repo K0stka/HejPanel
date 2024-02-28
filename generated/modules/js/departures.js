@@ -116,7 +116,11 @@ const hydrateDepartureRow = (container, departureCacheEntry) => {
 	container.children[0].childNodes[0].textContent = departureCacheEntry.departure.scheduled;
 	container.children[0].querySelector("span").innerText = departureCacheEntry.departure.delay != 0 ? "+" + departureCacheEntry.departure.delay + "" : "";
 	container.children[1].innerHTML = `${
-		departureCacheEntry.departure.number.length < 3 ? `<img src="${base_url}/assets/images/dpmo.webp">` : departureCacheEntry.departure.number.length < 4 ? "🚌" : `<img src="${base_url}/assets/images/cd.webp">`
+		departureCacheEntry.departure.number.length < 3
+			? `<img src="${base_url}/assets/images/dpmo.webp">`
+			: departureCacheEntry.departure.number.length < 4
+			? `<img src="${base_url}/assets/images/bus.webp">`
+			: `<img src="${base_url}/assets/images/cd.webp">`
 	} ${departureCacheEntry.departure.number}`;
 	container.children[2].innerText = departureCacheEntry.departure.destination;
 };
