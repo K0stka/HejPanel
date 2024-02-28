@@ -246,6 +246,7 @@ button,
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	cursor: pointer;
 }
 
 button:hover,
@@ -631,12 +632,16 @@ button.non-active:hover,
 	font-size: 1.6rem;
 	transition: var(--t);
 	max-height: 100%;
---scroll-width: 0 !important;
+	--scroll-width: 0 !important;
 	position: absolute;
 	animation-timing-function: cubic-bezier(0.8, 0.01, 0.36, 0.99);
 }
 
-.hidden:is(.panel-food, .panel-departures) {opacity: 0;padding: 0;/* filter: blur(3px); */pointer-events: none;}
+.hidden:is(.panel-food, .panel-departures) {
+	opacity: 0;
+	padding: 0; /* filter: blur(3px); */
+	pointer-events: none;
+}
 
 .panel-phone-info {
 	font-size: 1.2rem;
