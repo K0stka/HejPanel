@@ -23,6 +23,10 @@ $isAdmin = new ApiEndpointCondition(function () use ($app) {
 $ensureAuth = new ApiEndpointCondition(function () use ($app) {
     $_POST["fingerprint"]["ip"] = getClientIP();
 
+    if (!isset($_POST["mail"]) || $_POST["mail"] == "null@null.null") {
+        $_POST["mail"] = "";
+    }
+
     if (!$app->authenticated) {
         $app->authenticated = true;
         $app->user = User::register(($_POST["mail"] != "" ? $_POST["mail"] : ("Temp" . substr(strval(time()), -6))), "temp" . time(), "", UserType::temp);
@@ -41,8 +45,8 @@ $api->addEndpoint(
         "type" => "addPanel",
         "show_from" => Type::date,
         "show_till" => Type::date,
-        "fingerprint" => DataType::array,
-        "panel_type" => array_map(fn ($e) => $e->value, PanelType::cases()),
+        "fingerprint" => DataType::array ,
+        "panel_type" => array_map(fn($e) => $e->value, PanelType::cases()),
         "content" => DataType::string,
         "url" => Type::nullableUrl,
         "mail" => Type::mail,
@@ -53,13 +57,15 @@ $api->addEndpoint(
         $show_from = new DateTime($_POST["show_from"]);
         $show_till = new DateTime($_POST["show_till"]);
 
-        if ($show_from > $show_till) return new ApiErrorResponse("Neplatný časový rozsah");
+        if ($show_from > $show_till)
+            return new ApiErrorResponse("Neplatný časový rozsah");
 
         switch ($panelType = PanelType::from($_POST["panel_type"])) {
             case PanelType::image:
                 $file = $con->select("id", "files")->where(["id" => $_POST["content"], "uploaded_by" => $app->user->id])->fetchRow();
 
-                if (empty($file)) return new ApiErrorResponse("Nahraný soubor nebylo možné nalézt.");
+                if (empty($file))
+                    return new ApiErrorResponse("Nahraný soubor nebylo možné nalézt.");
 
                 $_POST["content"] = $file["id"];
                 break;
@@ -98,15 +104,16 @@ $api->addEndpoint(Method::GET, ["i" => DataType::int_array], [], function () {
     global $forceReload;
 
     $panelIds = Panel::getVisiblePanelsIds();
-    if (empty($panelIds)) $panelIds = [Panel::getEmptyPanel()->id];
+    if (empty($panelIds))
+        $panelIds = [Panel::getEmptyPanel()->id];
 
-    $clientHas = array_map(fn ($e) => intval($e), $_GET["i"]);
+    $clientHas = array_map(fn($e) => intval($e), $_GET["i"]);
 
     $panelIdsToAdd = array_diff($panelIds, $clientHas);
     $panelIdsToRemove = array_diff($clientHas, $panelIds);
 
     if ($panelIdsToAdd != [-1])
-        $panelsToAdd = array_map(fn ($e) => $e->serializePanel(), Panel::getPanelsByIds($panelIdsToAdd));
+        $panelsToAdd = array_map(fn($e) => $e->serializePanel(), Panel::getPanelsByIds($panelIdsToAdd));
     else
         $panelsToAdd = [Panel::getEmptyPanel()->serializePanel()];
 

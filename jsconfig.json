@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"lib": ["WebWorker", "es2022", "DOM"],
+		// "strict": true,
+		"checkJs": true,
+		"alwaysStrict": true
+	},
+	"include": ["generated/modules/js/**/*.js", "static/pwa/serviceworker.js"]
+}

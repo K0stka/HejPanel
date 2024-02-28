@@ -145,6 +145,7 @@
 		transition: var(--t);
 		position: sticky;
 		top: 1rem;
+		z-index: 1;
 	}
 
 	body:has(.panel-info.visible) .panel-header {
@@ -178,12 +179,27 @@
 		gap: var(--normal);
 		justify-content: flex-start;
 		flex-shrink: 0;
+		padding: 0.2rem 0 !important;
 	}
 	.panel-food-row {
 		display: flex;
 		gap: var(--small);
 		flex-direction: column;
 		font-size: 1.2rem;
+	}
+	.panel-food, .panel-departures {
+		position: relative;
+		max-height: unset;
+	}
+	.panel-departures {
+		margin-top: 2rem;
+		font-size: 1.2rem;
+		max-height: unset;
+		overflow: visible;
+	}
+	.hidden:is(.panel-food, .panel-departures) {
+		opacity: 1;
+		filter: none;
 	}
 	.panel-container {
 		height: 100vh;

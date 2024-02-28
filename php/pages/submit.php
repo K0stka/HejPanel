@@ -30,10 +30,20 @@
         <div class="note">
             Na email Vás budeme kontaktovat pouze<br> pokud se vyskytne nějaký problém s Vaším panelem.
         </div>
-        <div class="input-label">
-            <label for="show-till">Email:</label>
-            <input type="string" id="mail" data-type="mail">
-        </div>
+        <?php
+        if (!$app->authenticated || $app->user->type == UserType::temp) {
+            ?>
+            <div class="input-label">
+                <label for="show-till">Email:</label>
+                <input type="string" id="mail" data-type="mail">
+            </div>
+            <?php
+        } else {
+            ?>
+            <input type="hidden" id="mail" value="null@null.null">
+            <?php
+        }
+        ?>
         <div class="input-label">
             <label for="note">Dodatečná poznámka (Nepovinné):</label>
             <textarea id="note"></textarea>

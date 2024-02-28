@@ -120,6 +120,13 @@ const panelLogoBtn = document.querySelector("#panel-logo-button");
 const panelTime = document.querySelector("#panel-time");
 const panelTimetable = document.querySelector("#panel-timetable");
 const panelJidelna = document.querySelector("#panel-jidelna");
+const panelDepartures = document.querySelector("#panel-departures");
+const panelDeparturesLadova = document.querySelector("#ladova");
+const panelDeparturesNatrati = document.querySelector("#natrati");
+const panelDeparturesElements = {
+	ladova: panelDeparturesLadova.querySelectorAll("tr"),
+	natrati: panelDeparturesNatrati.querySelectorAll("tr"),
+};
 const panelQR = document.querySelector("#panel-qr");
 const panelCTA = document.querySelector("#panel-cta");
 
@@ -297,25 +304,76 @@ const updateJidelna = (jidelna) => {
 	if (jidelna.result && jidelna.result == "error") {
 		panelJidelna.innerHTML = "<b>Nemohli jsme načíst data z jídelny 😞</b>";
 	} else {
-		panelJidelna.innerHTML = '<div class="panel-food-row"><span>Polévka:</span> ' + jidelna.X1 + '</div><div class="panel-food-row"><span>Oběd 1:</span> ' + jidelna.O1 + '</div><div class="panel-food-row"><span>Oběd 2:</span> ' + jidelna.O2 + '</div><div class="panel-food-row"><span>Oběd 3:</span> ' + jidelna.O3 + '</div><div class="panel-food-row"><span>Svačina:</span> ' + jidelna.SV + "</div>";
+		panelJidelna.innerHTML =
+			'<div class="panel-food-row"><span>Polévka:</span> ' +
+			jidelna.X1 +
+			'</div><div class="panel-food-row"><span>Oběd 1:</span> ' +
+			jidelna.O1 +
+			'</div><div class="panel-food-row"><span>Oběd 2:</span> ' +
+			jidelna.O2 +
+			'</div><div class="panel-food-row"><span>Oběd 3:</span> ' +
+			jidelna.O3 +
+			'</div><div class="panel-food-row"><span>Svačina:</span> ' +
+			jidelna.SV +
+			"</div>";
 	}
 };
 
 let updateRadialGraph = () => {
 	if (panels.length < 2) radialGraph.style.opacity = 0;
 	else radialGraph.style.opacity = 1;
-	radialGraph.style.setProperty("--value", (carouselTick / CAROUSEL_SPEED) * 2 + "%");
+	radialGraph.style.setProperty("--value", Math.round((carouselTick / CAROUSEL_SPEED) * 200) / 100 + "%");
 	requestAnimationFrame(updateRadialGraph);
 };
 requestAnimationFrame(updateRadialGraph);
 
+const smoothPanThrough = (element, duration) => {
+	if (element.scrollHeight - 10 <= element.offsetHeight) return;
+
+	const startTime = performance.now();
+	const target = element.scrollHeight - element.offsetHeight;
+
+	const easeInOutQuad = (x) => {
+		return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+	};
+
+	const animateScroll = (currentTime) => {
+		const elapsedTime = currentTime - startTime;
+
+		element.scrollTo({ top: easeInOutQuad(elapsedTime / duration) * target, behavior: "instant" });
+
+		if (elapsedTime < duration) requestAnimationFrame(animateScroll);
+	};
+
+	requestAnimationFrame(animateScroll);
+};
+
+const toggleJidelnaDepartures = () => {
+	if (panelDepartures.classList.contains("hidden")) {
+		panelJidelna.classList.add("hidden");
+
+		smoothPanThrough(panelDepartures, 5000);
+
+		panelDepartures.classList.remove("hidden");
+	} else {
+		panelDepartures.classList.add("hidden");
+
+		smoothPanThrough(panelJidelna, 5000);
+
+		panelJidelna.classList.remove("hidden");
+	}
+};
+
 // On load
 cyclePanels();
 updateJidelna(JIDELNA_PRELOAD);
+fetchDepartures();
 
 // Clock & timetable
 panelTime.innerHTML = new Date().toLocaleTimeString();
 const clockInterval = setInterval(() => {
+	if (document.hidden) return;
+
 	const now = new Date();
 	const milTime = now.getHours() * 100 + now.getMinutes();
 
@@ -327,6 +385,13 @@ const clockInterval = setInterval(() => {
 			return;
 		}
 	});
+
+	const seconds = now.getSeconds();
+	if (seconds % 5 === 0) {
+		if (seconds % 20 === 0) fetchDepartures();
+		else updateDepartures();
+		toggleJidelnaDepartures();
+	}
 }, 1000);
 
 // Carousel
@@ -519,5 +584,5 @@ window.addEventListener(
 		removeEventListener("touchstart", gestureTouchStart);
 		removeEventListener("touchmove", gestureTouchMove);
 	},
-	{ once: true },
+	{ once: true }
 );

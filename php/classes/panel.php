@@ -47,8 +47,8 @@ class Panel extends MySQLtoPHPautomapper {
         "approved_at" => ["approvedAt", StoredAs::nullableDatetime],
         "show_from" => ["showFrom", StoredAs::datetime],
         "show_till" => ["showTill", StoredAs::datetime],
-        "show_override" => ["showOverride", StoredAs::enum, "ShowOverride"],
-        "type" => ["type", StoredAs::enum, "PanelType"],
+        "show_override" => ["showOverride", StoredAs::enum , "ShowOverride"],
+        "type" => ["type", StoredAs::enum , "PanelType"],
         "content" => ["content", StoredAs::string],
         "url" => ["url", StoredAs::nullableString],
         "mail" => ["mail", StoredAs::nullableString],
@@ -62,7 +62,8 @@ class Panel extends MySQLtoPHPautomapper {
 
         parent::__construct($data);
 
-        if ($shallow || $data == false) return;
+        if ($shallow || $data == false)
+            return;
 
         $this->complete();
     }
@@ -82,8 +83,10 @@ class Panel extends MySQLtoPHPautomapper {
     }
 
     public function isVisible(): bool {
-        if ($this->showOverride == ShowOverride::show) return true;
-        if ($this->showOverride == ShowOverride::hide) return false;
+        if ($this->showOverride == ShowOverride::show)
+            return true;
+        if ($this->showOverride == ShowOverride::hide)
+            return false;
         return $this->approved && $this->showFrom <= new DateTime() && $this->showTill >= new DateTime();
     }
 
@@ -91,14 +94,15 @@ class Panel extends MySQLtoPHPautomapper {
     // Warning - Expects already pre-sanitized input
     public static function getPanelsByIds(array $ids): array {
         global $con;
-        if (empty($ids)) return [];
-        return array_map(fn ($data) => new Panel($data, true), $con->select(["id", "type", "content", "url"], "panels")->addSQL("WHERE (show_override = 'show' OR (show_override IS NULL AND approved = TRUE AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")) AND (", join(" OR ", array_map(fn ($e) => "id = " . $e, $ids)), ")")->orderBy("show_from", Order::minToMax)->fetchAll());
+        if (empty($ids))
+            return [];
+        return array_map(fn($data) => new Panel($data, true), $con->select(["id", "type", "content", "url"], "panels")->addSQL("WHERE (show_override = 'show' OR (show_override IS NULL AND approved = TRUE AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")) AND (", join(" OR ", array_map(fn($e) => "id = " . $e, $ids)), ")")->orderBy("show_from", Order::minToMax)->fetchAll());
     }
 
     /** @return Panel[] */
     public static function getVisiblePanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'show' OR (show_override IS NULL AND approved = TRUE AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")")->orderBy("show_from", Order::minToMax)->fetchAll());
+        return array_map(fn($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_override = 'show' OR (show_override IS NULL AND approved = TRUE AND show_from <= ", [date(MYSQL_DATETIME)], " AND show_till >= ", [date(MYSQL_DATETIME)], ")")->orderBy("show_from", Order::minToMax)->fetchAll());
     }
 
     public static function getVisiblePanelsIDs(): array {
@@ -109,31 +113,31 @@ class Panel extends MySQLtoPHPautomapper {
     /** @return Panel[] */
     public static function getExpiredPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE approved = TRUE AND (show_override = 'hide' OR (show_override IS NULL AND show_till <= ", [date(MYSQL_DATETIME)], "))")->orderBy("id", Order::maxToMin)->fetchAll());
+        return array_map(fn($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE approved = TRUE AND (show_override = 'hide' OR (show_override IS NULL AND show_till <= ", [date(MYSQL_DATETIME)], "))")->orderBy("id", Order::maxToMin)->fetchAll());
     }
 
     /** @return Panel[] */
     public static function getAllPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->orderBy("id", Order::maxToMin)->fetchAll());
+        return array_map(fn($data) => new Panel($data), $con->select(true, "panels")->orderBy("id", Order::maxToMin)->fetchAll());
     }
 
     /** @return Panel[] */
     public static function getWaitingPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_till >= ", [date(MYSQL_DATETIME)], " AND approved IS NULL")->fetchAll());
+        return array_map(fn($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_till >= ", [date(MYSQL_DATETIME)], " AND approved IS NULL")->fetchAll());
     }
 
     /** @return Panel[] */
     public static function getDisapprovedPanels(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE approved = FALSE AND (show_override = 'hide' OR show_override IS NULL)")->orderBy("id", Order::maxToMin)->fetchAll());
+        return array_map(fn($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE approved = FALSE AND (show_override = 'hide' OR show_override IS NULL)")->orderBy("id", Order::maxToMin)->fetchAll());
     }
 
     /** @return Panel[] */
     public static function getPanelsWaitingToBeDisplayed(): array {
         global $con;
-        return array_map(fn ($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_from >= ", [date(MYSQL_DATETIME)], " AND approved IS TRUE AND show_override IS NULL")->orderBy("show_from", Order::minToMax)->fetchAll());
+        return array_map(fn($data) => new Panel($data), $con->select(true, "panels")->addSQL("WHERE show_from >= ", [date(MYSQL_DATETIME)], " AND approved IS TRUE AND show_override IS NULL")->orderBy("show_from", Order::minToMax)->fetchAll());
     }
 
     public static function countWaitingPanels(): int {

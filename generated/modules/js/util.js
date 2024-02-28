@@ -7,6 +7,10 @@ const objectForEach = (object, callback) => {
 	Object.entries(object).forEach(([key, val]) => callback(key, val));
 };
 
+const objectSort = (object, sortFunction = (a, b) => a - b) => {
+	return Object.fromEntries(Object.entries(object).sort(([, a], [, b]) => sortFunction(a, b)));
+};
+
 HTMLCollection.prototype.forEach = Array.prototype.forEach;
 DOMTokenList.prototype.filter = Array.prototype.filter;
 NodeList.prototype.forEach = Array.prototype.forEach;

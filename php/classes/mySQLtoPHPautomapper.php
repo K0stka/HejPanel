@@ -24,9 +24,11 @@ class MySQLtoPHPautomapper {
     protected bool $updateAllOnDestroy = false;
 
     protected function __construct(&$data) {
-        if ($data == false) return;
+        if ($data == false)
+            return;
 
-        if (is_int($data)) $data = [$this->index => $data];
+        if (is_int($data))
+            $data = [$this->index => $data];
 
         foreach ($this->mapFromTo as $key => $value) {
             $this->reverseMap[$value[0]] = [$key, $value[1], $value[2] ?? null];
@@ -39,7 +41,8 @@ class MySQLtoPHPautomapper {
         foreach ($data as $PHPkey => $value) {
             $reverseMapping = $this->reverseMap[$PHPkey] ?? null;
 
-            if (!$reverseMapping) return;
+            if (!$reverseMapping)
+                return;
 
             $this->$PHPkey = self::toPHP($reverseMapping[1], $value, $reverseMapping[2] ?? null);
         }
@@ -62,9 +65,11 @@ class MySQLtoPHPautomapper {
             $missing = [];
 
             foreach ($this->mapFromTo as $mysqlKey => $mapTo)
-                if (!isset($this->{$mapTo[0]})) $missing[$mysqlKey] = $mapTo[0];
+                if (!isset($this->{$mapTo[0]}))
+                    $missing[$mysqlKey] = $mapTo[0];
 
-            if (count($missing) == 0) return;
+            if (count($missing) == 0)
+                return;
         }
 
 
@@ -78,7 +83,8 @@ class MySQLtoPHPautomapper {
         } else {
             $completeData = $this->con->select($missing, $this->tableName)->where($this->serializeToMySQLValuesAndKeys())->fetchAll();
 
-            if (empty($completeData) || count($completeData) > 1) throw new Exception("Cannot complete object using auto detect");
+            if (empty($completeData) || count($completeData) > 1)
+                throw new Exception("Cannot complete object using auto detect");
 
             $completeData = $completeData[0];
         }
@@ -87,18 +93,21 @@ class MySQLtoPHPautomapper {
     }
 
     public function updateAll() {
-        if (!isset($this->{$this->index})) $this->complete($this->index);
+        if (!isset($this->{$this->index}))
+            $this->complete($this->index);
 
         $this->con->update($this->tableName, $this->serializeToMySQLValuesAndKeys())->where([$this->index => $this->{$this->index}])->execute();
     }
 
     public function delete() {
-        if (!isset($this->{$this->index})) $this->complete($this->index);
+        if (!isset($this->{$this->index}))
+            $this->complete($this->index);
         $this->con->delete(self::$tableName)->where([$this->index => $this->{$this->index}])->execute();
     }
 
     public function get($name) {
-        if (!isset($this->$name) && isset($this->reverseMap[$name])) $this->complete($name);
+        if (!isset($this->$name) && isset($this->reverseMap[$name]))
+            $this->complete($name);
 
         return $this->$name ?? null;
     }
@@ -114,7 +123,8 @@ class MySQLtoPHPautomapper {
     }
 
     public function __destruct() {
-        if (!$this->updateAllOnDestroy) return;
+        if (!$this->updateAllOnDestroy)
+            return;
 
         $this->updateAll();
     }
