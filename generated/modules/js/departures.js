@@ -48,6 +48,8 @@ const fetchDepartures = () => {
 	fetch("https://hejpanel-departures.102.nedomovi.net/")
 		.then((response) => response.json())
 		.then((data) => {
+			panelJidelna.classList.remove("departuresDisabled");
+			panelDepartures.classList.remove("departuresDisabled");
 			data.ladova?.forEach((departure) => {
 				const departureCacheEntry = departureCacheEntryFactory(departure);
 				if (departures.ladova[departureCacheEntry.id]) {
@@ -73,6 +75,10 @@ const fetchDepartures = () => {
 			});
 			departures.natrati = objectSort(departures.natrati, (a, b) => a.departing.getTime() - b.departing.getTime());
 			updateDepartures();
+		})
+		.catch(() => {
+			panelJidelna.classList.add("departuresDisabled");
+			panelDepartures.classList.add("departuresDisabled");
 		});
 };
 

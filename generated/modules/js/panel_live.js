@@ -377,18 +377,18 @@ const clockInterval = setInterval(() => {
 	const now = new Date();
 	const milTime = now.getHours() * 100 + now.getMinutes();
 
-	panelTime.innerHTML = now.toLocaleTimeString();
-	panelTimetable.innerHTML = "";
+	panelTime.innerText = now.toLocaleTimeString();
+	panelTimetable.innerText = "";
 	timetable.forEach((event) => {
 		if (event.from_milTime <= milTime && event.to_milTime > milTime) {
-			panelTimetable.innerHTML = event.type + " (" + event.from_time + " - " + event.to_time + ")";
+			panelTimetable.innerText = event.type + " (" + event.from_time + " - " + event.to_time + ")";
 			return;
 		}
 	});
 
 	const seconds = now.getSeconds();
 	if (seconds % 6 === 0) {
-		if (seconds % 18 === 0) fetchDepartures();
+		if (seconds % 30 === 0) fetchDepartures();
 		else updateDepartures();
 		toggleJidelnaDepartures();
 	}

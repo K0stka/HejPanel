@@ -637,7 +637,8 @@ button.non-active:hover,
 	animation-timing-function: cubic-bezier(0.8, 0.01, 0.36, 0.99);
 }
 
-.hidden:is(.panel-food, .panel-departures) {
+.hidden:is(.panel-food:not(.departuresDisabled), .panel-departures),
+.panel-departures.departuresDisabled {
 	opacity: 0;
 	padding: 0; /* filter: blur(3px); */
 	pointer-events: none;
