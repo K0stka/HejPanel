@@ -6,6 +6,14 @@
     </div>
     <form id="submit-form">
         <div class="note">
+            Upozornění:<br>
+            Zjistili jsme, že z důvodu toho, že Apple neimplementuje<br>
+            možnost registrovat kliknutí, nefunguje odesílání na<br>
+            iPhone a iPad. Zatímco hledáme alternativní řešení,<br>
+            využíjte prosím jiné zařízení.<br>
+            Za způsobené komplikace se omlouváme.
+        </div>
+        <div class="note">
             V případě vysokého množství panelů je možné,<br>
             že Váš panel nebude zobrazen po celou dobu, co zadáte.<br>
             Doporučená doba zobrazení je týden.
