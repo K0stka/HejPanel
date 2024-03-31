@@ -400,7 +400,17 @@ const VALIDATE_FORM = (element, addClass = null) => {
 };
 
 const GET_FINGERPRINT = async () => {
-	return navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
+	try {
+		return navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
+	} catch (e) {
+		return {
+			architecture: "most likely an iPhone",
+			model: "??",
+			platform: "??",
+			platformVersion: "??",
+			mobile: true
+		};
+	}
 };
 
 const API_MANAGER = new ApiManager(new ApiCallback((result, data, address) => createModal("Požadavek byl úspěšně vykonnán", "")), {
