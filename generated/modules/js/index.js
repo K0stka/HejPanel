@@ -93,7 +93,7 @@ const onReady = () => {
 		e.style.color = L > 0.179 ? "var(--text)" : "var(--background)";
 	});
 
-	document.querySelectorAll("a").forEach((e) => {
+	document.querySelectorAll("a:not([normal])").forEach((e) => {
 		e.onclick = (event) => {
 			navigate(e.href);
 			event.preventDefault();
@@ -102,7 +102,14 @@ const onReady = () => {
 
 	document.querySelectorAll("*[safe-href]").forEach((e) => {
 		e.onclick = (event) => {
-			createModal("Pozor, klikáte na potencionálně nebezpečný odkaz", "Odkaz, na který Vás přesměrujeme nepochází od autora stránky, pokračujete na vlastní nebezpečí.<br>URL: <b>" + e.getAttribute("safe-href") + "</b><br><br><button onclick=\"fadeTo('" + e.getAttribute("safe-href") + "');\">Pokračovat</button>");
+			createModal(
+				"Pozor, klikáte na potencionálně nebezpečný odkaz",
+				"Odkaz, na který Vás přesměrujeme nepochází od autora stránky, pokračujete na vlastní nebezpečí.<br>URL: <b>" +
+					e.getAttribute("safe-href") +
+					"</b><br><br><button onclick=\"fadeTo('" +
+					e.getAttribute("safe-href") +
+					"');\">Pokračovat</button>"
+			);
 			event.preventDefault();
 		};
 	});

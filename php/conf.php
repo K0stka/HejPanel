@@ -16,8 +16,8 @@ set_include_path(PREFIX);
 define("DEV", (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVER_NAME'], -13) == "192.168.137.1"));
 
 // Include dependencies
-require_once(".env.php");
-require_once("php/fx.php");
+require_once (".env.php");
+require_once ("php/fx.php");
 
 // Environmental settings
 if (DEV) {
@@ -41,12 +41,12 @@ if (DEV) {
 
 $forceReload = 0;
 
-$prefix =  $rootDir . $folder;
+$prefix = $rootDir . $folder;
 
 // Router settings
-require_once("php/classes/user.php");
+require_once ("php/classes/user.php");
 $validPagesPerUserType = [
-    UserType::temp->value => ["panel", "submit", "login", "register"],
+    UserType::temp->value => ["panel", "submit", "login", "register", "download"],
     UserType::admin->value => ["live", "submit", "review", "waiting", "current", "archive", "disapproved", "all", "account", "panel"],
     UserType::superadmin->value => ["live", "submit", "review", "waiting", "current", "archive", "disapproved", "all", "users", "account", "panel"]
 ];
@@ -63,7 +63,8 @@ $pageNames = array(
     "disapproved" => "Zamítnuté panely",
     "all" => "Všechny panely",
     "account" => "Účet",
-    "users" => "Dočasní uživatelé"
+    "users" => "Dočasní uživatelé",
+    "download" => "Panely ke stažení"
 );
 
 

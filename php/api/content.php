@@ -1,7 +1,7 @@
 <?php
-require_once("../conf.php");
-require_once("php/session.php");
-require_once("php/api/src/api.php");
+require_once ("../conf.php");
+require_once ("php/session.php");
+require_once ("php/api/src/api.php");
 
 function get_safe_file_name() {
     global $con;
@@ -36,7 +36,7 @@ $ensureAuth = new ApiEndpointCondition(function () use ($app) {
 
     $_POST["fingerprint"]["ip"] = getClientIP();
 
-    if (!isset($_POST["mail"]) || $_POST["mail"] == "null@null.null") {
+    if (!isset ($_POST["mail"]) || $_POST["mail"] == "null@null.null") {
         $_POST["mail"] = "";
     }
 
@@ -53,7 +53,7 @@ $ensureAuth = new ApiEndpointCondition(function () use ($app) {
 }, new ApiErrorResponse(""));
 
 $api->addEndpoint(Method::GET, [], [], function () use ($missingFile, $con, $app) {
-    if (empty($_GET) || count($_GET) > 1 || $_GET[array_key_first($_GET)] != "")
+    if (empty ($_GET) || count($_GET) > 1 || $_GET[array_key_first($_GET)] != "")
         return $missingFile;
 
     $id = array_key_first($_GET);
