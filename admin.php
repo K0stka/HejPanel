@@ -60,6 +60,8 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
         $app->cssManager->fetch();
         $app->jsManager->fetch();
         ?>
+        
+        <script defer src="https://logs.krychlic.com/script.js" data-website-id="7a923501-0597-4355-805e-90ed5bcb9005" data-tag="admin"></script>
     </head>
 
     <body>

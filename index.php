@@ -21,6 +21,8 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
     <html lang="cs">
 
     <head>
+        <script defer src="https://logs.krychlic.com/script.js" id="analytics-src" data-website-id="7a923501-0597-4355-805e-90ed5bcb9005"></script>
+
         <script>
             const base_url = "<?= $prefix ?>";
             const PUBLIC_KEY = "<?= PUBLIC_KEY ?>";
@@ -49,6 +51,10 @@ if ($app->pageManager->isNormalRequest) { // Only for initial page load
             <?php
             }
             ?>
+
+            document.querySelector("#analytics-src").addEventListener("load", () => {
+                umami.identify('<?=session_id()?>', { name: '<?= escape($app->user?->name ?? "Anonymous") ?>' });
+            });
         </script>
 
         <title><?= $app->pageManager->pageTitle ?></title>
