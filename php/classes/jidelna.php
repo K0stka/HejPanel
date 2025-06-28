@@ -24,7 +24,7 @@ class Jidelna {
         curl_setopt($ch, CURLOPT_URL, "https://app.strava.cz/api/jidelnicky");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, '{"cislo":"1692"}');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, '{"cislo":"1692","s5url":"https://wss5.strava.cz/WSStravne5/WSStravne5.svc"}');
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/plain'));
         $result = curl_exec($ch);
 

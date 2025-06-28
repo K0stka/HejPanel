@@ -5,10 +5,10 @@ class MysqlSession implements SessionHandlerInterface {
 
     // PHP Key => MySQL Key
     private array $saveSeparately = [
-        User::SESSION_KEY_ID => "user",
+        User::SESSION_KEY_ID   => "user",
         User::SESSION_KEY_AUTH => "auth",
-        "subscription" => "subscription",
-        "fingerprint" => "fingerprint",
+        "subscription"         => "subscription",
+        "fingerprint"          => "fingerprint",
     ];
 
     public function __construct(int $lifetime) {
@@ -76,8 +76,8 @@ ini_set("session.use_strict_mode", 1);
 session_set_cookie_params([
     "lifetime" => $lifetime,
     // "domain" => $rootDir, // Breaks because browsers do not thing it's the correct address?
-    "path" => "/",
-    "secure" => true, // Breaks if using localhost over IP (or anything without HTTPS)
+    "path"     => "/",
+    // "secure" => true, // Breaks if using localhost over IP (or anything without HTTPS)
     "httponly" => true,
 ]);
 

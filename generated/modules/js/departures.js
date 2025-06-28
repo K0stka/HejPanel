@@ -45,7 +45,7 @@ const departureCacheEntryFactory = (object) => {
 };
 
 const fetchDepartures = () => {
-	fetch("https://hejpanel-departures.102.nedomovi.net/")
+	fetch("https://hejpanel-departures.nedomovi.net/")
 		.then((response) => response.json())
 		.then((data) => {
 			panelJidelna.classList.remove("departuresDisabled");

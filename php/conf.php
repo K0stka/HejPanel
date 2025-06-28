@@ -13,14 +13,16 @@ define("MYSQL_DATETIME", "Y-m-d H:i:s");
 // Define side-wide constants
 define('PREFIX', str_replace(["php\conf.php", "php/conf.php"], '', __FILE__));
 set_include_path(PREFIX);
+
 define("DEV", (substr($_SERVER['SERVER_NAME'], -9) == "localhost" || substr($_SERVER['SERVER_NAME'], -13) == "192.168.137.1"));
+//const DEV = true;
 
 // Include dependencies
-require_once (".env.php");
-require_once ("php/fx.php");
+require_once(".env.php");
+require_once("php/fx.php");
 
 // Environmental settings
-if (DEV) {
+if (DEV && false) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
 
@@ -29,42 +31,42 @@ if (DEV) {
     $v = "?v=0";
 
     $rootDir = (substr($_SERVER['SERVER_NAME'], -9) == "localhost" ? "http://localhost/" : "http://192.168.137.1/");
-    $folder = "HejPanel";
+    $folder  = "HejPanel";
 } else {
     define("SERVICE_WORKER_ENABLED", true);
 
-    $v = "?v=1";
+    $v = "?v=3";
 
-    $rootDir = "https://krychlic.com/";
-    $folder = "hejpanel";
+    $rootDir = "https://hejpanel.krychlic.com";
+    $folder  = "";
 }
 
-$forceReload = 0;
+$forceReload = 10;
 
 $prefix = $rootDir . $folder;
 
 // Router settings
-require_once ("php/classes/user.php");
+require_once("php/classes/user.php");
 $validPagesPerUserType = [
-    UserType::temp->value => ["panel", "submit", "login", "register", "download"],
-    UserType::admin->value => ["live", "submit", "review", "waiting", "current", "archive", "disapproved", "all", "account", "panel"],
+    UserType::temp->value       => ["panel", "submit", "login", "register", "download"],
+    UserType::admin->value      => ["live", "submit", "review", "waiting", "current", "archive", "disapproved", "all", "account", "panel"],
     UserType::superadmin->value => ["live", "submit", "review", "waiting", "current", "archive", "disapproved", "all", "users", "account", "panel"]
 ];
 
 $pageNames = array(
-    "submit" => "Přidat panel",
-    "login" => "Přihlášení",
-    "register" => "Registrace",
-    "live" => "Živý náhled",
-    "review" => "Čeká na povolení",
-    "waiting" => "Čeká na zobrazení",
-    "current" => "Momentálně viditelné",
-    "archive" => "Archiv panelů",
+    "submit"      => "Přidat panel",
+    "login"       => "Přihlášení",
+    "register"    => "Registrace",
+    "live"        => "Živý náhled",
+    "review"      => "Čeká na povolení",
+    "waiting"     => "Čeká na zobrazení",
+    "current"     => "Momentálně viditelné",
+    "archive"     => "Archiv panelů",
     "disapproved" => "Zamítnuté panely",
-    "all" => "Všechny panely",
-    "account" => "Účet",
-    "users" => "Dočasní uživatelé",
-    "download" => "Panely ke stažení"
+    "all"         => "Všechny panely",
+    "account"     => "Účet",
+    "users"       => "Dočasní uživatelé",
+    "download"    => "Panely ke stažení"
 );
 
 
