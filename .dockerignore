@@ -1,0 +1,8 @@
+.git
+.github
+.vscode
+vendor/
+uploads/
+generated/packages/
+*.sql
+*.md
