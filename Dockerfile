@@ -1,4 +1,4 @@
-FROM php:8.3-apache-bookworm
+FROM php:8.3.36-apache-bookworm
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libavif-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libonig-dev unzip \
